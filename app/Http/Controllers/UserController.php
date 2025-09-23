@@ -15,20 +15,14 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $query = User::query();
-
-        // Search functionality
-        if ($request->has('search') && $request->search) {
-            $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('email', 'like', '%' . $request->search . '%');
-            });
-        }
+        // Search functionality and build query
+        $search = (string)$request->get('search', '');
+        $query = User::search($search);
 
         // Sorting
         $sortField = $request->get('sort', 'created_at');
         $sortDirection = $request->get('direction', 'desc');
-        
+
         $allowedSorts = ['name', 'email', 'created_at', 'email_verified_at'];
         if (in_array($sortField, $allowedSorts)) {
             $query->orderBy($sortField, $sortDirection);

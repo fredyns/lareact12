@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Traits\Searchable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -25,6 +26,7 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable;
     use HasUuids;
+    use Searchable;
 
     /**
      * The attributes that are mass assignable.
@@ -35,6 +37,16 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+    ];
+
+    /**
+     * The attributes that are searchable from a single keyword.
+     *
+     * @var list<string>
+     */
+    protected $searchableFields = [
+        'name',
+        'email',
     ];
 
     /**
