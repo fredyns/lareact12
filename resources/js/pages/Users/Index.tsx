@@ -189,7 +189,7 @@ export default function UsersIndex({ users, filters }: Props) {
                                             <th className="h-12 px-4 text-left align-middle font-medium">
                                                 Status
                                             </th>
-                                            <th className="h-12 px-4 text-left align-middle font-medium">
+                                            <th className="h-12 px-4 text-left align-middle font-medium hidden sm:table-cell">
                                                 <Button
                                                     variant="ghost"
                                                     onClick={() => handleSort('created_at')}
@@ -225,7 +225,7 @@ export default function UsersIndex({ users, filters }: Props) {
                                                         {user.email_verified_at ? "Verified" : "Unverified"}
                                                     </Badge>
                                                 </td>
-                                                <td className="p-4 align-middle">
+                                                <td className="p-4 align-middle hidden sm:table-cell">
                                                     <div className="text-sm text-muted-foreground">
                                                         {formatDate(user.created_at)}
                                                     </div>
