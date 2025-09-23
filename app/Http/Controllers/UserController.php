@@ -15,6 +15,8 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('viewAny', User::class);
+
         // Search functionality and build query
         $search = (string)$request->get('search', '');
         $query = User::search($search);
@@ -45,6 +47,8 @@ class UserController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', User::class);
+        
         return Inertia::render('Users/Create');
     }
 
@@ -53,6 +57,8 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', User::class);
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -74,6 +80,8 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
+        $this->authorize('view', $user);
+        
         return Inertia::render('Users/Show', [
             'user' => $user->only(['id', 'name', 'email', 'email_verified_at', 'created_at', 'updated_at']),
         ]);
@@ -84,6 +92,8 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
+        $this->authorize('update', $user);
+        
         return Inertia::render('Users/Edit', [
             'user' => $user->only(['id', 'name', 'email', 'email_verified_at']),
         ]);
@@ -94,6 +104,8 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
+        $this->authorize('update', $user);
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
@@ -121,11 +133,7 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        // Prevent deletion of the current authenticated user
-        if ($user->id === auth()->id()) {
-            return redirect()->route('users.index')
-                ->with('error', 'You cannot delete your own account.');
-        }
+        $this->authorize('delete', $user);
 
         $user->delete();
 

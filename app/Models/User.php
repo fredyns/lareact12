@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * This is the model class for table "users".
@@ -27,6 +28,7 @@ class User extends Authenticatable
     use HasFactory, Notifiable, TwoFactorAuthenticatable;
     use HasUuids;
     use Searchable;
+    use HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -58,6 +60,13 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    /**
+     * The guard name for spatie/permission package.
+     * 
+     * @var string
+     */
+    protected string $guard_name = 'web';
 
     /**
      * Get the attributes that should be cast.
