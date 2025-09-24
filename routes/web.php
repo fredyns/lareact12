@@ -17,6 +17,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // User Management Routes
     Route::resource('users', UserController::class);
+    
+    // User Role Management Routes
+    Route::post('users/{user}/roles', [UserController::class, 'addRole'])->name('users.roles.add');
+    Route::delete('users/{user}/roles/{role}', [UserController::class, 'removeRole'])->name('users.roles.remove');
 
     // RBAC Routes with prefix and namespace
     Route::prefix('rbac')->name('rbac.')->group(function () {

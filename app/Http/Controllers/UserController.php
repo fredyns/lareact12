@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -82,8 +83,24 @@ class UserController extends Controller
     {
         $this->authorize('view', $user);
         
+        // Get all roles in the system
+        $allRoles = Role::all();
+        
         return Inertia::render('Users/Show', [
             'user' => $user->only(['id', 'name', 'email', 'email_verified_at', 'created_at', 'updated_at']),
+            'userRoles' => $user->roles->map(function($role) {
+                return [
+                    'id' => $role->id,
+                    'name' => $role->name,
+                ];
+            }),
+            'allRoles' => $allRoles->map(function($role) use ($user) {
+                return [
+                    'id' => $role->id,
+                    'name' => $role->name,
+                    'assigned' => $user->hasRole($role),
+                ];
+            }),
         ]);
     }
 
@@ -139,5 +156,43 @@ class UserController extends Controller
 
         return redirect()->route('users.index')
             ->with('success', 'User deleted successfully.');
+    }
+
+    /**
+     * Add a role to the specified user.
+     */
+    public function addRole(Request $request, User $user)
+    {
+        $this->authorize('update', $user);
+        
+        $validated = $request->validate([
+            'role_id' => 'required|exists:roles,id',
+        ]);
+        
+        $role = Role::findById($validated['role_id']);
+        
+        if (!$user->hasRole($role)) {
+            $user->assignRole($role);
+            return back()->with('success', "Role '{$role->name}' assigned successfully.");
+        }
+        
+        return back()->with('info', "User already has the role '{$role->name}'.");
+    }
+
+    /**
+     * Remove a role from the specified user.
+     */
+    public function removeRole(User $user, $roleId)
+    {
+        $this->authorize('update', $user);
+        
+        $role = Role::findById($roleId);
+        
+        if ($user->hasRole($role)) {
+            $user->removeRole($role);
+            return back()->with('success', "Role '{$role->name}' removed successfully.");
+        }
+        
+        return back()->with('info', "User doesn't have the role '{$role->name}'.");
     }
 }
