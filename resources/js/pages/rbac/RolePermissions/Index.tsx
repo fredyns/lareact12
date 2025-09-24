@@ -1,26 +1,30 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import { route } from 'ziggy-js';
+import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
-import { Plus, Search, Trash2, ArrowUpDown } from 'lucide-react';
-import AuthenticatedLayout from '@/layouts/app-layout';
+    Search,
+    Plus,
+    MoreHorizontal,
+    Eye,
+    Edit,
+    Trash2,
+    ArrowUpDown,
+    ArrowUp,
+    ArrowDown,
+    X
+} from 'lucide-react';
+import { type BreadcrumbItem } from '@/types';
 
 interface Role {
     id: string;
@@ -41,17 +45,19 @@ interface RolePermission {
     created_at: string;
 }
 
+interface PaginationLink {
+    url: string | null;
+    label: string;
+    active: boolean;
+}
+
 interface PaginatedRolePermissions {
     data: RolePermission[];
     current_page: number;
     last_page: number;
     per_page: number;
     total: number;
-    links: Array<{
-        url: string | null;
-        label: string;
-        active: boolean;
-    }>;
+    links: PaginationLink[];
 }
 
 interface Props {
@@ -63,12 +69,28 @@ interface Props {
     };
 }
 
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Dashboard',
+        href: route('dashboard'),
+    },
+    {
+        title: 'Role Permissions',
+        href: route('rbac.role-permissions.index'),
+    },
+];
+
 export default function RolePermissionsIndex({ rolePermissions, filters }: Props) {
-    const [search, setSearch] = React.useState(filters.search || '');
+    const [search, setSearch] = useState(filters.search || '');
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         router.get(route('rbac.role-permissions.index'), { search }, { preserveState: true });
+    };
+
+    const handleClearSearch = () => {
+        setSearch('');
+        router.get(route('rbac.role-permissions.index'), {}, { preserveState: true });
     };
 
     const handleSort = (field: string) => {
@@ -86,14 +108,29 @@ export default function RolePermissionsIndex({ rolePermissions, filters }: Props
         }
     };
 
+    const getSortIcon = (field: string) => {
+        if (filters.sort !== field) return <ArrowUpDown className="h-4 w-4" />;
+        return filters.direction === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />;
+    };
+
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+    };
+
     return (
-        <AuthenticatedLayout>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Role Permissions" />
-            
-            <div className="space-y-6">
+
+            <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Role Permissions</h1>
+                        <h1 className="text-2xl font-bold tracking-tight">Role Permissions</h1>
                         <p className="text-muted-foreground">
                             Manage permission assignments for roles
                         </p>
@@ -108,112 +145,152 @@ export default function RolePermissionsIndex({ rolePermissions, filters }: Props
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Role Permission Assignments</CardTitle>
-                        <CardDescription>
-                            A list of all permission assignments for roles in the system.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="flex items-center space-x-2 mb-4">
-                            <form onSubmit={handleSearch} className="flex items-center space-x-2 flex-1">
-                                <div className="relative flex-1 max-w-sm">
+                        <CardTitle>Role Permission Management</CardTitle>
+                        <div className="flex items-center space-x-2">
+                            <form onSubmit={handleSearch} className="flex items-center space-x-2">
+                                <div className="relative">
                                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                                     <Input
                                         placeholder="Search roles or permissions..."
                                         value={search}
                                         onChange={(e) => setSearch(e.target.value)}
-                                        className="pl-8"
+                                        className="pl-8 pr-8"
                                     />
+                                    {search && (
+                                        <button
+                                            type="button"
+                                            onClick={handleClearSearch}
+                                            className="absolute right-2 top-2.5 h-4 w-4 text-muted-foreground hover:text-foreground"
+                                        >
+                                            <X className="h-4 w-4" />
+                                        </button>
+                                    )}
                                 </div>
                                 <Button type="submit" variant="outline">
                                     Search
                                 </Button>
                             </form>
                         </div>
-
+                    </CardHeader>
+                    <CardContent>
                         <div className="rounded-md border">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Role</TableHead>
-                                        <TableHead>Role Guard</TableHead>
-                                        <TableHead>Permission</TableHead>
-                                        <TableHead>Permission Guard</TableHead>
-                                        <TableHead>
-                                            <Button
-                                                variant="ghost"
-                                                onClick={() => handleSort('created_at')}
-                                                className="h-auto p-0 font-semibold"
-                                            >
-                                                Assigned
-                                                <ArrowUpDown className="ml-2 h-4 w-4" />
-                                            </Button>
-                                        </TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {rolePermissions.data.length === 0 ? (
-                                        <TableRow>
-                                            <TableCell colSpan={6} className="text-center py-8">
-                                                <div className="text-muted-foreground">
-                                                    No role permission assignments found.
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : (
-                                        rolePermissions.data.map((rolePermission) => (
-                                            <TableRow key={rolePermission.id}>
-                                                <TableCell className="font-medium">
-                                                    <Badge variant="secondary">
-                                                        {rolePermission.role.name}
-                                                    </Badge>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Badge variant="outline">
-                                                        {rolePermission.role.guard_name}
-                                                    </Badge>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Badge variant="secondary">
-                                                        {rolePermission.permission.name}
-                                                    </Badge>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Badge variant="outline">
-                                                        {rolePermission.permission.guard_name}
-                                                    </Badge>
-                                                </TableCell>
-                                                <TableCell>
-                                                    {new Date(rolePermission.created_at).toLocaleDateString()}
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    <div className="flex items-center justify-end space-x-2">
-                                                        <Link href={route('rbac.role-permissions.show', rolePermission.id)}>
-                                                            <Button variant="outline" size="sm">
-                                                                View
-                                                            </Button>
-                                                        </Link>
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            onClick={() => handleDelete(rolePermission)}
-                                                            className="text-destructive hover:text-destructive"
-                                                        >
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
+                            <div className="overflow-x-auto">
+                                <table className="w-full">
+                                    <thead>
+                                        <tr className="border-b bg-muted/50">
+                                            <th className="h-12 px-4 text-left align-middle font-medium w-16">
+                                                #
+                                            </th>
+                                            <th className="h-12 px-4 text-left align-middle font-medium">
+                                                Role
+                                            </th>
+                                            <th className="h-12 px-4 text-left align-middle font-medium">
+                                                Role Guard
+                                            </th>
+                                            <th className="h-12 px-4 text-left align-middle font-medium">
+                                                Permission
+                                            </th>
+                                            <th className="h-12 px-4 text-left align-middle font-medium">
+                                                Permission Guard
+                                            </th>
+                                            <th className="h-12 px-4 text-left align-middle font-medium hidden sm:table-cell">
+                                                <Button
+                                                    variant="ghost"
+                                                    onClick={() => handleSort('created_at')}
+                                                    className="h-auto p-0 font-medium"
+                                                >
+                                                    Assigned
+                                                    {getSortIcon('created_at')}
+                                                </Button>
+                                            </th>
+                                            <th className="h-12 px-4 text-right align-middle font-medium">
+                                                Actions
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {rolePermissions.data.length === 0 ? (
+                                            <tr className="border-b">
+                                                <td colSpan={7} className="p-4 text-center">
+                                                    <div className="text-muted-foreground">
+                                                        No role permission assignments found.
                                                     </div>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))
-                                    )}
-                                </TableBody>
-                            </Table>
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            rolePermissions.data.map((rolePermission, index) => (
+                                                <tr key={rolePermission.id} className="border-b">
+                                                    <td className="p-4 align-middle">
+                                                        <div className="text-sm text-muted-foreground font-mono">
+                                                            {((rolePermissions.current_page - 1) * rolePermissions.per_page) + index + 1}
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-4 align-middle">
+                                                        <Badge variant="secondary">
+                                                            {rolePermission.role.name}
+                                                        </Badge>
+                                                    </td>
+                                                    <td className="p-4 align-middle">
+                                                        <Badge variant="outline">
+                                                            {rolePermission.role.guard_name}
+                                                        </Badge>
+                                                    </td>
+                                                    <td className="p-4 align-middle">
+                                                        <Badge variant="secondary">
+                                                            {rolePermission.permission.name}
+                                                        </Badge>
+                                                    </td>
+                                                    <td className="p-4 align-middle">
+                                                        <Badge variant="outline">
+                                                            {rolePermission.permission.guard_name}
+                                                        </Badge>
+                                                    </td>
+                                                    <td className="p-4 align-middle hidden sm:table-cell">
+                                                        <div className="text-sm text-muted-foreground">
+                                                            {formatDate(rolePermission.created_at)}
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-4 align-middle text-right">
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                                                    <MoreHorizontal className="h-4 w-4" />
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end">
+                                                                <DropdownMenuItem asChild>
+                                                                    <Link href={route('rbac.role-permissions.show', rolePermission.id)}>
+                                                                        <Eye className="mr-2 h-4 w-4" />
+                                                                        View
+                                                                    </Link>
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem asChild>
+                                                                    <Link href={route('rbac.role-permissions.edit', rolePermission.role.id)}>
+                                                                        <Edit className="mr-2 h-4 w-4" />
+                                                                        Edit
+                                                                    </Link>
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem
+                                                                    onClick={() => handleDelete(rolePermission)}
+                                                                    className="text-destructive"
+                                                                >
+                                                                    <Trash2 className="mr-2 h-4 w-4" />
+                                                                    Delete
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
 
                         {/* Pagination */}
                         {rolePermissions.last_page > 1 && (
-                            <div className="flex items-center justify-between mt-4">
+                            <div className="flex items-center justify-between space-x-2 py-4">
                                 <div className="text-sm text-muted-foreground">
                                     Showing {((rolePermissions.current_page - 1) * rolePermissions.per_page) + 1} to{' '}
                                     {Math.min(rolePermissions.current_page * rolePermissions.per_page, rolePermissions.total)} of{' '}
@@ -225,8 +302,8 @@ export default function RolePermissionsIndex({ rolePermissions, filters }: Props
                                             key={index}
                                             variant={link.active ? "default" : "outline"}
                                             size="sm"
-                                            disabled={!link.url}
                                             onClick={() => link.url && router.get(link.url)}
+                                            disabled={!link.url}
                                             dangerouslySetInnerHTML={{ __html: link.label }}
                                         />
                                     ))}
@@ -236,6 +313,6 @@ export default function RolePermissionsIndex({ rolePermissions, filters }: Props
                     </CardContent>
                 </Card>
             </div>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }
