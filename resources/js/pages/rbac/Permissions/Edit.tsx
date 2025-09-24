@@ -35,35 +35,55 @@ export default function EditPermission({ permission }: Props) {
         put(route('rbac.permissions.update', permission.id));
     };
 
+    interface BreadcrumbItem {
+        title: string;
+        href: string;
+    }
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Dashboard',
+            href: route('dashboard'),
+        },
+        {
+            title: 'Permissions',
+            href: route('rbac.permissions.index'),
+        },
+        {
+            title: 'Edit Permission',
+            href: '#',
+        },
+    ];
+
     return (
-        <AuthenticatedLayout>
+        <AuthenticatedLayout breadcrumbs={breadcrumbs}>
             <Head title={`Edit Permission: ${permission.name}`} />
-            
-            <div className="space-y-6">
-                <div className="flex items-center space-x-4">
-                    <Link href={route('rbac.permissions.index')}>
-                        <Button variant="outline" size="sm">
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Back to Permissions
-                        </Button>
-                    </Link>
+
+            <div className="flex h-full flex-1 flex-col gap-4 p-4">
+                <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Edit Permission</h1>
+                        <h1 className="text-2xl font-bold tracking-tight">Edit Permission</h1>
                         <p className="text-muted-foreground">
                             Update permission details
                         </p>
                     </div>
+                    <Link href={route('rbac.permissions.index')}>
+                        <Button variant="outline">
+                            <ArrowLeft className="mr-2 h-4 w-4" />
+                            Back to Permissions
+                        </Button>
+                    </Link>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Permission Details</CardTitle>
-                            <CardDescription>
-                                Update the basic information for this permission.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
+                <Card className="max-w-2xl">
+                    <CardHeader>
+                        <CardTitle>Permission Details</CardTitle>
+                        <CardDescription>
+                            Update the basic information for this permission
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="space-y-2">
                                 <Label htmlFor="name">Name</Label>
                                 <Input
@@ -99,21 +119,20 @@ export default function EditPermission({ permission }: Props) {
                                     Usually 'web' for web applications
                                 </p>
                             </div>
-                        </CardContent>
-                    </Card>
-
-                    <div className="flex items-center justify-end space-x-4">
-                        <Link href={route('rbac.permissions.index')}>
-                            <Button variant="outline" type="button">
-                                Cancel
-                            </Button>
-                        </Link>
-                        <Button type="submit" disabled={processing}>
-                            <Save className="mr-2 h-4 w-4" />
-                            {processing ? 'Updating...' : 'Update Permission'}
-                        </Button>
-                    </div>
-                </form>
+                            <div className="flex items-center justify-end space-x-2 pt-4">
+                                <Link href={route('rbac.permissions.index')}>
+                                    <Button type="button" variant="outline">
+                                        Cancel
+                                    </Button>
+                                </Link>
+                                <Button type="submit" disabled={processing}>
+                                    <Save className="mr-2 h-4 w-4" />
+                                    {processing ? 'Updating...' : 'Update Permission'}
+                                </Button>
+                            </div>
+                        </form>
+                    </CardContent>
+                </Card>
             </div>
         </AuthenticatedLayout>
     );

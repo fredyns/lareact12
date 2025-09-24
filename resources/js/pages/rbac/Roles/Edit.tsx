@@ -33,6 +33,26 @@ interface Props {
     permissions: Permission[];
 }
 
+interface BreadcrumbItem {
+    title: string;
+    href: string;
+}
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Dashboard',
+        href: route('dashboard'),
+    },
+    {
+        title: 'Roles',
+        href: route('rbac.roles.index'),
+    },
+    {
+        title: 'Edit Role',
+        href: '#',
+    },
+];
+
 export default function EditRole({ role, permissions }: Props) {
     const { data, setData, put, processing, errors } = useForm({
         name: role.name,
@@ -54,34 +74,34 @@ export default function EditRole({ role, permissions }: Props) {
     };
 
     return (
-        <AuthenticatedLayout>
+        <AuthenticatedLayout breadcrumbs={breadcrumbs}>
             <Head title={`Edit Role: ${role.name}`} />
             
-            <div className="space-y-6">
-                <div className="flex items-center space-x-4">
-                    <Link href={route('rbac.roles.index')}>
-                        <Button variant="outline" size="sm">
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Back to Roles
-                        </Button>
-                    </Link>
+            <div className="flex h-full flex-1 flex-col gap-4 p-4">
+                <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Edit Role</h1>
+                        <h1 className="text-2xl font-bold tracking-tight">Edit Role</h1>
                         <p className="text-muted-foreground">
                             Update role details and permissions
                         </p>
                     </div>
+                    <Link href={route('rbac.roles.index')}>
+                        <Button variant="outline">
+                            <ArrowLeft className="mr-2 h-4 w-4" />
+                            Back to Roles
+                        </Button>
+                    </Link>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Role Details</CardTitle>
-                            <CardDescription>
-                                Update the basic information for this role.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
+                <Card className="max-w-2xl">
+                    <CardHeader>
+                        <CardTitle>Role Details</CardTitle>
+                        <CardDescription>
+                            Update the basic information for this role
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="space-y-2">
                                 <Label htmlFor="name">Name</Label>
                                 <Input
@@ -111,58 +131,58 @@ export default function EditRole({ role, permissions }: Props) {
                                     <p className="text-sm text-destructive">{errors.guard_name}</p>
                                 )}
                             </div>
-                        </CardContent>
-                    </Card>
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Permissions</CardTitle>
-                            <CardDescription>
-                                Select the permissions to assign to this role.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            {permissions.length === 0 ? (
-                                <p className="text-muted-foreground">No permissions available.</p>
-                            ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    {permissions.map((permission) => (
-                                        <div key={permission.id} className="flex items-center space-x-2">
-                                            <Checkbox
-                                                id={`permission-${permission.id}`}
-                                                checked={data.permissions.includes(permission.id)}
-                                                onCheckedChange={(checked) => 
-                                                    handlePermissionChange(permission.id, checked as boolean)
-                                                }
-                                            />
-                                            <Label 
-                                                htmlFor={`permission-${permission.id}`}
-                                                className="text-sm font-normal cursor-pointer"
-                                            >
-                                                {permission.name}
-                                            </Label>
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Permissions</CardTitle>
+                                    <CardDescription>
+                                        Select the permissions to assign to this role
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    {permissions.length === 0 ? (
+                                        <p className="text-muted-foreground">No permissions available.</p>
+                                    ) : (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                            {permissions.map((permission) => (
+                                                <div key={permission.id} className="flex items-center space-x-2">
+                                                    <Checkbox
+                                                        id={`permission-${permission.id}`}
+                                                        checked={data.permissions.includes(permission.id)}
+                                                        onCheckedChange={(checked) => 
+                                                            handlePermissionChange(permission.id, checked as boolean)
+                                                        }
+                                                    />
+                                                    <Label 
+                                                        htmlFor={`permission-${permission.id}`}
+                                                        className="text-sm font-normal cursor-pointer"
+                                                    >
+                                                        {permission.name}
+                                                    </Label>
+                                                </div>
+                                            ))}
                                         </div>
-                                    ))}
-                                </div>
-                            )}
-                            {errors.permissions && (
-                                <p className="text-sm text-destructive mt-2">{errors.permissions}</p>
-                            )}
-                        </CardContent>
-                    </Card>
+                                    )}
+                                    {errors.permissions && (
+                                        <p className="text-sm text-destructive mt-2">{errors.permissions}</p>
+                                    )}
+                                </CardContent>
+                            </Card>
 
-                    <div className="flex items-center justify-end space-x-4">
-                        <Link href={route('rbac.roles.index')}>
-                            <Button variant="outline" type="button">
-                                Cancel
-                            </Button>
-                        </Link>
-                        <Button type="submit" disabled={processing}>
-                            <Save className="mr-2 h-4 w-4" />
-                            {processing ? 'Updating...' : 'Update Role'}
-                        </Button>
-                    </div>
-                </form>
+                            <div className="flex items-center justify-end space-x-2 pt-4">
+                                <Link href={route('rbac.roles.index')}>
+                                    <Button type="button" variant="outline">
+                                        Cancel
+                                    </Button>
+                                </Link>
+                                <Button type="submit" disabled={processing}>
+                                    <Save className="mr-2 h-4 w-4" />
+                                    {processing ? 'Updating...' : 'Update Role'}
+                                </Button>
+                            </div>
+                        </form>
+                    </CardContent>
+                </Card>
             </div>
         </AuthenticatedLayout>
     );
