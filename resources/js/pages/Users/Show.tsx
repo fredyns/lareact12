@@ -283,53 +283,46 @@ export default function ShowUser({ user, userRoles, allRoles }: Props) {
 
                 {/* User Roles Card */}
                 <Card>
-                    <CardHeader className="flex flex-row items-center justify-between">
+                    <CardHeader>
                         <CardTitle>User Roles</CardTitle>
-                        <Button
-                            size="sm"
-                            onClick={() => setIsAddRoleModalOpen(true)}
-                            disabled={unassignedRoles.length === 0}
-                        >
-                            <Plus className="mr-2 h-4 w-4" />
-                            Add Role
-                        </Button>
                     </CardHeader>
                     <CardContent>
-                        {userRoles.length === 0 ? (
-                            <p className="text-sm text-muted-foreground">
-                                This user has no roles assigned.
-                            </p>
-                        ) : (
-                            <div className="space-y-2">
-                                {userRoles.map((role) => (
-                                    <div
-                                        key={role.id}
-                                        className="flex items-center justify-between rounded-md border p-3"
+                        <div className="flex flex-wrap gap-2">
+                            {userRoles.length === 0 ? (
+                                <p className="text-sm text-muted-foreground">
+                                    This user has no roles assigned.
+                                </p>
+                            ) : (
+                                userRoles.map((role) => (
+                                    <Badge 
+                                        key={role.id} 
+                                        variant="secondary"
+                                        className="flex items-center gap-1 px-3 py-1 text-sm"
                                     >
-                                        <div className="flex items-center space-x-3">
-                                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-                                                <Shield className="h-4 w-4 text-primary" />
-                                            </div>
-                                            <div>
-                                                <p className="font-medium">
-                                                    {role.name}
-                                                </p>
-                                            </div>
-                                        </div>
+                                        <Shield className="h-3 w-3 text-primary" />
+                                        {role.name}
                                         <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() =>
-                                                setRoleToRemove(role)
-                                            }
+                                            variant="ghost"
+                                            size="icon"
+                                            className="ml-1 h-4 w-4 rounded-full p-0 hover:bg-destructive/20"
+                                            onClick={() => setRoleToRemove(role)}
                                         >
-                                            <X className="mr-2 h-4 w-4" />
-                                            Remove
+                                            <X className="h-3 w-3" />
                                         </Button>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                                    </Badge>
+                                ))
+                            )}
+                            {unassignedRoles.length > 0 && (
+                                <Badge 
+                                    variant="outline" 
+                                    className="cursor-pointer flex items-center gap-1 px-3 py-1 text-sm hover:bg-primary/10"
+                                    onClick={() => setIsAddRoleModalOpen(true)}
+                                >
+                                    <Plus className="h-3 w-3" />
+                                    Assign Role
+                                </Badge>
+                            )}
+                        </div>
                     </CardContent>
                 </Card>
             </div>
