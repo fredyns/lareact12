@@ -49,21 +49,6 @@ const navGroups: NavGroup[] = [
                 href: route('rbac.permissions.index'),
                 icon: Key,
             },
-            {
-                title: 'User Roles',
-                href: route('rbac.user-roles.index'),
-                icon: UserCheck,
-            },
-            {
-                title: 'User Permissions',
-                href: route('rbac.user-permissions.index'),
-                icon: UserCog,
-            },
-            {
-                title: 'Role Permissions',
-                href: route('rbac.role-permissions.index'),
-                icon: Settings,
-            },
         ],
     },
 ];
