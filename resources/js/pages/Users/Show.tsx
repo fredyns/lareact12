@@ -281,17 +281,17 @@ export default function ShowUser({ user, userRoles, allRoles }: Props) {
                                         <Badge
                                             key={role.id}
                                             variant="secondary"
-                                            className="flex items-center gap-1 px-3 py-1 text-sm"
+                                            className="flex items-center gap-1 px-3 py-1 text-sm bg-indigo-500 hover:bg-indigo-600 text-white border-transparent"
                                         >
-                                            <Shield className="h-3 w-3 text-primary" />
+                                            <Shield className="h-3 w-3 text-white" />
                                             {role.name}
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                className="ml-1 h-4 w-4 rounded-full p-0 hover:bg-destructive/20"
+                                                className="ml-1 h-4 w-4 rounded-full p-0 hover:bg-indigo-700"
                                                 onClick={() => setRoleToRemove(role)}
                                             >
-                                                <X className="h-3 w-3" />
+                                                <X className="h-3 w-3 text-white" />
                                             </Button>
                                         </Badge>
                                     ))
@@ -408,7 +408,7 @@ export default function ShowUser({ user, userRoles, allRoles }: Props) {
                         <AlertDialogTitle>Assign Role</AlertDialogTitle>
                         <AlertDialogDescription>
                             Are you sure you want to assign the role "
-                            {roleToAdd?.name}" to {user.name}? 
+                            {roleToAdd?.name}" to {user.name}?
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
