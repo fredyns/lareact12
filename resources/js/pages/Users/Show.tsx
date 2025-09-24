@@ -77,6 +77,7 @@ export default function ShowUser({ user, userRoles, allRoles }: Props) {
     const [isAddRoleModalOpen, setIsAddRoleModalOpen] = useState(false);
     const [roleToRemove, setRoleToRemove] = useState<Role | null>(null);
     const [roleToAdd, setRoleToAdd] = useState<Role | null>(null);
+    const [showAddRoleConfirmation, setShowAddRoleConfirmation] = useState(false);
 
     // Get unassigned roles for the add role modal
     const unassignedRoles = allRoles.filter(
@@ -263,74 +264,77 @@ export default function ShowUser({ user, userRoles, allRoles }: Props) {
                             )}
                         </CardContent>
                     </Card>
-                </div>
 
-                {/* User ID Card */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>User ID</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="rounded-md bg-muted p-3">
-                            <code className="font-mono text-sm">{user.id}</code>
-                        </div>
-                        <p className="mt-2 text-sm text-muted-foreground">
-                            This is the unique identifier for this user in the
-                            system.
-                        </p>
-                    </CardContent>
-                </Card>
-
-                {/* User Roles Card */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>User Roles</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="flex flex-wrap gap-2">
-                            {userRoles.length === 0 ? (
-                                <p className="text-sm text-muted-foreground">
-                                    This user has no roles assigned.
-                                </p>
-                            ) : (
-                                userRoles.map((role) => (
-                                    <Badge 
-                                        key={role.id} 
-                                        variant="secondary"
-                                        className="flex items-center gap-1 px-3 py-1 text-sm"
-                                    >
-                                        <Shield className="h-3 w-3 text-primary" />
-                                        {role.name}
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="ml-1 h-4 w-4 rounded-full p-0 hover:bg-destructive/20"
-                                            onClick={() => setRoleToRemove(role)}
+                    {/* User Roles Card */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>User Roles</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex flex-wrap gap-2">
+                                {userRoles.length === 0 ? (
+                                    <p className="text-sm text-muted-foreground">
+                                        This user has no roles assigned.
+                                    </p>
+                                ) : (
+                                    userRoles.map((role) => (
+                                        <Badge
+                                            key={role.id}
+                                            variant="secondary"
+                                            className="flex items-center gap-1 px-3 py-1 text-sm"
                                         >
-                                            <X className="h-3 w-3" />
-                                        </Button>
+                                            <Shield className="h-3 w-3 text-primary" />
+                                            {role.name}
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="ml-1 h-4 w-4 rounded-full p-0 hover:bg-destructive/20"
+                                                onClick={() => setRoleToRemove(role)}
+                                            >
+                                                <X className="h-3 w-3" />
+                                            </Button>
+                                        </Badge>
+                                    ))
+                                )}
+                                {unassignedRoles.length > 0 && (
+                                    <Badge
+                                        variant="outline"
+                                        className="cursor-pointer flex items-center gap-1 px-3 py-1 text-sm hover:bg-primary/10"
+                                        onClick={() => setIsAddRoleModalOpen(true)}
+                                    >
+                                        <Plus className="h-3 w-3" />
+                                        Assign Role
                                     </Badge>
-                                ))
-                            )}
-                            {unassignedRoles.length > 0 && (
-                                <Badge 
-                                    variant="outline" 
-                                    className="cursor-pointer flex items-center gap-1 px-3 py-1 text-sm hover:bg-primary/10"
-                                    onClick={() => setIsAddRoleModalOpen(true)}
-                                >
-                                    <Plus className="h-3 w-3" />
-                                    Assign Role
-                                </Badge>
-                            )}
-                        </div>
-                    </CardContent>
-                </Card>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* User ID Card */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>User ID</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="rounded-md bg-muted p-3">
+                                <code className="font-mono text-sm">{user.id}</code>
+                            </div>
+                            <p className="mt-2 text-sm text-muted-foreground">
+                                This is the unique identifier for this user in the
+                                system.
+                            </p>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
 
             {/* Add Role Modal */}
             <Dialog
                 open={isAddRoleModalOpen}
-                onOpenChange={setIsAddRoleModalOpen}
+                onOpenChange={(open) => {
+                    setIsAddRoleModalOpen(open);
+                    if (!open) setRoleToAdd(null);
+                }}
             >
                 <DialogContent>
                     <DialogHeader>
@@ -382,13 +386,8 @@ export default function ShowUser({ user, userRoles, allRoles }: Props) {
                         <Button
                             onClick={() => {
                                 if (roleToAdd) {
-                                    if (
-                                        confirm(
-                                            `Are you sure you want to assign the role "${roleToAdd.name}" to ${user.name}?`,
-                                        )
-                                    ) {
-                                        handleAddRole();
-                                    }
+                                    setShowAddRoleConfirmation(true);
+                                    setIsAddRoleModalOpen(false);
                                 }
                             }}
                             disabled={!roleToAdd}
@@ -398,6 +397,28 @@ export default function ShowUser({ user, userRoles, allRoles }: Props) {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            {/* Add Role Confirmation Dialog */}
+            <AlertDialog
+                open={showAddRoleConfirmation}
+                onOpenChange={(open) => !open && setShowAddRoleConfirmation(false)}
+            >
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Assign Role</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to assign the role "
+                            {roleToAdd?.name}" to {user.name}? 
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => setRoleToAdd(null)}>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleAddRole}>
+                            Assign
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
 
             {/* Remove Role Confirmation Dialog */}
             <AlertDialog
