@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -22,11 +23,11 @@ interface Props {
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
-        href: '/dashboard',
+        href: route('dashboard'),
     },
     {
         title: 'Users',
-        href: '/users',
+        href: route('users.index'),
     },
     {
         title: 'User Details',
@@ -37,7 +38,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function ShowUser({ user }: Props) {
     const handleDelete = () => {
         if (confirm(`Are you sure you want to delete ${user.name}?`)) {
-            router.delete(`/users/${user.id}`);
+            router.delete(route('users.destroy', user.id));
         }
     };
 
@@ -64,13 +65,13 @@ export default function ShowUser({ user }: Props) {
                         </p>
                     </div>
                     <div className="flex items-center space-x-2">
-                        <Link href="/users">
+                        <Link href={route('users.index')}>
                             <Button variant="outline">
                                 <ArrowLeft className="mr-2 h-4 w-4" />
                                 Back to Users
                             </Button>
                         </Link>
-                        <Link href={`/users/${user.id}/edit`}>
+                        <Link href={route('users.edit', user.id)}>
                             <Button>
                                 <Edit className="mr-2 h-4 w-4" />
                                 Edit User

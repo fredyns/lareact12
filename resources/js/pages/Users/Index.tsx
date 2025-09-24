@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -61,11 +62,11 @@ interface Props {
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
-        href: '/dashboard',
+        href: route('dashboard'),
     },
     {
         title: 'Users',
-        href: '/users',
+        href: route('users.index'),
     },
 ];
 
@@ -74,22 +75,22 @@ export default function UsersIndex({ users, filters }: Props) {
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        router.get('/users', { search }, { preserveState: true });
+        router.get(route('users.index'), { search }, { preserveState: true });
     };
 
     const handleClearSearch = () => {
         setSearch('');
-        router.get('/users', {}, { preserveState: true });
+        router.get(route('users.index'), {}, { preserveState: true });
     };
 
     const handleSort = (field: string) => {
         const direction = filters.sort === field && filters.direction === 'asc' ? 'desc' : 'asc';
-        router.get('/users', { ...filters, sort: field, direction }, { preserveState: true });
+        router.get(route('users.index'), { ...filters, sort: field, direction }, { preserveState: true });
     };
 
     const handleDelete = (user: User) => {
         if (confirm(`Are you sure you want to delete ${user.name}?`)) {
-            router.delete(`/users/${user.id}`);
+            router.delete(route('users.destroy', user.id));
         }
     };
 
@@ -120,7 +121,7 @@ export default function UsersIndex({ users, filters }: Props) {
                             Manage user accounts and permissions
                         </p>
                     </div>
-                    <Link href="/users/create">
+                    <Link href={route('users.create')}>
                         <Button>
                             <Plus className="mr-2 h-4 w-4" />
                             Add User
@@ -239,13 +240,13 @@ export default function UsersIndex({ users, filters }: Props) {
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent align="end">
                                                             <DropdownMenuItem asChild>
-                                                                <Link href={`/users/${user.id}`}>
+                                                                <Link href={route('users.show', user.id)}>
                                                                     <Eye className="mr-2 h-4 w-4" />
                                                                     View
                                                                 </Link>
                                                             </DropdownMenuItem>
                                                             <DropdownMenuItem asChild>
-                                                                <Link href={`/users/${user.id}/edit`}>
+                                                                <Link href={route('users.edit', user.id)}>
                                                                     <Edit className="mr-2 h-4 w-4" />
                                                                     Edit
                                                                 </Link>

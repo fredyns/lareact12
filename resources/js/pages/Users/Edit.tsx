@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,11 +30,11 @@ interface Props {
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
-        href: '/dashboard',
+        href: route('dashboard'),
     },
     {
         title: 'Users',
-        href: '/users',
+        href: route('users.index'),
     },
     {
         title: 'Edit User',
@@ -51,7 +52,7 @@ export default function EditUser({ user }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/users/${user.id}`);
+        put(route('users.update', user.id));
     };
 
     return (
@@ -66,7 +67,7 @@ export default function EditUser({ user }: Props) {
                             Update user information and settings
                         </p>
                     </div>
-                    <Link href="/users">
+                    <Link href={route('users.index')}>
                         <Button variant="outline">
                             <ArrowLeft className="mr-2 h-4 w-4" />
                             Back to Users
@@ -150,7 +151,7 @@ export default function EditUser({ user }: Props) {
                             </div>
 
                             <div className="flex items-center justify-end space-x-2 pt-4">
-                                <Link href="/users">
+                                <Link href={route('users.index')}>
                                     <Button type="button" variant="outline">
                                         Cancel
                                     </Button>

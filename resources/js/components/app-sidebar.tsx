@@ -13,6 +13,7 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem, type NavGroup } from '@/types';
 import { Link } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 import { BookOpen, Folder, LayoutGrid, Users, Shield, Key, UserCheck, UserCog, Settings } from 'lucide-react';
 import AppLogo from './app-logo';
 
@@ -30,7 +31,7 @@ const navGroups: NavGroup[] = [
         items: [
             {
                 title: 'Users',
-                href: '/users',
+                href: route('users.index'),
                 icon: Users,
             },
         ],
@@ -40,27 +41,27 @@ const navGroups: NavGroup[] = [
         items: [
             {
                 title: 'Roles',
-                href: '/rbac/roles',
+                href: route('rbac.roles.index'),
                 icon: Shield,
             },
             {
                 title: 'Permissions',
-                href: '/rbac/permissions',
+                href: route('rbac.permissions.index'),
                 icon: Key,
             },
             {
                 title: 'User Roles',
-                href: '/rbac/user-roles',
+                href: route('rbac.user-roles.index'),
                 icon: UserCheck,
             },
             {
                 title: 'User Permissions',
-                href: '/rbac/user-permissions',
+                href: route('rbac.user-permissions.index'),
                 icon: UserCog,
             },
             {
                 title: 'Role Permissions',
-                href: '/rbac/role-permissions',
+                href: route('rbac.role-permissions.index'),
                 icon: Settings,
             },
         ],
