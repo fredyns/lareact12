@@ -13,7 +13,7 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem, type NavGroup } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Users } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, Users, Shield, Key, UserCheck, UserCog, Settings } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -32,6 +32,36 @@ const navGroups: NavGroup[] = [
                 title: 'Users',
                 href: '/users',
                 icon: Users,
+            },
+        ],
+    },
+    {
+        title: 'RBAC',
+        items: [
+            {
+                title: 'Roles',
+                href: '/rbac/roles',
+                icon: Shield,
+            },
+            {
+                title: 'Permissions',
+                href: '/rbac/permissions',
+                icon: Key,
+            },
+            {
+                title: 'User Roles',
+                href: '/rbac/user-roles',
+                icon: UserCheck,
+            },
+            {
+                title: 'User Permissions',
+                href: '/rbac/user-permissions',
+                icon: UserCog,
+            },
+            {
+                title: 'Role Permissions',
+                href: '/rbac/role-permissions',
+                icon: Settings,
             },
         ],
     },
