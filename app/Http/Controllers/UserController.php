@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\RBAC\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
-use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -49,7 +49,7 @@ class UserController extends Controller
     public function create()
     {
         $this->authorize('create', User::class);
-        
+
         return Inertia::render('Users/Create');
     }
 
@@ -59,7 +59,7 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $this->authorize('create', User::class);
-        
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -82,19 +82,19 @@ class UserController extends Controller
     public function show(User $user)
     {
         $this->authorize('view', $user);
-        
+
         // Get all roles in the system
         $allRoles = Role::all();
-        
+
         return Inertia::render('Users/Show', [
             'user' => $user->only(['id', 'name', 'email', 'email_verified_at', 'created_at', 'updated_at']),
-            'userRoles' => $user->roles->map(function($role) {
+            'userRoles' => $user->roles->map(function ($role) {
                 return [
                     'id' => $role->id,
                     'name' => $role->name,
                 ];
             }),
-            'allRoles' => $allRoles->map(function($role) use ($user) {
+            'allRoles' => $allRoles->map(function ($role) use ($user) {
                 return [
                     'id' => $role->id,
                     'name' => $role->name,
@@ -110,7 +110,7 @@ class UserController extends Controller
     public function edit(User $user)
     {
         $this->authorize('update', $user);
-        
+
         return Inertia::render('Users/Edit', [
             'user' => $user->only(['id', 'name', 'email', 'email_verified_at']),
         ]);
@@ -122,7 +122,7 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $this->authorize('update', $user);
-        
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
@@ -164,18 +164,18 @@ class UserController extends Controller
     public function addRole(Request $request, User $user)
     {
         $this->authorize('update', $user);
-        
+
         $validated = $request->validate([
             'role_id' => 'required|exists:roles,id',
         ]);
-        
+
         $role = Role::findById($validated['role_id']);
-        
+
         if (!$user->hasRole($role)) {
             $user->assignRole($role);
             return back()->with('success', "Role '{$role->name}' assigned successfully.");
         }
-        
+
         return back()->with('info', "User already has the role '{$role->name}'.");
     }
 
@@ -185,14 +185,14 @@ class UserController extends Controller
     public function removeRole(User $user, $roleId)
     {
         $this->authorize('update', $user);
-        
+
         $role = Role::findById($roleId);
-        
+
         if ($user->hasRole($role)) {
             $user->removeRole($role);
             return back()->with('success', "Role '{$role->name}' removed successfully.");
         }
-        
+
         return back()->with('info', "User doesn't have the role '{$role->name}'.");
     }
 }

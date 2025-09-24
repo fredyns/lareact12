@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\RBAC;
 
 use App\Http\Controllers\Controller;
+use App\Models\RBAC\Permission;
+use App\Models\RBAC\Role;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
 
 class RoleController extends Controller
 {
@@ -49,7 +49,7 @@ class RoleController extends Controller
     public function create()
     {
         $permissions = Permission::all();
-        
+
         return Inertia::render('rbac/Roles/Create', [
             'permissions' => $permissions,
         ]);
@@ -86,7 +86,7 @@ class RoleController extends Controller
     public function show(Role $role)
     {
         $role->load('permissions');
-        
+
         return Inertia::render('rbac/Roles/Show', [
             'role' => $role,
         ]);
@@ -99,7 +99,7 @@ class RoleController extends Controller
     {
         $permissions = Permission::all();
         $role->load('permissions');
-        
+
         return Inertia::render('rbac/Roles/Edit', [
             'role' => $role,
             'permissions' => $permissions,
