@@ -13,7 +13,8 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { ArrowLeft, Save } from 'lucide-react';
-import AuthenticatedLayout from '@/layouts/app-layout';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
 
 interface Permission {
     id: string;
@@ -24,6 +25,21 @@ interface Permission {
 interface Props {
     permissions: Permission[];
 }
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Dashboard',
+        href: route('dashboard'),
+    },
+    {
+        title: 'Roles',
+        href: route('rbac.roles.index'),
+    },
+    {
+        title: 'Create Role',
+        href: route('rbac.roles.create'),
+    },
+];
 
 export default function CreateRole({ permissions }: Props) {
     const { data, setData, post, processing, errors } = useForm({
@@ -46,62 +62,64 @@ export default function CreateRole({ permissions }: Props) {
     };
 
     return (
-        <AuthenticatedLayout>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Role" />
             
-            <div className="space-y-6">
-                <div className="flex items-center space-x-4">
-                    <Link href={route('rbac.roles.index')}>
-                        <Button variant="outline" size="sm">
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Back to Roles
-                        </Button>
-                    </Link>
+            <div className="flex h-full flex-1 flex-col gap-4 p-4">
+                <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Create Role</h1>
+                        <h1 className="text-2xl font-bold tracking-tight">Create Role</h1>
                         <p className="text-muted-foreground">
                             Create a new role and assign permissions
                         </p>
                     </div>
+                    <Link href={route('rbac.roles.index')}>
+                        <Button variant="outline">
+                            <ArrowLeft className="mr-2 h-4 w-4" />
+                            Back to Roles
+                        </Button>
+                    </Link>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    <Card>
+                    <Card className="max-w-2xl">
                         <CardHeader>
                             <CardTitle>Role Details</CardTitle>
                             <CardDescription>
                                 Enter the basic information for the new role.
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="name">Name</Label>
-                                <Input
-                                    id="name"
-                                    type="text"
-                                    value={data.name}
-                                    onChange={(e) => setData('name', e.target.value)}
-                                    placeholder="Enter role name"
-                                    className={errors.name ? 'border-destructive' : ''}
-                                />
-                                {errors.name && (
-                                    <p className="text-sm text-destructive">{errors.name}</p>
-                                )}
-                            </div>
+                        <CardContent>
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="name">Name</Label>
+                                    <Input
+                                        id="name"
+                                        type="text"
+                                        value={data.name}
+                                        onChange={(e) => setData('name', e.target.value)}
+                                        placeholder="Enter role name"
+                                        className={errors.name ? 'border-destructive' : ''}
+                                    />
+                                    {errors.name && (
+                                        <p className="text-sm text-destructive">{errors.name}</p>
+                                    )}
+                                </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="guard_name">Guard Name</Label>
-                                <Input
-                                    id="guard_name"
-                                    type="text"
-                                    value={data.guard_name}
-                                    onChange={(e) => setData('guard_name', e.target.value)}
-                                    placeholder="Enter guard name"
-                                    className={errors.guard_name ? 'border-destructive' : ''}
-                                />
-                                {errors.guard_name && (
-                                    <p className="text-sm text-destructive">{errors.guard_name}</p>
-                                )}
+                                <div className="space-y-2">
+                                    <Label htmlFor="guard_name">Guard Name</Label>
+                                    <Input
+                                        id="guard_name"
+                                        type="text"
+                                        value={data.guard_name}
+                                        onChange={(e) => setData('guard_name', e.target.value)}
+                                        placeholder="Enter guard name"
+                                        className={errors.guard_name ? 'border-destructive' : ''}
+                                    />
+                                    {errors.guard_name && (
+                                        <p className="text-sm text-destructive">{errors.guard_name}</p>
+                                    )}
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
@@ -143,9 +161,9 @@ export default function CreateRole({ permissions }: Props) {
                         </CardContent>
                     </Card>
 
-                    <div className="flex items-center justify-end space-x-4">
+                    <div className="flex items-center justify-end space-x-2 pt-4">
                         <Link href={route('rbac.roles.index')}>
-                            <Button variant="outline" type="button">
+                            <Button type="button" variant="outline">
                                 Cancel
                             </Button>
                         </Link>
@@ -156,6 +174,6 @@ export default function CreateRole({ permissions }: Props) {
                     </div>
                 </form>
             </div>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }

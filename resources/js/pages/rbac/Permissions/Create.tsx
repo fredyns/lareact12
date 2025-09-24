@@ -12,7 +12,23 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { ArrowLeft, Save } from 'lucide-react';
-import AuthenticatedLayout from '@/layouts/app-layout';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Dashboard',
+        href: route('dashboard'),
+    },
+    {
+        title: 'Permissions',
+        href: route('rbac.permissions.index'),
+    },
+    {
+        title: 'Create Permission',
+        href: route('rbac.permissions.create'),
+    },
+];
 
 export default function CreatePermission() {
     const { data, setData, post, processing, errors } = useForm({
@@ -26,34 +42,34 @@ export default function CreatePermission() {
     };
 
     return (
-        <AuthenticatedLayout>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Permission" />
             
-            <div className="space-y-6">
-                <div className="flex items-center space-x-4">
-                    <Link href={route('rbac.permissions.index')}>
-                        <Button variant="outline" size="sm">
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Back to Permissions
-                        </Button>
-                    </Link>
+            <div className="flex h-full flex-1 flex-col gap-4 p-4">
+                <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Create Permission</h1>
+                        <h1 className="text-2xl font-bold tracking-tight">Create Permission</h1>
                         <p className="text-muted-foreground">
                             Create a new permission for access control
                         </p>
                     </div>
+                    <Link href={route('rbac.permissions.index')}>
+                        <Button variant="outline">
+                            <ArrowLeft className="mr-2 h-4 w-4" />
+                            Back to Permissions
+                        </Button>
+                    </Link>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Permission Details</CardTitle>
-                            <CardDescription>
-                                Enter the basic information for the new permission.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
+                <Card className="max-w-2xl">
+                    <CardHeader>
+                        <CardTitle>Permission Details</CardTitle>
+                        <CardDescription>
+                            Enter the basic information for the new permission.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="space-y-2">
                                 <Label htmlFor="name">Name</Label>
                                 <Input
@@ -89,22 +105,22 @@ export default function CreatePermission() {
                                     Usually 'web' for web applications
                                 </p>
                             </div>
-                        </CardContent>
-                    </Card>
 
-                    <div className="flex items-center justify-end space-x-4">
-                        <Link href={route('rbac.permissions.index')}>
-                            <Button variant="outline" type="button">
-                                Cancel
-                            </Button>
-                        </Link>
-                        <Button type="submit" disabled={processing}>
-                            <Save className="mr-2 h-4 w-4" />
-                            {processing ? 'Creating...' : 'Create Permission'}
-                        </Button>
-                    </div>
-                </form>
+                            <div className="flex items-center justify-end space-x-2 pt-4">
+                                <Link href={route('rbac.permissions.index')}>
+                                    <Button type="button" variant="outline">
+                                        Cancel
+                                    </Button>
+                                </Link>
+                                <Button type="submit" disabled={processing}>
+                                    <Save className="mr-2 h-4 w-4" />
+                                    {processing ? 'Creating...' : 'Create Permission'}
+                                </Button>
+                            </div>
+                        </form>
+                    </CardContent>
+                </Card>
             </div>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }
