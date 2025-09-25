@@ -120,381 +120,257 @@ export default function Show({ item, enumerateOptions }: Props) {
           </div>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-6">
           {/* Basic Information Card */}
           <Card>
             <CardHeader>
               <CardTitle>Basic Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                  <Type className="h-4 w-4 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium">{item.string}</p>
-                  <p className="text-sm text-muted-foreground">String Value</p>
-                </div>
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">String</p>
+                <p className="font-medium">{item.string}</p>
               </div>
 
               {item.email && (
-                <div className="flex items-center space-x-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/20">
-                    <Mail className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <div>
-                    <p className="font-medium">{item.email}</p>
-                    <p className="text-sm text-muted-foreground">Email Address</p>
-                  </div>
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Email</p>
+                  <p className="font-medium">{item.email}</p>
                 </div>
               )}
 
               {item.color && (
-                <div className="flex items-center space-x-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/20">
-                    <Palette className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <div>
-                    <div className="flex items-center">
-                      <div
-                        className="w-6 h-6 rounded mr-2 border"
-                        style={{ backgroundColor: item.color }}
-                      />
-                      <p className="font-medium">{item.color}</p>
-                    </div>
-                    <p className="text-sm text-muted-foreground">Color</p>
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Color</p>
+                  <div className="flex items-center space-x-2">
+                    <div
+                      className="w-6 h-6 rounded border"
+                      style={{ backgroundColor: item.color }}
+                    />
+                    <p className="font-medium">{item.color}</p>
                   </div>
                 </div>
               )}
 
-              {item.enumerate && (
-                <div className="flex items-center space-x-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
-                    {item.enumerate === 'enable' ? (
-                      <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
-                    ) : (
-                      <XCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
-                    )}
-                  </div>
-                  <div>
-                    <Badge variant={item.enumerate === 'enable' ? 'default' : 'secondary'}>
-                      {getEnumerateLabel(item.enumerate)}
-                    </Badge>
-                    <p className="text-sm text-muted-foreground">Status</p>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Numeric Information Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Numeric Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {item.integer !== null && (
-                <div className="flex items-center space-x-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/20">
-                    <Hash className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-                  </div>
-                  <div>
-                    <p className="font-medium">{item.integer}</p>
-                    <p className="text-sm text-muted-foreground">Integer Value</p>
-                  </div>
+              {item.integer !== null && re(
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Integer (1-100)</p>
+                  <p className="font-medium">{item.integer}</p>
                 </div>
               )}
 
               {item.decimal !== null && (
-                <div className="flex items-center space-x-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-100 dark:bg-cyan-900/20">
-                    <Hash className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
-                  </div>
-                  <div>
-                    <p className="font-medium">{item.decimal}</p>
-                    <p className="text-sm text-muted-foreground">Decimal Value</p>
-                  </div>
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Decimal</p>
+                  <p className="font-medium">{item.decimal}</p>
                 </div>
               )}
 
               {item.npwp && (
-                <div className="flex items-center space-x-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/20">
-                    <FileText className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
-                  </div>
-                  <div>
-                    <p className="font-medium">{item.npwp}</p>
-                    <p className="text-sm text-muted-foreground">NPWP</p>
-                  </div>
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">NPWP</p>
+                  <p className="font-medium">{item.npwp}</p>
                 </div>
               )}
 
-              {item.boolean !== null && (
-                <div className="flex items-center space-x-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/20">
-                    {item.boolean ? (
-                      <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                    ) : (
-                      <XCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
-                    )}
-                  </div>
-                  <div>
-                    <p className="font-medium">{item.boolean ? 'True' : 'False'}</p>
-                    <p className="text-sm text-muted-foreground">Boolean Value</p>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Date & Time Information Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Date & Time Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/20">
-                  <Calendar className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                </div>
-                <div>
-                  <p className="font-medium">{formatDate(item.created_at)}</p>
-                  <p className="text-sm text-muted-foreground">Created At</p>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/20">
-                  <Clock className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-                </div>
-                <div>
-                  <p className="font-medium">{formatDate(item.updated_at)}</p>
-                  <p className="text-sm text-muted-foreground">Last Updated</p>
-                </div>
-              </div>
-
-              {item.date && (
-                <div className="flex items-center space-x-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/20">
-                    <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <div>
-                    <p className="font-medium">{item.date}</p>
-                    <p className="text-sm text-muted-foreground">Date Field</p>
-                  </div>
-                </div>
-              )}
-
-              {item.time && (
-                <div className="flex items-center space-x-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
-                    <Clock className="h-4 w-4 text-green-600 dark:text-green-400" />
-                  </div>
-                  <div>
-                    <p className="font-medium">{item.time}</p>
-                    <p className="text-sm text-muted-foreground">Time Field</p>
-                  </div>
-                </div>
-              )}
-
-              {item.datetime && (
-                <div className="flex items-center space-x-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-violet-100 dark:bg-violet-900/20">
-                    <Clock className="h-4 w-4 text-violet-600 dark:text-violet-400" />
-                  </div>
-                  <div>
-                    <p className="font-medium">{new Date(item.datetime).toLocaleString()}</p>
-                    <p className="text-sm text-muted-foreground">DateTime Field</p>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Additional Information Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Additional Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {item.ip_address && (
-                <div className="flex items-center space-x-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
-                    <Globe className="h-4 w-4 text-red-600 dark:text-red-400" />
-                  </div>
-                  <div>
-                    <p className="font-medium">{item.ip_address}</p>
-                    <p className="text-sm text-muted-foreground">IP Address</p>
-                  </div>
+              {item.enumerate && (
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Status</p>
+                  <Badge variant={item.enumerate === 'enable' ? 'default' : 'secondary'}>
+                    {getEnumerateLabel(item.enumerate)}
+                  </Badge>
                 </div>
               )}
 
               {item.user && (
-                <div className="flex items-center space-x-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                    <User className="h-4 w-4 text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-medium">{item.user.name}</p>
-                    <p className="text-sm text-muted-foreground">Associated User</p>
-                  </div>
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">User</p>
+                  <p className="font-medium">{item.user.name}</p>
                 </div>
               )}
             </CardContent>
           </Card>
 
-          {/* Item ID Card */}
+          {/* Date & Time */}
           <Card>
             <CardHeader>
-              <CardTitle>Item ID</CardTitle>
+              <CardTitle>Date & Time</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="rounded-md bg-muted p-3">
-                <code className="font-mono text-sm">{item.id}</code>
-              </div>
-              <p className="mt-2 text-sm text-muted-foreground">
-                This is the unique identifier for this item in the system.
-              </p>
+            <CardContent className="space-y-4">
+              {item.date && (
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Date</p>
+                  <p className="font-medium">{item.date}</p>
+                </div>
+              )}
+
+              {item.time && (
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Time</p>
+                  <p className="font-medium">{item.time}</p>
+                </div>
+              )}
+
+              {item.datetime && (
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Datetime</p>
+                  <p className="font-medium">{new Date(item.datetime).toLocaleString()}</p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
-          {/* Location Card */}
-          {(item.latitude !== null && item.longitude !== null && 
-            typeof item.latitude === 'number' && typeof item.longitude === 'number' &&
-            !isNaN(item.latitude) && !isNaN(item.longitude)) && (
-            <Card className="md:col-span-2">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <MapPin className="mr-2 h-5 w-5" />
-                  Location
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Latitude</p>
-                    <p className="font-medium">{item.latitude}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Longitude</p>
-                    <p className="font-medium">{item.longitude}</p>
-                  </div>
+          {/* Other Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Other Information</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {item.ip_address && (
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">IP Address</p>
+                  <p className="font-medium">{item.ip_address}</p>
                 </div>
-                <div className="h-64 rounded overflow-hidden border">
-                  <MapContainer
-                    center={[item.latitude, item.longitude]}
-                    zoom={13}
-                    style={{ height: '100%', width: '100%' }}
+              )}
+
+              {item.boolean !== null && (
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Boolean</p>
+                  <p className="font-medium">{item.boolean ? 'True' : 'False'}</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+          </div>
+
+          <div className="space-y-6">
+
+          {/* Location */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Location</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {(item.latitude !== null && item.longitude !== null &&
+                typeof item.latitude === 'number' && typeof item.longitude === 'number' &&
+                !isNaN(item.latitude) && !isNaN(item.longitude)) ? (
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">Latitude</p>
+                      <p className="font-medium">{item.latitude}</p>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">Longitude</p>
+                      <p className="font-medium">{item.longitude}</p>
+                    </div>
+                  </div>
+
+                  <div className="h-64 mt-2">
+                    <MapContainer
+                      center={[item.latitude, item.longitude]}
+                      zoom={13}
+                      style={{ height: '100%', width: '100%' }}
+                    >
+                      <TileLayer
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      />
+                      <Marker position={[item.latitude, item.longitude]}>
+                        <Popup>
+                          {item.string}
+                        </Popup>
+                      </Marker>
+                    </MapContainer>
+                  </div>
+                </>
+              ) : (
+                <p className="text-sm text-muted-foreground">No location data available</p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Files */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Files</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {item.file && (
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">File (PDF, DOCX, PPTX, XLSX, ZIP, RAR)</p>
+                  <a
+                    href={`/storage/${item.file}`}
+                    target="_blank"
+                    className="flex items-center p-3 border rounded-lg hover:bg-muted/50 transition-colors"
                   >
-                    <TileLayer
-                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                    <Marker position={[item.latitude, item.longitude]}>
-                      <Popup>
-                        {item.string}
-                      </Popup>
-                    </Marker>
-                  </MapContainer>
+                    <FileText className="h-8 w-8 mr-3 text-blue-600" />
+                    <div>
+                      <p className="font-medium">{item.file.split('/').pop()}</p>
+                      <p className="text-sm text-muted-foreground">Click to download</p>
+                    </div>
+                  </a>
                 </div>
-              </CardContent>
-            </Card>
-          )}
+              )}
 
-          {/* File Card */}
-          {item.file && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <FileText className="mr-2 h-5 w-5" />
-                  File
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <a
-                  href={`/storage/${item.file}`}
-                  target="_blank"
-                  className="flex items-center p-3 border rounded-lg hover:bg-muted/50 transition-colors"
-                >
-                  <FileText className="h-8 w-8 mr-3 text-blue-600" />
-                  <div>
-                    <p className="font-medium">{item.file.split('/').pop()}</p>
-                    <p className="text-sm text-muted-foreground">Click to download</p>
+              {item.image && (
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Image (JPG, JPEG, PNG)</p>
+                  <img
+                    src={`/storage/${item.image}`}
+                    alt={item.string}
+                    className="max-w-full h-auto rounded-lg border"
+                  />
+                </div>
+              )}
+
+              {!item.file && !item.image && (
+                <p className="text-sm text-muted-foreground">No files uploaded</p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Text Content */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Text Content</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {item.text && (
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Text</p>
+                  <div className="bg-muted/50 p-4 rounded-lg whitespace-pre-wrap">
+                    {item.text}
                   </div>
-                </a>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Image Card */}
-          {item.image && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <ImageIcon className="mr-2 h-5 w-5" />
-                  Image
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <img
-                  src={`/storage/${item.image}`}
-                  alt={item.string}
-                  className="max-w-full h-auto rounded-lg border"
-                />
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Text Content Card */}
-          {item.text && (
-            <Card className="md:col-span-2">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <FileText className="mr-2 h-5 w-5" />
-                  Text Content
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="bg-muted/50 p-4 rounded-lg whitespace-pre-wrap">
-                  {item.text}
                 </div>
-              </CardContent>
-            </Card>
-          )}
+              )}
 
-          {/* Markdown Text Card */}
-          {item.markdown_text && (
-            <Card className="md:col-span-2">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <FileText className="mr-2 h-5 w-5" />
-                  Markdown Content
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="prose max-w-none dark:prose-invert">
-                  <div dangerouslySetInnerHTML={{ __html: item.markdown_text }} />
+              {item.markdown_text && (
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Markdown Text</p>
+                  <div className="prose max-w-none dark:prose-invert">
+                    <div dangerouslySetInnerHTML={{ __html: item.markdown_text }} />
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          )}
+              )}
 
-          {/* WYSIWYG Content Card */}
-          {item.wysiwyg && (
-            <Card className="md:col-span-2">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Edit className="mr-2 h-5 w-5" />
-                  WYSIWYG Content
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="prose max-w-none dark:prose-invert">
-                  <div dangerouslySetInnerHTML={{ __html: item.wysiwyg }} />
+              {item.wysiwyg && (
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">WYSIWYG Content</p>
+                  <div className="prose max-w-none dark:prose-invert">
+                    <div dangerouslySetInnerHTML={{ __html: item.wysiwyg }} />
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          )}
+              )}
+
+              {!item.text && !item.markdown_text && !item.wysiwyg && (
+                <p className="text-sm text-muted-foreground">No text content available</p>
+              )}
+            </CardContent>
+          </Card>
+          </div>
+
         </div>
       </div>
     </AppLayout>
