@@ -14,7 +14,7 @@ import { dashboard } from '@/routes';
 import { type NavItem, type NavGroup } from '@/types';
 import { Link } from '@inertiajs/react';
 import { route } from 'ziggy-js';
-import { BookOpen, Folder, LayoutGrid, Users, Shield, Key, UserCheck, UserCog, Settings } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, Users, Shield, Key, Package } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -33,6 +33,16 @@ const navGroups: NavGroup[] = [
                 title: 'Users',
                 href: route('users.index'),
                 icon: Users,
+            },
+        ],
+    },
+    {
+        title: 'Sample',
+        items: [
+            {
+                title: 'Items',
+                href: route('sample.items.index'),
+                icon: Package,
             },
         ],
     },

@@ -3,6 +3,7 @@
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RBAC\RoleController;
 use App\Http\Controllers\RBAC\PermissionController;
+use App\Http\Controllers\Sample\ItemController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -26,6 +27,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('rbac')->name('rbac.')->group(function () {
         Route::resource('roles', RoleController::class);
         Route::resource('permissions', PermissionController::class);
+    });
+    
+    // Sample Routes with prefix and namespace
+    Route::prefix('sample')->name('sample.')->group(function () {
+        Route::resource('items', ItemController::class);
     });
 });
 
