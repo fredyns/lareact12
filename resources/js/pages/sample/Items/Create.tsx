@@ -185,11 +185,6 @@ export default function Create({ enumerateOptions }: Props) {
           </Link>
         </div>
 
-        <Card className="max-w-7xl">
-          <CardHeader>
-            <CardTitle>Item Information</CardTitle>
-          </CardHeader>
-          <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
@@ -631,8 +626,6 @@ export default function Create({ enumerateOptions }: Props) {
                 </Button>
               </div>
             </form>
-          </CardContent>
-        </Card>
       </div>
     </AppLayout>
   );
