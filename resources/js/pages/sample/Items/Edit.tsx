@@ -561,7 +561,8 @@ export default function Edit({ item, enumerateOptions }: Props) {
                   <Label htmlFor="wysiwyg">WYSIWYG Content</Label>
                   <Editor
                     id="wysiwyg"
-                    apiKey={import.meta.env.TINYMCE_API_KEY}
+                    apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
+                    licenseKey="gpl"
                     initialValue={item.wysiwyg || ''}
                     init={{
                       height: 300,

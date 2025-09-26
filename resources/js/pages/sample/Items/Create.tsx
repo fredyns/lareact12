@@ -532,7 +532,8 @@ export default function Create({ enumerateOptions }: Props) {
                     <Label htmlFor="wysiwyg">WYSIWYG Content</Label>
                     <Editor
                       id="wysiwyg"
-                      apiKey={import.meta.env.TINYMCE_API_KEY}
+                      apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
+                      licenseKey="gpl"
                       init={{
                         height: 300,
                         menubar: false,
