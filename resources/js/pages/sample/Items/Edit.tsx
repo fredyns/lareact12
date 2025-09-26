@@ -125,10 +125,14 @@ export default function Edit({ item, enumerateOptions }: Props) {
 
   const loadUserOptions = async (inputValue: string) => {
     try {
-      const response = await fetch(`/api/users?search=${inputValue}`, {
+      const response = await fetch(`/select-options/users?search=${inputValue}`, {
+        method: 'GET',
         headers: {
-          Accept: 'application/json',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
         },
+        credentials: 'same-origin',
       });
 
       if (!response.ok) {
@@ -561,7 +565,6 @@ export default function Edit({ item, enumerateOptions }: Props) {
                   <Label htmlFor="wysiwyg">WYSIWYG Content</Label>
                   <Editor
                     id="wysiwyg"
-                    apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
                     licenseKey="gpl"
                     initialValue={item.wysiwyg || ''}
                     init={{
