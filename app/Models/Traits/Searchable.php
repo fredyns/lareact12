@@ -4,6 +4,9 @@ namespace App\Models\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * @method static Builder search(string $search)
+ */
 trait Searchable
 {
     /**

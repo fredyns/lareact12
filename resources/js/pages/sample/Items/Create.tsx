@@ -122,11 +122,12 @@ export default function Create({ enumerateOptions }: Props) {
 
   const loadUserOptions = async (inputValue: string) => {
     try {
-      const response = await fetch(`/api/users?search=${inputValue}`, {
+      const response = await fetch(`/select-options/users?search=${inputValue}`, {
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
         },
         credentials: 'same-origin',
       });
