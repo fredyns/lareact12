@@ -1,46 +1,46 @@
-import { useState } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
-import { route } from 'ziggy-js';
-import AppLayout from '@/layouts/app-layout';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-    Search,
-    Plus,
-    MoreHorizontal,
-    Eye,
-    Edit,
-    Trash2,
-    ArrowUpDown,
-    ArrowUp,
-    ArrowDown,
-    X,
-    Filter
-} from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, Item } from '@/types';
+import { Head, Link, router } from '@inertiajs/react';
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  Edit,
+  Eye,
+  Filter,
+  MoreHorizontal,
+  Plus,
+  Search,
+  Trash2,
+  X,
+} from 'lucide-react';
+import { useState } from 'react';
 import Select from 'react-select';
+import { route } from 'ziggy-js';
 
 interface PaginationLink {
-    url: string | null;
-    label: string;
-    active: boolean;
+  url: string | null;
+  label: string;
+  active: boolean;
 }
 
 interface ItemsData {
-    data: Item[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    links: PaginationLink[];
+  data: Item[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+  links: PaginationLink[];
 }
 
 interface Props {
@@ -56,35 +56,37 @@ interface Props {
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Dashboard',
-        href: route('dashboard'),
-    },
-    {
-        title: 'Sample Items',
-        href: route('sample.items.index'),
-    },
+  {
+    title: 'Dashboard',
+    href: route('dashboard'),
+  },
+  {
+    title: 'Sample Items',
+    href: route('sample.items.index'),
+  },
 ];
 
 export default function ItemsIndex({ items, filters, enumerateOptions }: Props) {
   const [search, setSearch] = useState(filters.search || '');
   const [enumerate, setEnumerate] = useState(
-    filters.enumerate ?
-      enumerateOptions.find(option => option.value === filters.enumerate) :
-      null
+    filters.enumerate ? enumerateOptions.find((option) => option.value === filters.enumerate) : null,
   );
 
   const handleSort = (field: string) => {
     const direction = filters.sort_field === field && filters.sort_direction === 'asc' ? 'desc' : 'asc';
-    router.get(route('sample.items.index'), {
-      search,
-      enumerate: enumerate?.value,
-      sort_field: field,
-      sort_direction: direction,
-    }, {
-      preserveState: true,
-      replace: true,
-    });
+    router.get(
+      route('sample.items.index'),
+      {
+        search,
+        enumerate: enumerate?.value,
+        sort_field: field,
+        sort_direction: direction,
+      },
+      {
+        preserveState: true,
+        replace: true,
+      },
+    );
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -99,13 +101,17 @@ export default function ItemsIndex({ items, filters, enumerateOptions }: Props) 
 
   const handleEnumerateChange = (selected: { value: string; label: string } | null) => {
     setEnumerate(selected);
-    router.get(route('sample.items.index'), {
-      search,
-      enumerate: selected?.value || null,
-    }, {
-      preserveState: true,
-      replace: true,
-    });
+    router.get(
+      route('sample.items.index'),
+      {
+        search,
+        enumerate: selected?.value || null,
+      },
+      {
+        preserveState: true,
+        replace: true,
+      },
+    );
   };
 
   const handleDelete = (item: Item) => {
@@ -137,9 +143,7 @@ export default function ItemsIndex({ items, filters, enumerateOptions }: Props) 
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Sample Items</h1>
-            <p className="text-muted-foreground">
-              Manage sample items and their properties
-            </p>
+            <p className="text-muted-foreground">Manage sample items and their properties</p>
           </div>
           <Link href={route('sample.items.create')}>
             <Button>
@@ -152,21 +156,21 @@ export default function ItemsIndex({ items, filters, enumerateOptions }: Props) 
         <Card>
           <CardHeader>
             <CardTitle>Item Management</CardTitle>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
               <form onSubmit={handleSearch} className="flex items-center space-x-2">
                 <div className="relative">
-                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Search className="absolute top-2.5 left-2 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Search items..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="pl-8 pr-8"
+                    className="pr-8 pl-8"
                   />
                   {search && (
                     <button
                       type="button"
                       onClick={handleClearSearch}
-                      className="absolute right-2 top-2.5 h-4 w-4 text-muted-foreground hover:text-foreground"
+                      className="absolute top-2.5 right-2 h-4 w-4 text-muted-foreground hover:text-foreground"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -176,10 +180,10 @@ export default function ItemsIndex({ items, filters, enumerateOptions }: Props) 
                   Search
                 </Button>
               </form>
-              
+
               <div className="w-full sm:w-64">
                 <div className="relative">
-                  <Filter className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground z-10" />
+                  <Filter className="absolute top-2.5 left-2 z-10 h-4 w-4 text-muted-foreground" />
                   <Select
                     isClearable
                     placeholder="Filter by status"
@@ -200,31 +204,20 @@ export default function ItemsIndex({ items, filters, enumerateOptions }: Props) 
             </div>
           </CardHeader>
           <CardContent>
-
             <div className="rounded-md border">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b bg-muted/50">
-                      <th className="h-12 px-4 text-left align-middle font-medium w-16">
-                        #
-                      </th>
+                      <th className="h-12 w-16 px-4 text-left align-middle font-medium">#</th>
                       <th className="h-12 px-4 text-left align-middle font-medium">
-                        <Button
-                          variant="ghost"
-                          onClick={() => handleSort('string')}
-                          className="h-auto p-0 font-medium"
-                        >
+                        <Button variant="ghost" onClick={() => handleSort('string')} className="h-auto p-0 font-medium">
                           String
                           {getSortIcon('string')}
                         </Button>
                       </th>
                       <th className="h-12 px-4 text-left align-middle font-medium">
-                        <Button
-                          variant="ghost"
-                          onClick={() => handleSort('email')}
-                          className="h-auto p-0 font-medium"
-                        >
+                        <Button variant="ghost" onClick={() => handleSort('email')} className="h-auto p-0 font-medium">
                           Email
                           {getSortIcon('email')}
                         </Button>
@@ -239,7 +232,7 @@ export default function ItemsIndex({ items, filters, enumerateOptions }: Props) 
                           {getSortIcon('enumerate')}
                         </Button>
                       </th>
-                      <th className="h-12 px-4 text-left align-middle font-medium hidden sm:table-cell">
+                      <th className="hidden h-12 px-4 text-left align-middle font-medium sm:table-cell">
                         <Button
                           variant="ghost"
                           onClick={() => handleSort('created_at')}
@@ -249,38 +242,32 @@ export default function ItemsIndex({ items, filters, enumerateOptions }: Props) 
                           {getSortIcon('created_at')}
                         </Button>
                       </th>
-                      <th className="h-12 px-4 text-right align-middle font-medium">
-                        Actions
-                      </th>
+                      <th className="h-12 px-4 text-right align-middle font-medium">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {items.data.map((item, index) => (
                       <tr key={item.id} className="border-b">
                         <td className="p-4 align-middle">
-                          <div className="text-sm text-muted-foreground font-mono">
-                            {((items.current_page - 1) * items.per_page) + index + 1}
+                          <div className="font-mono text-sm text-muted-foreground">
+                            {(items.current_page - 1) * items.per_page + index + 1}
                           </div>
                         </td>
                         <td className="p-4 align-middle">
                           <div className="font-medium">{item.string}</div>
                         </td>
                         <td className="p-4 align-middle">
-                          <div className="text-sm text-muted-foreground">
-                            {item.email}
-                          </div>
+                          <div className="text-sm text-muted-foreground">{item.email}</div>
                         </td>
                         <td className="p-4 align-middle">
-                          <Badge variant={item.enumerate === 'enable' ? "default" : "secondary"}>
+                          <Badge variant={item.enumerate === 'enable' ? 'default' : 'secondary'}>
                             {item.enumerate ? item.enumerate.charAt(0).toUpperCase() + item.enumerate.slice(1) : 'N/A'}
                           </Badge>
                         </td>
-                        <td className="p-4 align-middle hidden sm:table-cell">
-                          <div className="text-sm text-muted-foreground">
-                            {formatDate(item.created_at)}
-                          </div>
+                        <td className="hidden p-4 align-middle sm:table-cell">
+                          <div className="text-sm text-muted-foreground">{formatDate(item.created_at)}</div>
                         </td>
-                        <td className="p-4 align-middle text-right">
+                        <td className="p-4 text-right align-middle">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" className="h-8 w-8 p-0">
@@ -300,10 +287,7 @@ export default function ItemsIndex({ items, filters, enumerateOptions }: Props) 
                                   Edit
                                 </Link>
                               </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => handleDelete(item)}
-                                className="text-destructive"
-                              >
+                              <DropdownMenuItem onClick={() => handleDelete(item)} className="text-destructive">
                                 <Trash2 className="mr-2 h-4 w-4" />
                                 Delete
                               </DropdownMenuItem>
@@ -328,21 +312,21 @@ export default function ItemsIndex({ items, filters, enumerateOptions }: Props) 
             {items.last_page > 1 && (
               <div className="flex items-center justify-between space-x-2 py-4">
                 <div className="text-sm text-muted-foreground">
-                  Showing {((items.current_page - 1) * items.per_page) + 1} to{' '}
-                  {Math.min(items.current_page * items.per_page, items.total)} of{' '}
-                  {items.total} results
+                  Showing {(items.current_page - 1) * items.per_page + 1} to{' '}
+                  {Math.min(items.current_page * items.per_page, items.total)} of {items.total} results
                 </div>
                 <div className="flex items-center space-x-2">
-                  {items.links && items.links.map((link, index) => (
-                    <Button
-                      key={index}
-                      variant={link.active ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => link.url && router.get(link.url)}
-                      disabled={!link.url}
-                      dangerouslySetInnerHTML={{ __html: link.label }}
-                    />
-                  ))}
+                  {items.links &&
+                    items.links.map((link, index) => (
+                      <Button
+                        key={index}
+                        variant={link.active ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => link.url && router.get(link.url)}
+                        disabled={!link.url}
+                        dangerouslySetInnerHTML={{ __html: link.label }}
+                      />
+                    ))}
                 </div>
               </div>
             )}

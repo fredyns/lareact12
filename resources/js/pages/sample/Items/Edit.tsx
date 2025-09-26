@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { route } from 'ziggy-js';
-import Select from 'react-select';
-import AsyncSelect from 'react-select/async';
-import { Editor } from '@tinymce/tinymce-react';
-import MDEditor from '@uiw/react-md-editor';
-import { Sketch } from '@uiw/react-color';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
+import AppLayout from '@/layouts/app-layout';
+import type { BreadcrumbItem, Item } from '@/types';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { Editor } from '@tinymce/tinymce-react';
+import { Sketch } from '@uiw/react-color';
+import MDEditor from '@uiw/react-md-editor';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { ArrowLeft, Save } from 'lucide-react';
-import type { Item, BreadcrumbItem } from '@/types';
+import React, { useEffect, useState } from 'react';
+import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet';
+import Select from 'react-select';
+import AsyncSelect from 'react-select/async';
+import { route } from 'ziggy-js';
 
 // Define interface for Leaflet Icon prototype
 interface LeafletIconPrototype extends L.Icon.Default {
@@ -127,7 +127,7 @@ export default function Edit({ item, enumerateOptions }: Props) {
     try {
       const response = await fetch(`/api/users?search=${inputValue}`, {
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
         },
       });
 
@@ -173,9 +173,7 @@ export default function Edit({ item, enumerateOptions }: Props) {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Edit Item</h1>
-            <p className="text-muted-foreground">
-              Update item information and settings
-            </p>
+            <p className="text-muted-foreground">Update item information and settings</p>
           </div>
           <Link href={route('sample.items.index')}>
             <Button variant="outline">
@@ -185,7 +183,7 @@ export default function Edit({ item, enumerateOptions }: Props) {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <div className="space-y-6">
             {/* Basic Information */}
             <Card>
@@ -195,19 +193,19 @@ export default function Edit({ item, enumerateOptions }: Props) {
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="string">String <span className="text-destructive">*</span></Label>
+                    <Label htmlFor="string">
+                      String <span className="text-destructive">*</span>
+                    </Label>
                     <Input
                       id="string"
                       type="text"
                       value={data.string}
-                      onChange={e => setData('string', e.target.value)}
+                      onChange={(e) => setData('string', e.target.value)}
                       placeholder="Enter string value"
                       className={errors.string ? 'border-destructive' : ''}
                       required
                     />
-                    {errors.string && (
-                      <p className="text-sm text-destructive">{errors.string}</p>
-                    )}
+                    {errors.string && <p className="text-sm text-destructive">{errors.string}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -216,13 +214,11 @@ export default function Edit({ item, enumerateOptions }: Props) {
                       id="email"
                       type="email"
                       value={data.email}
-                      onChange={e => setData('email', e.target.value)}
+                      onChange={(e) => setData('email', e.target.value)}
                       placeholder="Enter email address"
                       className={errors.email ? 'border-destructive' : ''}
                     />
-                    {errors.email && (
-                      <p className="text-sm text-destructive">{errors.email}</p>
-                    )}
+                    {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -232,13 +228,13 @@ export default function Edit({ item, enumerateOptions }: Props) {
                         id="color"
                         type="text"
                         value={data.color}
-                        onChange={e => setData('color', e.target.value)}
+                        onChange={(e) => setData('color', e.target.value)}
                         placeholder="Select a color"
                         className={errors.color ? 'border-destructive' : ''}
                         readOnly
                       />
                       <div
-                        className="w-10 h-10 border rounded cursor-pointer"
+                        className="h-10 w-10 cursor-pointer rounded border"
                         style={{ backgroundColor: data.color || '#fff' }}
                         onClick={() => setShowColorPicker(!showColorPicker)}
                       />
@@ -247,16 +243,11 @@ export default function Edit({ item, enumerateOptions }: Props) {
                       <div className="absolute z-10 mt-2">
                         <div className="fixed inset-0" onClick={() => setShowColorPicker(false)} />
                         <div className="relative">
-                          <Sketch
-                            color={data.color || '#fff'}
-                            onChange={(color) => setData('color', color.hex)}
-                          />
+                          <Sketch color={data.color || '#fff'} onChange={(color) => setData('color', color.hex)} />
                         </div>
                       </div>
                     )}
-                    {errors.color && (
-                      <p className="text-sm text-destructive">{errors.color}</p>
-                    )}
+                    {errors.color && <p className="text-sm text-destructive">{errors.color}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -267,13 +258,11 @@ export default function Edit({ item, enumerateOptions }: Props) {
                       min="1"
                       max="100"
                       value={data.integer || '1'}
-                      onChange={e => setData('integer', e.target.value)}
-                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                      onChange={(e) => setData('integer', e.target.value)}
+                      className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
                     />
                     <div className="text-center text-sm text-muted-foreground">{data.integer || '1'}</div>
-                    {errors.integer && (
-                      <p className="text-sm text-destructive">{errors.integer}</p>
-                    )}
+                    {errors.integer && <p className="text-sm text-destructive">{errors.integer}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -283,13 +272,11 @@ export default function Edit({ item, enumerateOptions }: Props) {
                       type="number"
                       step="0.01"
                       value={data.decimal}
-                      onChange={e => setData('decimal', e.target.value)}
+                      onChange={(e) => setData('decimal', e.target.value)}
                       placeholder="Enter decimal value"
                       className={errors.decimal ? 'border-destructive' : ''}
                     />
-                    {errors.decimal && (
-                      <p className="text-sm text-destructive">{errors.decimal}</p>
-                    )}
+                    {errors.decimal && <p className="text-sm text-destructive">{errors.decimal}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -304,9 +291,7 @@ export default function Edit({ item, enumerateOptions }: Props) {
                       title="Please enter NPWP in format: 99.999.999.9-999.999"
                       className={errors.npwp ? 'border-destructive' : ''}
                     />
-                    {errors.npwp && (
-                      <p className="text-sm text-destructive">{errors.npwp}</p>
-                    )}
+                    {errors.npwp && <p className="text-sm text-destructive">{errors.npwp}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -314,15 +299,13 @@ export default function Edit({ item, enumerateOptions }: Props) {
                     <Select
                       id="enumerate"
                       options={enumerateOptions}
-                      value={enumerateOptions.find(option => option.value === data.enumerate) || null}
+                      value={enumerateOptions.find((option) => option.value === data.enumerate) || null}
                       onChange={(selected: SelectOption | null) => setData('enumerate', selected ? selected.value : '')}
                       isClearable
                       className="react-select-container"
                       classNamePrefix="react-select"
                     />
-                    {errors.enumerate && (
-                      <p className="text-sm text-destructive">{errors.enumerate}</p>
-                    )}
+                    {errors.enumerate && <p className="text-sm text-destructive">{errors.enumerate}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -338,9 +321,7 @@ export default function Edit({ item, enumerateOptions }: Props) {
                       classNamePrefix="react-select"
                       isClearable
                     />
-                    {errors.user_id && (
-                      <p className="text-sm text-destructive">{errors.user_id}</p>
-                    )}
+                    {errors.user_id && <p className="text-sm text-destructive">{errors.user_id}</p>}
                   </div>
                 </form>
               </CardContent>
@@ -358,12 +339,10 @@ export default function Edit({ item, enumerateOptions }: Props) {
                     id="date"
                     type="date"
                     value={data.date}
-                    onChange={e => setData('date', e.target.value)}
+                    onChange={(e) => setData('date', e.target.value)}
                     className={errors.date ? 'border-destructive' : ''}
                   />
-                  {errors.date && (
-                    <p className="text-sm text-destructive">{errors.date}</p>
-                  )}
+                  {errors.date && <p className="text-sm text-destructive">{errors.date}</p>}
                 </div>
 
                 <div className="space-y-2">
@@ -372,12 +351,10 @@ export default function Edit({ item, enumerateOptions }: Props) {
                     id="time"
                     type="time"
                     value={data.time}
-                    onChange={e => setData('time', e.target.value)}
+                    onChange={(e) => setData('time', e.target.value)}
                     className={errors.time ? 'border-destructive' : ''}
                   />
-                  {errors.time && (
-                    <p className="text-sm text-destructive">{errors.time}</p>
-                  )}
+                  {errors.time && <p className="text-sm text-destructive">{errors.time}</p>}
                 </div>
 
                 <div className="space-y-2">
@@ -386,12 +363,10 @@ export default function Edit({ item, enumerateOptions }: Props) {
                     id="datetime"
                     type="datetime-local"
                     value={data.datetime}
-                    onChange={e => setData('datetime', e.target.value)}
+                    onChange={(e) => setData('datetime', e.target.value)}
                     className={errors.datetime ? 'border-destructive' : ''}
                   />
-                  {errors.datetime && (
-                    <p className="text-sm text-destructive">{errors.datetime}</p>
-                  )}
+                  {errors.datetime && <p className="text-sm text-destructive">{errors.datetime}</p>}
                 </div>
               </CardContent>
             </Card>
@@ -408,13 +383,11 @@ export default function Edit({ item, enumerateOptions }: Props) {
                     id="ip_address"
                     type="text"
                     value={data.ip_address}
-                    onChange={e => setData('ip_address', e.target.value)}
+                    onChange={(e) => setData('ip_address', e.target.value)}
                     placeholder="192.168.1.1"
                     className={errors.ip_address ? 'border-destructive' : ''}
                   />
-                  {errors.ip_address && (
-                    <p className="text-sm text-destructive">{errors.ip_address}</p>
-                  )}
+                  {errors.ip_address && <p className="text-sm text-destructive">{errors.ip_address}</p>}
                 </div>
 
                 <div className="flex items-center space-x-2">
@@ -424,9 +397,7 @@ export default function Edit({ item, enumerateOptions }: Props) {
                     onCheckedChange={(checked) => setData('boolean', !!checked)}
                   />
                   <Label htmlFor="boolean">Boolean</Label>
-                  {errors.boolean && (
-                    <p className="text-sm text-destructive">{errors.boolean}</p>
-                  )}
+                  {errors.boolean && <p className="text-sm text-destructive">{errors.boolean}</p>}
                 </div>
               </CardContent>
             </Card>
@@ -449,16 +420,14 @@ export default function Edit({ item, enumerateOptions }: Props) {
                       min="-90"
                       max="90"
                       value={data.latitude}
-                      onChange={e => {
+                      onChange={(e) => {
                         const lat = parseFloat(e.target.value);
                         setData('latitude', lat);
                       }}
                       placeholder="Enter latitude"
                       className={errors.latitude ? 'border-destructive' : ''}
                     />
-                    {errors.latitude && (
-                      <p className="text-sm text-destructive">{errors.latitude}</p>
-                    )}
+                    {errors.latitude && <p className="text-sm text-destructive">{errors.latitude}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -470,20 +439,18 @@ export default function Edit({ item, enumerateOptions }: Props) {
                       min="-180"
                       max="180"
                       value={data.longitude}
-                      onChange={e => {
+                      onChange={(e) => {
                         const lng = parseFloat(e.target.value);
                         setData('longitude', lng);
                       }}
                       placeholder="Enter longitude"
                       className={errors.longitude ? 'border-destructive' : ''}
                     />
-                    {errors.longitude && (
-                      <p className="text-sm text-destructive">{errors.longitude}</p>
-                    )}
+                    {errors.longitude && <p className="text-sm text-destructive">{errors.longitude}</p>}
                   </div>
                 </div>
 
-                <div className="h-64 mt-2">
+                <div className="mt-2 h-64">
                   <MapContainer
                     center={[data.latitude || 0, data.longitude || 0]}
                     zoom={data.latitude && data.longitude ? 13 : 2}
@@ -515,10 +482,21 @@ export default function Edit({ item, enumerateOptions }: Props) {
                       <a
                         href={`/storage/${item.file}`}
                         target="_blank"
-                        className="text-blue-600 hover:underline flex items-center"
+                        className="flex items-center text-blue-600 hover:underline"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="mr-2 h-5 w-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                          />
                         </svg>
                         Current file: {item.file.split('/').pop()}
                       </a>
@@ -528,36 +506,28 @@ export default function Edit({ item, enumerateOptions }: Props) {
                     type="file"
                     id="file"
                     onChange={(e) => handleFileChange(e, 'file')}
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
                     accept=".pdf,.docx,.pptx,.xlsx,.zip,.rar"
                   />
-                  {errors.file && (
-                    <p className="text-sm text-destructive">{errors.file}</p>
-                  )}
+                  {errors.file && <p className="text-sm text-destructive">{errors.file}</p>}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="image">Image (JPG, JPEG, PNG)</Label>
                   {item.image && (
                     <div className="mb-2">
-                      <img
-                        src={`/storage/${item.image}`}
-                        alt={item.string}
-                        className="h-24 w-auto rounded"
-                      />
-                      <p className="text-sm text-muted-foreground mt-1">Current image: {item.image.split('/').pop()}</p>
+                      <img src={`/storage/${item.image}`} alt={item.string} className="h-24 w-auto rounded" />
+                      <p className="mt-1 text-sm text-muted-foreground">Current image: {item.image.split('/').pop()}</p>
                     </div>
                   )}
                   <input
                     type="file"
                     id="image"
                     onChange={(e) => handleFileChange(e, 'image')}
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
                     accept=".jpg,.jpeg,.png"
                   />
-                  {errors.image && (
-                    <p className="text-sm text-destructive">{errors.image}</p>
-                  )}
+                  {errors.image && <p className="text-sm text-destructive">{errors.image}</p>}
                 </div>
               </CardContent>
             </Card>
@@ -573,25 +543,18 @@ export default function Edit({ item, enumerateOptions }: Props) {
                   <Textarea
                     id="text"
                     value={data.text}
-                    onChange={e => setData('text', e.target.value)}
+                    onChange={(e) => setData('text', e.target.value)}
                     rows={3}
                     placeholder="Enter text content"
                     className={errors.text ? 'border-destructive' : ''}
                   />
-                  {errors.text && (
-                    <p className="text-sm text-destructive">{errors.text}</p>
-                  )}
+                  {errors.text && <p className="text-sm text-destructive">{errors.text}</p>}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="markdown_text">Markdown Text</Label>
-                  <MDEditor
-                    value={markdownValue}
-                    onChange={setMarkdownValue}
-                  />
-                  {errors.markdown_text && (
-                    <p className="text-sm text-destructive">{errors.markdown_text}</p>
-                  )}
+                  <MDEditor value={markdownValue} onChange={setMarkdownValue} />
+                  {errors.markdown_text && <p className="text-sm text-destructive">{errors.markdown_text}</p>}
                 </div>
 
                 <div className="space-y-2">
@@ -606,26 +569,39 @@ export default function Edit({ item, enumerateOptions }: Props) {
                       branding: false,
                       promotion: false,
                       plugins: [
-                        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
-                        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                        'insertdatetime', 'media', 'table', 'help', 'wordcount'
+                        'advlist',
+                        'autolink',
+                        'lists',
+                        'link',
+                        'image',
+                        'charmap',
+                        'anchor',
+                        'searchreplace',
+                        'visualblocks',
+                        'code',
+                        'fullscreen',
+                        'insertdatetime',
+                        'media',
+                        'table',
+                        'help',
+                        'wordcount',
                       ],
-                      toolbar: 'undo redo | formatselect | ' +
+                      toolbar:
+                        'undo redo | formatselect | ' +
                         'bold italic backcolor | alignleft aligncenter ' +
                         'alignright alignjustify | bullist numlist outdent indent | ' +
                         'removeformat | help',
-                      content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif; font-size: 14px }',
+                      content_style:
+                        'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif; font-size: 14px }',
                       setup: (editor) => {
                         editor.on('change', () => {
                           setWysiwygValue(editor.getContent());
                         });
-                      }
+                      },
                     }}
                     onEditorChange={setWysiwygValue}
                   />
-                  {errors.wysiwyg && (
-                    <p className="text-sm text-destructive">{errors.wysiwyg}</p>
-                  )}
+                  {errors.wysiwyg && <p className="text-sm text-destructive">{errors.wysiwyg}</p>}
                 </div>
               </CardContent>
             </Card>

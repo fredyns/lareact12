@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 import Select from 'react-select';
@@ -7,7 +7,7 @@ import { Editor } from '@tinymce/tinymce-react';
 import { Editor as TinyMCEEditor } from 'tinymce';
 import MDEditor from '@uiw/react-md-editor';
 import { Sketch } from '@uiw/react-color';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import AppLayout from '@/layouts/app-layout';
@@ -124,7 +124,7 @@ export default function Create({ enumerateOptions }: Props) {
     try {
       const response = await fetch(`/api/users?search=${inputValue}`, {
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
           'Content-Type': 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
         },
@@ -173,9 +173,7 @@ export default function Create({ enumerateOptions }: Props) {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Create Item</h1>
-            <p className="text-muted-foreground">
-              Add a new sample item to the system
-            </p>
+            <p className="text-muted-foreground">Add a new sample item to the system</p>
           </div>
           <Link href={route('sample.items.index')}>
             <Button variant="outline">
@@ -186,7 +184,7 @@ export default function Create({ enumerateOptions }: Props) {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {/* Left Column */}
             <div className="space-y-4">
               {/* Basic Information */}
@@ -206,9 +204,7 @@ export default function Create({ enumerateOptions }: Props) {
                       className={errors.string ? 'border-destructive' : ''}
                       required
                     />
-                    {errors.string && (
-                      <p className="text-sm text-destructive">{errors.string}</p>
-                    )}
+                    {errors.string && <p className="text-sm text-destructive">{errors.string}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -221,9 +217,7 @@ export default function Create({ enumerateOptions }: Props) {
                       placeholder="Enter email address"
                       className={errors.email ? 'border-destructive' : ''}
                     />
-                    {errors.email && (
-                      <p className="text-sm text-destructive">{errors.email}</p>
-                    )}
+                    {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -239,7 +233,7 @@ export default function Create({ enumerateOptions }: Props) {
                         readOnly
                       />
                       <div
-                        className="w-10 h-10 border rounded-md cursor-pointer"
+                        className="h-10 w-10 cursor-pointer rounded-md border"
                         style={{ backgroundColor: data.color || '#fff' }}
                         onClick={() => setShowColorPicker(!showColorPicker)}
                       />
@@ -248,16 +242,11 @@ export default function Create({ enumerateOptions }: Props) {
                       <div className="absolute z-10 mt-2">
                         <div className="fixed inset-0" onClick={() => setShowColorPicker(false)} />
                         <div className="relative">
-                          <Sketch
-                            color={data.color || '#fff'}
-                            onChange={(color) => setData('color', color.hex)}
-                          />
+                          <Sketch color={data.color || '#fff'} onChange={(color) => setData('color', color.hex)} />
                         </div>
                       </div>
                     )}
-                    {errors.color && (
-                      <p className="text-sm text-destructive">{errors.color}</p>
-                    )}
+                    {errors.color && <p className="text-sm text-destructive">{errors.color}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -268,15 +257,11 @@ export default function Create({ enumerateOptions }: Props) {
                       min="0"
                       max="100"
                       value={data.integer || '0'}
-                      onChange={e => setData('integer', e.target.value)}
-                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                      onChange={(e) => setData('integer', e.target.value)}
+                      className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
                     />
-                    <div className="text-center text-sm font-medium">
-                      {data.integer || '0'}
-                    </div>
-                    {errors.integer && (
-                      <p className="text-sm text-destructive">{errors.integer}</p>
-                    )}
+                    <div className="text-center text-sm font-medium">{data.integer || '0'}</div>
+                    {errors.integer && <p className="text-sm text-destructive">{errors.integer}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -290,9 +275,7 @@ export default function Create({ enumerateOptions }: Props) {
                       placeholder="Enter decimal value"
                       className={errors.decimal ? 'border-destructive' : ''}
                     />
-                    {errors.decimal && (
-                      <p className="text-sm text-destructive">{errors.decimal}</p>
-                    )}
+                    {errors.decimal && <p className="text-sm text-destructive">{errors.decimal}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -307,9 +290,7 @@ export default function Create({ enumerateOptions }: Props) {
                       title="Please enter NPWP in format: 99.999.999.9-999.999"
                       className={errors.npwp ? 'border-destructive' : ''}
                     />
-                    {errors.npwp && (
-                      <p className="text-sm text-destructive">{errors.npwp}</p>
-                    )}
+                    {errors.npwp && <p className="text-sm text-destructive">{errors.npwp}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -317,18 +298,14 @@ export default function Create({ enumerateOptions }: Props) {
                     <Select
                       id="enumerate"
                       options={enumerateOptions}
-                      value={enumerateOptions.find(option => option.value === data.enumerate) || null}
-                      onChange={(selected: SelectOption | null) =>
-                        setData('enumerate', selected ? selected.value : '')
-                      }
+                      value={enumerateOptions.find((option) => option.value === data.enumerate) || null}
+                      onChange={(selected: SelectOption | null) => setData('enumerate', selected ? selected.value : '')}
                       isClearable
                       className="react-select-container"
                       classNamePrefix="react-select"
                       placeholder="Select status"
                     />
-                    {errors.enumerate && (
-                      <p className="text-sm text-destructive">{errors.enumerate}</p>
-                    )}
+                    {errors.enumerate && <p className="text-sm text-destructive">{errors.enumerate}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -338,17 +315,13 @@ export default function Create({ enumerateOptions }: Props) {
                       cacheOptions
                       defaultOptions
                       loadOptions={loadUserOptions}
-                      onChange={(selected: SelectOption | null) =>
-                        setData('user_id', selected ? selected.value : '')
-                      }
+                      onChange={(selected: SelectOption | null) => setData('user_id', selected ? selected.value : '')}
                       className="react-select-container"
                       classNamePrefix="react-select"
                       isClearable
                       placeholder="Search and select user"
                     />
-                    {errors.user_id && (
-                      <p className="text-sm text-destructive">{errors.user_id}</p>
-                    )}
+                    {errors.user_id && <p className="text-sm text-destructive">{errors.user_id}</p>}
                   </div>
                 </CardContent>
               </Card>
@@ -368,9 +341,7 @@ export default function Create({ enumerateOptions }: Props) {
                       onChange={(e) => setData('date', e.target.value)}
                       className={errors.date ? 'border-destructive' : ''}
                     />
-                    {errors.date && (
-                      <p className="text-sm text-destructive">{errors.date}</p>
-                    )}
+                    {errors.date && <p className="text-sm text-destructive">{errors.date}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -382,9 +353,7 @@ export default function Create({ enumerateOptions }: Props) {
                       onChange={(e) => setData('time', e.target.value)}
                       className={errors.time ? 'border-destructive' : ''}
                     />
-                    {errors.time && (
-                      <p className="text-sm text-destructive">{errors.time}</p>
-                    )}
+                    {errors.time && <p className="text-sm text-destructive">{errors.time}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -396,9 +365,7 @@ export default function Create({ enumerateOptions }: Props) {
                       onChange={(e) => setData('datetime', e.target.value)}
                       className={errors.datetime ? 'border-destructive' : ''}
                     />
-                    {errors.datetime && (
-                      <p className="text-sm text-destructive">{errors.datetime}</p>
-                    )}
+                    {errors.datetime && <p className="text-sm text-destructive">{errors.datetime}</p>}
                   </div>
                 </CardContent>
               </Card>
@@ -419,9 +386,7 @@ export default function Create({ enumerateOptions }: Props) {
                       placeholder="192.168.1.1"
                       className={errors.ip_address ? 'border-destructive' : ''}
                     />
-                    {errors.ip_address && (
-                      <p className="text-sm text-destructive">{errors.ip_address}</p>
-                    )}
+                    {errors.ip_address && <p className="text-sm text-destructive">{errors.ip_address}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -433,9 +398,7 @@ export default function Create({ enumerateOptions }: Props) {
                       />
                       <Label htmlFor="boolean">Boolean</Label>
                     </div>
-                    {errors.boolean && (
-                      <p className="text-sm text-destructive">{errors.boolean}</p>
-                    )}
+                    {errors.boolean && <p className="text-sm text-destructive">{errors.boolean}</p>}
                   </div>
                 </CardContent>
               </Card>
@@ -466,9 +429,7 @@ export default function Create({ enumerateOptions }: Props) {
                         placeholder="Enter latitude"
                         className={errors.latitude ? 'border-destructive' : ''}
                       />
-                      {errors.latitude && (
-                        <p className="text-sm text-destructive">{errors.latitude}</p>
-                      )}
+                      {errors.latitude && <p className="text-sm text-destructive">{errors.latitude}</p>}
                     </div>
 
                     <div className="space-y-2">
@@ -487,13 +448,11 @@ export default function Create({ enumerateOptions }: Props) {
                         placeholder="Enter longitude"
                         className={errors.longitude ? 'border-destructive' : ''}
                       />
-                      {errors.longitude && (
-                        <p className="text-sm text-destructive">{errors.longitude}</p>
-                      )}
+                      {errors.longitude && <p className="text-sm text-destructive">{errors.longitude}</p>}
                     </div>
                   </div>
 
-                  <div className="h-64 mt-2">
+                  <div className="mt-2 h-64">
                     <MapContainer
                       center={[data.latitude || 0, data.longitude || 0]}
                       zoom={2}
@@ -527,9 +486,7 @@ export default function Create({ enumerateOptions }: Props) {
                       accept=".pdf,.docx,.pptx,.xlsx,.zip,.rar"
                       className={errors.file ? 'border-destructive' : ''}
                     />
-                    {errors.file && (
-                      <p className="text-sm text-destructive">{errors.file}</p>
-                    )}
+                    {errors.file && <p className="text-sm text-destructive">{errors.file}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -541,9 +498,7 @@ export default function Create({ enumerateOptions }: Props) {
                       accept=".jpg,.jpeg,.png"
                       className={errors.image ? 'border-destructive' : ''}
                     />
-                    {errors.image && (
-                      <p className="text-sm text-destructive">{errors.image}</p>
-                    )}
+                    {errors.image && <p className="text-sm text-destructive">{errors.image}</p>}
                   </div>
                 </CardContent>
               </Card>
@@ -562,22 +517,15 @@ export default function Create({ enumerateOptions }: Props) {
                       onChange={(e) => setData('text', e.target.value)}
                       rows={3}
                       placeholder="Enter text content"
-                      className={`flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${errors.text ? 'border-destructive' : ''}`}
+                      className={`flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${errors.text ? 'border-destructive' : ''}`}
                     />
-                    {errors.text && (
-                      <p className="text-sm text-destructive">{errors.text}</p>
-                    )}
+                    {errors.text && <p className="text-sm text-destructive">{errors.text}</p>}
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="markdown_text">Markdown Text</Label>
-                    <MDEditor
-                      value={markdownValue}
-                      onChange={setMarkdownValue}
-                    />
-                    {errors.markdown_text && (
-                      <p className="text-sm text-destructive">{errors.markdown_text}</p>
-                    )}
+                    <MDEditor value={markdownValue} onChange={setMarkdownValue} />
+                    {errors.markdown_text && <p className="text-sm text-destructive">{errors.markdown_text}</p>}
                   </div>
 
                   <div className="space-y-2">
@@ -591,27 +539,40 @@ export default function Create({ enumerateOptions }: Props) {
                         branding: false,
                         promotion: false,
                         plugins: [
-                          'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
-                          'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                          'insertdatetime', 'media', 'table', 'help', 'wordcount'
+                          'advlist',
+                          'autolink',
+                          'lists',
+                          'link',
+                          'image',
+                          'charmap',
+                          'anchor',
+                          'searchreplace',
+                          'visualblocks',
+                          'code',
+                          'fullscreen',
+                          'insertdatetime',
+                          'media',
+                          'table',
+                          'help',
+                          'wordcount',
                         ],
-                        toolbar: 'undo redo | formatselect | ' +
+                        toolbar:
+                          'undo redo | formatselect | ' +
                           'bold italic backcolor | alignleft aligncenter ' +
                           'alignright alignjustify | bullist numlist outdent indent | ' +
                           'removeformat | help',
-                        content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif; font-size: 14px }',
+                        content_style:
+                          'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif; font-size: 14px }',
                         setup: (editor: TinyMCEEditor) => {
                           editor.on('change', () => {
                             setWysiwygValue(editor.getContent());
                           });
-                        }
+                        },
                       }}
                       value={wysiwygValue}
                       onEditorChange={setWysiwygValue}
                     />
-                    {errors.wysiwyg && (
-                      <p className="text-sm text-destructive">{errors.wysiwyg}</p>
-                    )}
+                    {errors.wysiwyg && <p className="text-sm text-destructive">{errors.wysiwyg}</p>}
                   </div>
                 </CardContent>
               </Card>
