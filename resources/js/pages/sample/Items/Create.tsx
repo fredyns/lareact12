@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { route } from 'ziggy-js';
-import Select from 'react-select';
 import AsyncSelect from 'react-select/async';
 import { Editor } from '@tinymce/tinymce-react';
 import { Editor as TinyMCEEditor } from 'tinymce';
 import MDEditor from '@uiw/react-md-editor';
 import { Sketch } from '@uiw/react-color';
-import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet';
+import { MapContainer, Marker, TileLayer, useMapEvents, ScaleControl } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import AppLayout from '@/layouts/app-layout';
@@ -480,18 +479,19 @@ export default function Create({ enumerateOptions }: Props) {
                     </div>
                   </div>
 
-                  <div className="mt-2 h-64">
+                  <div className="mt-2 h-160">
                     <MapContainer
-                      center={[data.latitude || 0, data.longitude || 0]}
-                      zoom={2}
+                      center={[data.latitude || -6.2088, data.longitude || 106.8456]}
+                      zoom={11}
                       style={{ height: '100%', width: '100%' }}
                     >
                       <TileLayer
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                       />
+                      <ScaleControl position="bottomleft" />
                       <DraggableMarker
-                        position={[data.latitude || 0, data.longitude || 0]}
+                        position={[data.latitude || -6.2088, data.longitude || 106.8456]}
                         onPositionChange={handlePositionChange}
                       />
                     </MapContainer>

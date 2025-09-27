@@ -1,7 +1,6 @@
 <?php
 /**
  * Todo:
- *  5. in Items\Create > geo location picker: make it square
  *  5. in Items\Create > field 'file' & 'image':
  *      - implement minio
  *      - upload not working
