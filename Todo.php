@@ -1,7 +1,6 @@
 <?php
 /**
  * Todo:
- *  1. in Items\Create > field 'color': click on input to show color picker
  *  2. in Items\Create > field 'integer':
  *      - display input field on top slider
  *      - remove value label
