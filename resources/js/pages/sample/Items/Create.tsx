@@ -307,16 +307,32 @@ export default function Create({ enumerateOptions }: Props) {
 
                   <div className="space-y-2">
                     <Label htmlFor="enumerate">Status</Label>
-                    <Select
-                      id="enumerate"
-                      options={enumerateOptions}
-                      value={enumerateOptions.find((option) => option.value === data.enumerate) || null}
-                      onChange={(selected: SelectOption | null) => setData('enumerate', selected ? selected.value : '')}
-                      isClearable
-                      className="react-select-container"
-                      classNamePrefix="react-select"
-                      placeholder="Select status"
-                    />
+                    <div className="flex flex-wrap gap-2">
+                      {enumerateOptions.map((option) => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          onClick={() => setData('enumerate', option.value)}
+                          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                            data.enumerate === option.value
+                              ? 'bg-indigo-600 text-white'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                      {data.enumerate && (
+                        <button
+                          type="button"
+                          onClick={() => setData('enumerate', '')}
+                          className="px-3 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors"
+                          title="Clear selection"
+                        >
+                          ×
+                        </button>
+                      )}
+                    </div>
                     {errors.enumerate && <p className="text-sm text-destructive">{errors.enumerate}</p>}
                   </div>
 
