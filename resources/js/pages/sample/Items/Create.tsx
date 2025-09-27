@@ -253,16 +253,26 @@ export default function Create({ enumerateOptions }: Props) {
 
                   <div className="space-y-2">
                     <Label htmlFor="integer">Integer</Label>
-                    <input
-                      type="range"
+                    <Input
+                      type="number"
                       id="integer"
                       min="0"
                       max="100"
                       value={data.integer || '0'}
                       onChange={(e) => setData('integer', e.target.value)}
-                      className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
+                      className="w-full"
                     />
-                    <div className="text-center text-sm font-medium">{data.integer || '0'}</div>
+                    <div className="mt-2">
+                      <input
+                        type="range"
+                        id="integer-slider"
+                        min="0"
+                        max="100"
+                        value={data.integer || '0'}
+                        onChange={(e) => setData('integer', e.target.value)}
+                        className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
+                      />
+                    </div>
                     {errors.integer && <p className="text-sm text-destructive">{errors.integer}</p>}
                   </div>
 
