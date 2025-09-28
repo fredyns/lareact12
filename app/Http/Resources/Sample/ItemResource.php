@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Sample;
 
+use App\Services\MinioService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -20,6 +21,8 @@ class ItemResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $minioService = app(MinioService::class);
+        
         return [
             'id' => $this->id,
             'created_at' => $this->created_at,
@@ -41,7 +44,9 @@ class ItemResource extends JsonResource
             'enumerate' => $this->enumerate?->value,
             'text' => $this->text,
             'file' => $this->file,
+            'file_url' => $this->file ? $minioService->getFileUrl($this->file, 1440) : null, // 24 hours
             'image' => $this->image,
+            'image_url' => $this->image ? $minioService->getFileUrl($this->image, 1440) : null, // 24 hours
             'markdown_text' => $this->markdown_text,
             'wysiwyg' => $this->wysiwyg,
             'latitude' => $this->latitude,

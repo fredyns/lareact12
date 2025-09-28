@@ -3,6 +3,7 @@
 use App\Http\Controllers\RBAC\PermissionController;
 use App\Http\Controllers\RBAC\RoleController;
 use App\Http\Controllers\Sample\ItemController;
+use App\Http\Controllers\UploadController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -35,6 +36,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             return response()->json($users);
         });
+    });
+
+    // Generic Upload Routes for MinIO
+    Route::prefix('upload')->name('upload.')->group(function () {
+        Route::post('file', [UploadController::class, 'uploadFile'])->name('file');
+        Route::post('image', [UploadController::class, 'uploadImage'])->name('image');
     });
 
     // User Management Routes

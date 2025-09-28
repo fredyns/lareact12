@@ -9,6 +9,7 @@ use App\Http\Resources\Sample\ItemResource;
 use App\Http\Resources\Sample\ItemResourceCollection;
 use App\Models\Sample\Item;
 use App\Models\User;
+use App\Services\MinioService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -21,6 +22,13 @@ use Inertia\Inertia;
  */
 class ItemController extends Controller
 {
+    protected $minioService;
+
+    public function __construct(MinioService $minioService)
+    {
+        $this->minioService = $minioService;
+        // Authorization is handled in individual methods
+    }
     /**
      * Display a listing of the items.
      *
@@ -110,14 +118,9 @@ class ItemController extends Controller
 
         $data = $request->validated();
 
-        // Handle file uploads
-        if ($request->hasFile('file')) {
-            $data['file'] = $request->file('file')->store('items/files', 'public');
-        }
-
-        if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('items/images', 'public');
-        }
+        // Files are now uploaded via separate API endpoint
+        // The 'file' and 'image' fields contain MinIO paths as strings
+        // No additional file processing needed here
 
         $item = Item::create($data);
 
@@ -190,21 +193,33 @@ class ItemController extends Controller
 
         $data = $request->validated();
 
-        // Handle file uploads
+        // Handle file uploads using MinIO
         if ($request->hasFile('file')) {
             // Delete old file if exists
-            if ($item->file && Storage::disk('public')->exists($item->file)) {
-                Storage::disk('public')->delete($item->file);
+            if ($item->file && $this->minioService->fileExists($item->file)) {
+                $this->minioService->deleteFile($item->file);
             }
-            $data['file'] = $request->file('file')->store('items/files', 'public');
+            $filePath = $this->minioService->uploadFile(
+                $request->file('file'),
+                'items/files'
+            );
+            if ($filePath) {
+                $data['file'] = $filePath;
+            }
         }
 
         if ($request->hasFile('image')) {
             // Delete old image if exists
-            if ($item->image && Storage::disk('public')->exists($item->image)) {
-                Storage::disk('public')->delete($item->image);
+            if ($item->image && $this->minioService->fileExists($item->image)) {
+                $this->minioService->deleteFile($item->image);
             }
-            $data['image'] = $request->file('image')->store('items/images', 'public');
+            $imagePath = $this->minioService->uploadFile(
+                $request->file('image'),
+                'items/images'
+            );
+            if ($imagePath) {
+                $data['image'] = $imagePath;
+            }
         }
 
         $item->update($data);
@@ -229,13 +244,13 @@ class ItemController extends Controller
     {
         $this->authorize('delete', $item);
 
-        // Delete associated files
-        if ($item->file && Storage::disk('public')->exists($item->file)) {
-            Storage::disk('public')->delete($item->file);
+        // Delete associated files from MinIO
+        if ($item->file && $this->minioService->fileExists($item->file)) {
+            $this->minioService->deleteFile($item->file);
         }
 
-        if ($item->image && Storage::disk('public')->exists($item->image)) {
-            Storage::disk('public')->delete($item->image);
+        if ($item->image && $this->minioService->fileExists($item->image)) {
+            $this->minioService->deleteFile($item->image);
         }
 
         $item->delete();
@@ -247,4 +262,5 @@ class ItemController extends Controller
         return redirect()->route('sample.items.index')
             ->with('success', 'Item deleted successfully.');
     }
+
 }

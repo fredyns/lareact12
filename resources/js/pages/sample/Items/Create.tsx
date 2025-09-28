@@ -91,7 +91,10 @@ export default function Create({ enumerateOptions }: Props) {
   const [markdownValue, setMarkdownValue] = useState<string | undefined>('');
   const [wysiwygValue, setWysiwygValue] = useState('');
 
-  const { data, setData, post, processing, errors, reset } = useForm({
+  const [fileUploading, setFileUploading] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
+
+  const { data, setData, post, processing, errors, reset, setError, clearErrors } = useForm({
     string: '',
     email: '',
     color: '',
@@ -105,8 +108,8 @@ export default function Create({ enumerateOptions }: Props) {
     boolean: false,
     enumerate: '',
     text: '',
-    file: null as File | null,
-    image: null as File | null,
+    file: '',
+    image: '',
     markdown_text: '',
     wysiwyg: '',
     latitude: 0,
@@ -151,9 +154,81 @@ export default function Create({ enumerateOptions }: Props) {
     });
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'file' | 'image') => {
+  const uploadFileToMinio = async (file: File, type: 'file' | 'image'): Promise<string | null> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    // Add folder parameter to organize uploads by context
+    formData.append('folder', type === 'file' ? 'items/files' : 'items/images');
+
+    // Use the appropriate endpoint based on file type
+    const endpoint = type === 'file' ? '/upload/file' : '/upload/image';
+
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+        },
+        credentials: 'same-origin',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Upload failed');
+      }
+
+      const data = await response.json();
+      return data.path;
+    } catch (error) {
+      console.error('Upload error:', error);
+      throw error;
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, field: 'file' | 'image') => {
     if (e.target.files && e.target.files[0]) {
-      setData(field, e.target.files[0]);
+      const file = e.target.files[0];
+      
+      // Validate file size (max 10MB for files, 5MB for images)
+      const maxSize = field === 'file' ? 10 * 1024 * 1024 : 5 * 1024 * 1024;
+      if (file.size > maxSize) {
+        const maxSizeMB = field === 'file' ? '10MB' : '5MB';
+        setError(field, `File size must be less than ${maxSizeMB}`);
+        return;
+      }
+      
+      // Clear any previous errors
+      clearErrors(field);
+      
+      // Set uploading state
+      if (field === 'file') {
+        setFileUploading(true);
+      } else {
+        setImageUploading(true);
+      }
+
+      try {
+        // Upload file to MinIO
+        const filePath = await uploadFileToMinio(file, field);
+        
+        if (filePath) {
+          // Set the file path in form data
+          setData(field, filePath);
+        } else {
+          setError(field, 'Failed to upload file');
+        }
+      } catch (error) {
+        setError(field, error instanceof Error ? error.message : 'Upload failed');
+      } finally {
+        // Clear uploading state
+        if (field === 'file') {
+          setFileUploading(false);
+        } else {
+          setImageUploading(false);
+        }
+      }
     }
   };
 
@@ -513,8 +588,21 @@ export default function Create({ enumerateOptions }: Props) {
                       onChange={(e) => handleFileChange(e, 'file')}
                       accept=".pdf,.docx,.pptx,.xlsx,.zip,.rar"
                       className={errors.file ? 'border-destructive' : ''}
+                      disabled={fileUploading}
                     />
+                    {fileUploading && (
+                      <div className="text-sm text-blue-600 bg-blue-50 p-2 rounded-md">
+                        <p>Uploading file to MinIO...</p>
+                      </div>
+                    )}
+                    {data.file && !fileUploading && (
+                      <div className="text-sm text-green-600 bg-green-50 p-2 rounded-md">
+                        <p><strong>Uploaded:</strong> {data.file}</p>
+                        <p><strong>Status:</strong> Ready for submission</p>
+                      </div>
+                    )}
                     {errors.file && <p className="text-sm text-destructive">{errors.file}</p>}
+                    <p className="text-xs text-muted-foreground">Maximum file size: 10MB</p>
                   </div>
 
                   <div className="space-y-2">
@@ -525,8 +613,21 @@ export default function Create({ enumerateOptions }: Props) {
                       onChange={(e) => handleFileChange(e, 'image')}
                       accept=".jpg,.jpeg,.png"
                       className={errors.image ? 'border-destructive' : ''}
+                      disabled={imageUploading}
                     />
+                    {imageUploading && (
+                      <div className="text-sm text-blue-600 bg-blue-50 p-2 rounded-md">
+                        <p>Uploading image to MinIO...</p>
+                      </div>
+                    )}
+                    {data.image && !imageUploading && (
+                      <div className="text-sm text-green-600 bg-green-50 p-2 rounded-md">
+                        <p><strong>Uploaded:</strong> {data.image}</p>
+                        <p><strong>Status:</strong> Ready for submission</p>
+                      </div>
+                    )}
                     {errors.image && <p className="text-sm text-destructive">{errors.image}</p>}
+                    <p className="text-xs text-muted-foreground">Maximum file size: 5MB</p>
                   </div>
                 </CardContent>
               </Card>
