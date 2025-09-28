@@ -267,8 +267,6 @@ export default function Show({ item, enumerateOptions }: Props) {
                   ) : (
                     <p className="text-sm text-muted-foreground">No data available</p>
                   )}
-                    <p className="text-sm text-muted-foreground">file: {item.file || '-'}</p>
-                    <p className="text-sm text-muted-foreground">file_url: {item.file_url || '-'}</p>
                 </div>
 
                 <div className="space-y-2">
@@ -282,8 +280,6 @@ export default function Show({ item, enumerateOptions }: Props) {
                   ) : (
                     <p className="text-sm text-muted-foreground">No image available</p>
                   )}
-                    <p className="text-sm text-muted-foreground">image: {item.image || '-'}</p>
-                    <p className="text-sm text-muted-foreground">image_url: {item.image_url || '-'}</p>
                 </div>
               </CardContent>
             </Card>
