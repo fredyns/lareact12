@@ -4,9 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, Item } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
+import MDEditor from '@uiw/react-md-editor';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { ArrowLeft, Edit, FileText, Trash2 } from 'lucide-react';
@@ -328,9 +326,7 @@ export default function Show({ item, enumerateOptions }: Props) {
                   <p className="text-sm text-muted-foreground">Markdown Text</p>
                   {item.markdown_text ? (
                     <div className="md-preview" data-color-mode={colorMode}>
-                      <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
-                        {normalizeMarkdown(item.markdown_text)}
-                      </ReactMarkdown>
+                      <MDEditor.Markdown source={normalizeMarkdown(item.markdown_text)} />
                     </div>
                   ) : (
                     <>-</>
