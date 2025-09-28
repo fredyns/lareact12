@@ -1,9 +1,13 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { MermaidChart } from '@/components/markdown/MermaidChart';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, Item } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { normalizeMarkdown } from '@/utils/markdown';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { ArrowLeft, Edit, FileText, Trash2 } from 'lucide-react';
@@ -298,7 +302,31 @@ export default function Show({ item, enumerateOptions }: Props) {
 
                 <div className="space-y-2">
                   <p className="text-sm text-muted-foreground">Markdown Text</p>
-                  <div className="rounded-lg bg-muted/50 p-4 whitespace-pre-wrap">{item.markdown_text || '-'}</div>
+                  {item.markdown_text ? (
+                    <div className="prose prose-sm max-w-none dark:prose-invert">
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          code({ className, children, ...props }: any) {
+                            const inline = (props as any).inline;
+                            const match = /language-(\w+)/.exec(className || '');
+                            const language = match ? match[1] : '';
+                            const code = String(children).replace(/\n$/, '');
+                            
+                            if (!inline && language === 'mermaid') {
+                              return <MermaidChart code={code} />;
+                            }
+                            
+                            return <code className={className} {...props}>{children}</code>;
+                          },
+                        }}
+                      >
+                        {normalizeMarkdown(item.markdown_text)}
+                      </ReactMarkdown>
+                    </div>
+                  ) : (
+                    <div className="rounded-lg bg-muted/50 p-4 text-muted-foreground">-</div>
+                  )}
                 </div>
 
                 <div className="space-y-2">

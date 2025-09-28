@@ -6,6 +6,10 @@ import { Editor } from '@tinymce/tinymce-react';
 import { Editor as TinyMCEEditor } from 'tinymce';
 import { Sketch } from '@uiw/react-color';
 import { MapContainer, Marker, TileLayer, useMapEvents, ScaleControl } from 'react-leaflet';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { MermaidChart } from '@/components/markdown/MermaidChart';
+import { normalizeMarkdown } from '@/utils/markdown';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import AppLayout from '@/layouts/app-layout';
@@ -14,7 +18,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Save } from 'lucide-react';
 import { type BreadcrumbItem } from '@/types';
 
@@ -649,13 +652,51 @@ export default function Create({ enumerateOptions }: Props) {
 
                   <div className="space-y-2">
                     <Label htmlFor="markdown_text">Markdown Text</Label>
-                    <Textarea
-                      id="markdown_text"
-                      value={data.markdown_text}
-                      onChange={(e) => setData('markdown_text', e.target.value)}
-                      placeholder="Enter markdown text..."
-                      rows={6}
-                    />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-xs text-muted-foreground">Editor</Label>
+                        <textarea
+                          id="markdown_text"
+                          value={data.markdown_text || ''}
+                          onChange={(e) => setData('markdown_text', e.target.value)}
+                          rows={12}
+                          placeholder="Enter markdown text with mermaid diagrams...\n\nExample:\n**Bold text**\n*Italic text*\n~~Strikethrough~~\n\n```mermaid\ngraph TD\n    A[Start] --> B[End]\n```"
+                          className={`flex min-h-[300px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 font-mono ${errors.markdown_text ? 'border-destructive' : ''}`}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-xs text-muted-foreground">Preview</Label>
+                        <div className="min-h-[300px] rounded-md border border-input bg-background p-3 prose prose-sm max-w-none dark:prose-invert overflow-auto">
+                          {data.markdown_text ? (
+                            <ReactMarkdown
+                              remarkPlugins={[remarkGfm]}
+                              components={{
+                                code({ inline, className, children, ...props }: { 
+                                  inline?: boolean; 
+                                  className?: string; 
+                                  children?: React.ReactNode; 
+                                  [key: string]: any; 
+                                }) {
+                                  const match = /language-(\w+)/.exec(className || '');
+                                  const language = match ? match[1] : '';
+                                  const code = String(children).replace(/\n$/, '');
+                                  
+                                  if (!inline && language === 'mermaid') {
+                                    return <MermaidChart code={code} />;
+                                  }
+                                  
+                                  return <code className={className} {...props}>{children}</code>;
+                                },
+                              }}
+                            >
+                              {normalizeMarkdown(data.markdown_text)}
+                            </ReactMarkdown>
+                          ) : (
+                            <div className="text-muted-foreground text-sm">Preview will appear here...</div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                     {errors.markdown_text && <p className="text-sm text-destructive">{errors.markdown_text}</p>}
                   </div>
 
