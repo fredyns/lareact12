@@ -141,3 +141,91 @@
         @apply bg-background text-foreground;
     }
 }
+
+/* Scoped markdown preview styles */
+.md-preview {
+    line-height: 1.7;
+}
+.md-preview p,
+.md-preview .wmde-markdown p {
+    margin: 0.5rem 0 1rem;
+}
+.md-preview ul,
+.md-preview .wmde-markdown ul {
+    list-style: disc;
+    list-style-position: outside;
+    padding-left: 1.25rem; /* ensure bullets visible under resets */
+    margin: 0.5rem 0 1rem;
+}
+.md-preview ol,
+.md-preview .wmde-markdown ol {
+    list-style: decimal;
+    list-style-position: outside;
+    padding-left: 1.25rem;
+    margin: 0.5rem 0 1rem;
+}
+.md-preview li,
+.md-preview .wmde-markdown li {
+    margin: 0.25rem 0;
+}
+.md-preview strong,
+.md-preview .wmde-markdown strong {
+    font-weight: 600;
+}
+.md-preview b,
+.md-preview .wmde-markdown b {
+    font-weight: 600;
+}
+.md-preview del,
+.md-preview .wmde-markdown del {
+    text-decoration: line-through;
+}
+.md-preview s,
+.md-preview .wmde-markdown s {
+    text-decoration: line-through;
+}
+.md-preview em,
+.md-preview .wmde-markdown em {
+    font-style: italic;
+}
+.md-preview code,
+.md-preview .wmde-markdown code {
+    background: rgba(0,0,0,0.05);
+    padding: 0.15rem 0.35rem;
+    border-radius: 4px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.95em;
+}
+.md-preview pre,
+.md-preview .wmde-markdown pre {
+    background: rgba(0,0,0,0.05);
+    padding: 0.75rem;
+    border-radius: 6px;
+    overflow: auto;
+}
+.md-preview blockquote,
+.md-preview .wmde-markdown blockquote {
+    border-left: 4px solid rgba(0,0,0,0.2);
+    padding-left: 0.75rem;
+    margin: 0.75rem 0;
+    color: inherit;
+}
+.md-preview li::marker,
+.md-preview .wmde-markdown li::marker {
+    color: currentColor;
+}
+.md-preview h1,
+.md-preview h2,
+.md-preview h3,
+.md-preview h4,
+.md-preview h5,
+.md-preview h6,
+.md-preview .wmde-markdown h1,
+.md-preview .wmde-markdown h2,
+.md-preview .wmde-markdown h3,
+.md-preview .wmde-markdown h4,
+.md-preview .wmde-markdown h5,
+.md-preview .wmde-markdown h6 {
+    margin: 1rem 0 0.5rem;
+    font-weight: 600;
+}

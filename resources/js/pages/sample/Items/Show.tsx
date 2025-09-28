@@ -4,6 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, Item } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { ArrowLeft, Edit, FileText, Trash2 } from 'lucide-react';
@@ -49,6 +52,32 @@ export default function Show({ item, enumerateOptions }: Props) {
     if (!value) return 'N/A';
     const option = enumerateOptions.find((opt) => opt.value === value);
     return option ? option.label : value;
+  };
+
+  // Determine light/dark mode for markdown preview styling
+  const colorMode =
+    typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+      ? 'dark'
+      : 'light';
+
+  // Normalize common markdown mistakes like spaces inside markers: ** bold **, ~~ strike ~~
+  const normalizeMarkdown = (md: string) => {
+    if (!md) return md;
+    // Replace non-breaking spaces and zero-width spaces with normal spaces
+    md = md.replace(/[\u00A0\u200B\u200C\u200D\uFEFF]/g, ' ');
+    // Collapse multiple spaces to single inside the text generally
+    md = md.replace(/\s{2,}/g, ' ');
+    // Bold: trim any inner spaces regardless of position: ** text ** or **text ** or ** text**
+    md = md.replace(/\*\*([\s\S]*?)\*\*/g, (_m, c) => `**${String(c).trim()}**`);
+    // Bold with underscores: __ text __ -> __text__
+    md = md.replace(/__([\s\S]*?)__/g, (_m, c) => `__${String(c).trim()}__`);
+    // Strikethrough: trim inner spaces
+    md = md.replace(/~~([\s\S]*?)~~/g, (_m, c) => `~~${String(c).trim()}~~`);
+    // Italic: single * on each side (avoid **). Keep preceding char if not *
+    md = md.replace(/(^|[^*])\*([^*\n][\s\S]*?)\*(?!\*)/g, (_m, pre, c) => `${pre}*${String(c).trim()}*`);
+    // Italic with underscores: _ text _ -> _text_
+    md = md.replace(/(^|[^_])_([^_\n][\s\S]*?)_(?!_)/g, (_m, pre, c) => `${pre}_${String(c).trim()}_`);
+    return md;
   };
 
   return (
@@ -297,17 +326,15 @@ export default function Show({ item, enumerateOptions }: Props) {
 
                 <div className="space-y-2">
                   <p className="text-sm text-muted-foreground">Markdown Text</p>
-                  <div className="prose dark:prose-invert max-w-none">
-                    {item.markdown_text ? (
-                      <div
-                        dangerouslySetInnerHTML={{
-                          __html: item.markdown_text,
-                        }}
-                      />
-                    ) : (
-                      <>-</>
-                    )}
-                  </div>
+                  {item.markdown_text ? (
+                    <div className="md-preview" data-color-mode={colorMode}>
+                      <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                        {normalizeMarkdown(item.markdown_text)}
+                      </ReactMarkdown>
+                    </div>
+                  ) : (
+                    <>-</>
+                  )}
                 </div>
 
                 <div className="space-y-2">
