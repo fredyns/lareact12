@@ -63,7 +63,9 @@ export interface Item {
   enumerate: string | null;
   text: string | null;
   file: string | null;
+  file_url: string | null;
   image: string | null;
+  image_url: string | null;
   markdown_text: string | null;
   wysiwyg: string | null;
   latitude: number | null;

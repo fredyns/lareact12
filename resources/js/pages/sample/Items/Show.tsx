@@ -11,7 +11,7 @@ import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import { route } from 'ziggy-js';
 
 // Fix for Leaflet marker icons
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
   iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
@@ -252,32 +252,38 @@ export default function Show({ item, enumerateOptions }: Props) {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <p className="text-sm text-muted-foreground">File (PDF, DOCX, PPTX, XLSX, ZIP, RAR)</p>
-                  {item.file ? (
+                  {item.file_url ? (
                     <a
-                      href={`/storage/${item.file}`}
+                      href={item.file_url}
                       target="_blank"
                       className="flex items-center rounded-lg border p-3 transition-colors hover:bg-muted/50"
                     >
                       <FileText className="mr-3 h-8 w-8 text-blue-600" />
                       <div>
-                        <p className="font-medium">{item.file.split('/').pop()}</p>
+                        <p className="font-medium">{(item.file ?? '').split('/').pop() || 'Download file'}</p>
                         <p className="text-sm text-muted-foreground">Click to download</p>
                       </div>
                     </a>
                   ) : (
                     <p className="text-sm text-muted-foreground">No data available</p>
                   )}
+                    <p className="text-sm text-muted-foreground">file: {item.file || '-'}</p>
+                    <p className="text-sm text-muted-foreground">file_url: {item.file_url || '-'}</p>
                 </div>
 
                 <div className="space-y-2">
                   <p className="text-sm text-muted-foreground">Image (JPG, JPEG, PNG)</p>
-                  {item.image && (
+                  {item.image_url ? (
                     <img
-                      src={`/storage/${item.image}`}
+                      src={item.image_url}
                       alt={item.string}
                       className="h-auto max-w-full rounded-lg border"
                     />
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No image available</p>
                   )}
+                    <p className="text-sm text-muted-foreground">image: {item.image || '-'}</p>
+                    <p className="text-sm text-muted-foreground">image_url: {item.image_url || '-'}</p>
                 </div>
               </CardContent>
             </Card>

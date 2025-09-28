@@ -151,7 +151,7 @@ class ItemController extends Controller
         }
 
         return Inertia::render('sample/Items/Show', [
-            'item' => $item,
+            'item' => (new ItemResource($item))->toArray(request()),
             'enumerateOptions' => collect(ItemEnumerate::cases())->map(fn($case) => [
                 'value' => $case->value,
                 'label' => Str::title($case->value),
@@ -172,7 +172,7 @@ class ItemController extends Controller
         $item->load(['user', 'creator', 'updater']);
 
         return Inertia::render('sample/Items/Edit', [
-            'item' => new ItemResource($item),
+            'item' => (new ItemResource($item))->toArray(request()),
             'enumerateOptions' => collect(ItemEnumerate::cases())->map(fn($case) => [
                 'value' => $case->value,
                 'label' => Str::title($case->value),
