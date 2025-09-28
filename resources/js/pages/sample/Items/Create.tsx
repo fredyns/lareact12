@@ -4,7 +4,6 @@ import { route } from 'ziggy-js';
 import AsyncSelect from 'react-select/async';
 import { Editor } from '@tinymce/tinymce-react';
 import { Editor as TinyMCEEditor } from 'tinymce';
-import MDEditor from '@uiw/react-md-editor';
 import { Sketch } from '@uiw/react-color';
 import { MapContainer, Marker, TileLayer, useMapEvents, ScaleControl } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -15,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Save } from 'lucide-react';
 import { type BreadcrumbItem } from '@/types';
 
@@ -88,7 +88,6 @@ const DraggableMarker = ({ position, onPositionChange }: DraggableMarkerProps) =
 
 export default function Create({ enumerateOptions }: Props) {
   const [showColorPicker, setShowColorPicker] = useState(false);
-  const [markdownValue, setMarkdownValue] = useState<string | undefined>('');
   const [wysiwygValue, setWysiwygValue] = useState('');
 
   const [fileUploading, setFileUploading] = useState(false);
@@ -232,9 +231,6 @@ export default function Create({ enumerateOptions }: Props) {
     }
   };
 
-  useEffect(() => {
-    setData('markdown_text', markdownValue || '');
-  }, [markdownValue]);
 
   useEffect(() => {
     setData('wysiwyg', wysiwygValue);
@@ -653,7 +649,13 @@ export default function Create({ enumerateOptions }: Props) {
 
                   <div className="space-y-2">
                     <Label htmlFor="markdown_text">Markdown Text</Label>
-                    <MDEditor value={markdownValue} onChange={setMarkdownValue} />
+                    <Textarea
+                      id="markdown_text"
+                      value={data.markdown_text}
+                      onChange={(e) => setData('markdown_text', e.target.value)}
+                      placeholder="Enter markdown text..."
+                      rows={6}
+                    />
                     {errors.markdown_text && <p className="text-sm text-destructive">{errors.markdown_text}</p>}
                   </div>
 

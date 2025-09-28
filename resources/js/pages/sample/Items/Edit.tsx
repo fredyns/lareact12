@@ -9,7 +9,6 @@ import type { BreadcrumbItem, Item } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Editor } from '@tinymce/tinymce-react';
 import { Sketch } from '@uiw/react-color';
-import MDEditor from '@uiw/react-md-editor';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { ArrowLeft, Save } from 'lucide-react';
@@ -91,7 +90,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function Edit({ item, enumerateOptions }: Props) {
   const [showColorPicker, setShowColorPicker] = useState(false);
-  const [markdownValue, setMarkdownValue] = useState<string | undefined>(item.markdown_text || '');
   const [wysiwygValue, setWysiwygValue] = useState(item.wysiwyg || '');
 
   const { data, setData, put, processing, errors } = useForm({
@@ -161,9 +159,6 @@ export default function Edit({ item, enumerateOptions }: Props) {
     }
   };
 
-  useEffect(() => {
-    setData('markdown_text', markdownValue || '');
-  }, [markdownValue]);
 
   useEffect(() => {
     setData('wysiwyg', wysiwygValue);
@@ -557,7 +552,13 @@ export default function Edit({ item, enumerateOptions }: Props) {
 
                 <div className="space-y-2">
                   <Label htmlFor="markdown_text">Markdown Text</Label>
-                  <MDEditor value={markdownValue} onChange={setMarkdownValue} />
+                  <Textarea
+                    id="markdown_text"
+                    value={data.markdown_text}
+                    onChange={(e) => setData('markdown_text', e.target.value)}
+                    placeholder="Enter markdown text..."
+                    rows={6}
+                  />
                   {errors.markdown_text && <p className="text-sm text-destructive">{errors.markdown_text}</p>}
                 </div>
 

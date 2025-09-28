@@ -4,11 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, Item } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import MDEditor from '@uiw/react-md-editor';
-import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
-import mermaid from 'mermaid';
-import { getCodeString } from 'rehype-rewrite';
-import remarkGfm from 'remark-gfm';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { ArrowLeft, Edit, FileText, Trash2 } from 'lucide-react';
@@ -56,86 +51,6 @@ export default function Show({ item, enumerateOptions }: Props) {
     return option ? option.label : value;
   };
 
-  // Determine light/dark mode for markdown preview styling
-  const colorMode =
-    typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
-      ? 'dark'
-      : 'light';
-
-  // Initialize Mermaid with theme depending on color mode
-  useEffect(() => {
-    try {
-      mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: colorMode === 'dark' ? 'dark' : 'default' });
-    } catch (e) {
-      // noop
-    }
-  }, [colorMode]);
-
-  // Normalize markdown in non-code blocks only (preserve fenced code like ```mermaid)
-  const normalizeMarkdown = (md: string) => {
-    if (!md) return md;
-    const parts = md.split(/(```[\s\S]*?```)/g); // keep fences in results
-    return parts
-      .map((segment) => {
-        // If this is a fenced code block, return as-is
-        if (/^```[\s\S]*```$/.test(segment)) return segment;
-        // Otherwise, normalize common typos
-        let s = segment;
-        s = s.replace(/[\u00A0\u200B\u200C\u200D\uFEFF]/g, ' '); // invisible spaces
-        s = s.replace(/\s{2,}/g, ' '); // collapse multiples
-        s = s.replace(/\*\*([\s\S]*?)\*\*/g, (_m, c) => `**${String(c).trim()}**`); // bold ** **
-        s = s.replace(/__([\s\S]*?)__/g, (_m, c) => `__${String(c).trim()}__`); // bold __ __
-        s = s.replace(/~~([\s\S]*?)~~/g, (_m, c) => `~~${String(c).trim()}~~`); // strike ~~ ~~
-        s = s.replace(/(^|[^*])\*([^*\n][\s\S]*?)\*(?!\*)/g, (_m, pre, c) => `${pre}*${String(c).trim()}*`); // italic * *
-        s = s.replace(/(^|[^_])_([^_\n][\s\S]*?)_(?!_)/g, (_m, pre, c) => `${pre}_${String(c).trim()}_`); // italic _ _
-        return s;
-      })
-      .join('');
-  };
-
-  // Custom code renderer to support Mermaid blocks in Markdown
-  const Code = ({ inline, children = [], className, ...props }: any) => {
-    const demoid = useRef(`dome${Math.random().toString(36).slice(2)}`);
-    const [container, setContainer] = useState<HTMLElement | null>(null);
-    const isMermaidClass = className && /^language-mermaid/.test(String(className).toLowerCase());
-    // Some pipelines may omit className but still pass mermaid code blocks
-    const raw = getCodeString((props as any)?.node?.children) || (Array.isArray(children) ? String(children[0] ?? '') : String(children ?? ''));
-    const code = typeof raw === 'string' ? raw : String(raw ?? '');
-    const isMermaid = !inline && (isMermaidClass || code.trim().startsWith('graph ') || code.trim().startsWith('sequenceDiagram') || code.trim().startsWith('flowchart'));
-
-    useEffect(() => {
-      if (container && isMermaid && demoid.current && code) {
-        // Defensive initialize to ensure theme and config are applied even if parent didn't run yet
-        try {
-          mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: colorMode === 'dark' ? 'dark' : 'default' });
-        } catch {}
-        mermaid
-          .render(demoid.current, code)
-          .then(({ svg, bindFunctions }: any) => {
-            container.innerHTML = svg;
-            if (bindFunctions) bindFunctions(container);
-          })
-          .catch(() => {
-            // On error, just show the code block as plain text
-            container.textContent = code;
-          });
-      }
-    }, [container, isMermaid, code, colorMode]);
-
-    const refElement = useCallback((node: HTMLElement | null) => {
-      if (node !== null) setContainer(node);
-    }, []);
-
-    if (isMermaid) {
-      return (
-        <Fragment>
-          <div id={demoid.current} style={{ display: 'none' }} />
-          <div className={className} ref={refElement} data-name="mermaid" />
-        </Fragment>
-      );
-    }
-    return <code className={className}>{children}</code>;
-  };
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -383,18 +298,7 @@ export default function Show({ item, enumerateOptions }: Props) {
 
                 <div className="space-y-2">
                   <p className="text-sm text-muted-foreground">Markdown Text</p>
-                  {item.markdown_text ? (
-                    <div className="md-preview" data-color-mode={colorMode}>
-                      <MDEditor.Markdown
-                        source={normalizeMarkdown(item.markdown_text)}
-                        components={{ code: Code }}
-                        remarkPlugins={[remarkGfm]}
-                        previewOptions={{ components: { code: Code }, remarkPlugins: [remarkGfm] }}
-                      />
-                    </div>
-                  ) : (
-                    <>-</>
-                  )}
+                  <div className="rounded-lg bg-muted/50 p-4 whitespace-pre-wrap">{item.markdown_text || '-'}</div>
                 </div>
 
                 <div className="space-y-2">
