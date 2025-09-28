@@ -481,10 +481,10 @@ export default function Edit({ item, enumerateOptions }: Props) {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="file">File (PDF, DOCX, PPTX, XLSX, ZIP, RAR)</Label>
-                  {item.file && (
+                  {item.file_url ? (
                     <div className="mb-2">
                       <a
-                        href={`/storage/${item.file}`}
+                        href={item.file_url}
                         target="_blank"
                         className="flex items-center text-blue-600 hover:underline"
                       >
@@ -502,10 +502,10 @@ export default function Edit({ item, enumerateOptions }: Props) {
                             d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
                           />
                         </svg>
-                        Current file: {item.file.split('/').pop()}
+                        Current file: {(item.file ?? '').split('/').pop() || 'Download file'}
                       </a>
                     </div>
-                  )}
+                  ) : null}
                   <input
                     type="file"
                     id="file"
@@ -518,12 +518,12 @@ export default function Edit({ item, enumerateOptions }: Props) {
 
                 <div className="space-y-2">
                   <Label htmlFor="image">Image (JPG, JPEG, PNG)</Label>
-                  {item.image && (
+                  {item.image_url ? (
                     <div className="mb-2">
-                      <img src={`/storage/${item.image}`} alt={item.string} className="h-24 w-auto rounded" />
-                      <p className="mt-1 text-sm text-muted-foreground">Current image: {item.image.split('/').pop()}</p>
+                      <img src={item.image_url} alt={item.string} className="h-24 w-auto rounded" />
+                      <p className="mt-1 text-sm text-muted-foreground">Current image: {(item.image ?? '').split('/').pop()}</p>
                     </div>
-                  )}
+                  ) : null}
                   <input
                     type="file"
                     id="image"
@@ -565,6 +565,7 @@ export default function Edit({ item, enumerateOptions }: Props) {
                   <Label htmlFor="wysiwyg">WYSIWYG Content</Label>
                   <Editor
                     id="wysiwyg"
+                    apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
                     licenseKey="gpl"
                     initialValue={item.wysiwyg || ''}
                     init={{
