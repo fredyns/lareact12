@@ -8,6 +8,7 @@ import MDEditor from '@uiw/react-md-editor';
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import mermaid from 'mermaid';
 import { getCodeString } from 'rehype-rewrite';
+import remarkGfm from 'remark-gfm';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { ArrowLeft, Edit, FileText, Trash2 } from 'lucide-react';
@@ -70,24 +71,26 @@ export default function Show({ item, enumerateOptions }: Props) {
     }
   }, [colorMode]);
 
-  // Normalize common markdown mistakes like spaces inside markers: ** bold **, ~~ strike ~~
+  // Normalize markdown in non-code blocks only (preserve fenced code like ```mermaid)
   const normalizeMarkdown = (md: string) => {
     if (!md) return md;
-    // Replace non-breaking spaces and zero-width spaces with normal spaces
-    md = md.replace(/[\u00A0\u200B\u200C\u200D\uFEFF]/g, ' ');
-    // Collapse multiple spaces to single inside the text generally
-    md = md.replace(/\s{2,}/g, ' ');
-    // Bold: trim any inner spaces regardless of position: ** text ** or **text ** or ** text**
-    md = md.replace(/\*\*([\s\S]*?)\*\*/g, (_m, c) => `**${String(c).trim()}**`);
-    // Bold with underscores: __ text __ -> __text__
-    md = md.replace(/__([\s\S]*?)__/g, (_m, c) => `__${String(c).trim()}__`);
-    // Strikethrough: trim inner spaces
-    md = md.replace(/~~([\s\S]*?)~~/g, (_m, c) => `~~${String(c).trim()}~~`);
-    // Italic: single * on each side (avoid **). Keep preceding char if not *
-    md = md.replace(/(^|[^*])\*([^*\n][\s\S]*?)\*(?!\*)/g, (_m, pre, c) => `${pre}*${String(c).trim()}*`);
-    // Italic with underscores: _ text _ -> _text_
-    md = md.replace(/(^|[^_])_([^_\n][\s\S]*?)_(?!_)/g, (_m, pre, c) => `${pre}_${String(c).trim()}_`);
-    return md;
+    const parts = md.split(/(```[\s\S]*?```)/g); // keep fences in results
+    return parts
+      .map((segment) => {
+        // If this is a fenced code block, return as-is
+        if (/^```[\s\S]*```$/.test(segment)) return segment;
+        // Otherwise, normalize common typos
+        let s = segment;
+        s = s.replace(/[\u00A0\u200B\u200C\u200D\uFEFF]/g, ' '); // invisible spaces
+        s = s.replace(/\s{2,}/g, ' '); // collapse multiples
+        s = s.replace(/\*\*([\s\S]*?)\*\*/g, (_m, c) => `**${String(c).trim()}**`); // bold ** **
+        s = s.replace(/__([\s\S]*?)__/g, (_m, c) => `__${String(c).trim()}__`); // bold __ __
+        s = s.replace(/~~([\s\S]*?)~~/g, (_m, c) => `~~${String(c).trim()}~~`); // strike ~~ ~~
+        s = s.replace(/(^|[^*])\*([^*\n][\s\S]*?)\*(?!\*)/g, (_m, pre, c) => `${pre}*${String(c).trim()}*`); // italic * *
+        s = s.replace(/(^|[^_])_([^_\n][\s\S]*?)_(?!_)/g, (_m, pre, c) => `${pre}_${String(c).trim()}_`); // italic _ _
+        return s;
+      })
+      .join('');
   };
 
   // Custom code renderer to support Mermaid blocks in Markdown
@@ -383,9 +386,10 @@ export default function Show({ item, enumerateOptions }: Props) {
                   {item.markdown_text ? (
                     <div className="md-preview" data-color-mode={colorMode}>
                       <MDEditor.Markdown
-                        source={item.markdown_text}
+                        source={normalizeMarkdown(item.markdown_text)}
                         components={{ code: Code }}
-                        previewOptions={{ components: { code: Code } }}
+                        remarkPlugins={[remarkGfm]}
+                        previewOptions={{ components: { code: Code }, remarkPlugins: [remarkGfm] }}
                       />
                     </div>
                   ) : (
