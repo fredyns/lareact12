@@ -313,6 +313,7 @@ export default function Edit({ item, enumerateOptions }: Props) {
                         type="text"
                         value={data.color}
                         onChange={(e) => setData('color', e.target.value)}
+                        onClick={() => setShowColorPicker(!showColorPicker)}
                         placeholder="Select a color"
                         className={errors.color ? 'border-destructive' : ''}
                         readOnly
