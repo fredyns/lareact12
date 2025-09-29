@@ -336,17 +336,27 @@ export default function Edit({ item, enumerateOptions }: Props) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="integer">Integer (1-100)</Label>
-                    <input
-                      type="range"
+                    <Label htmlFor="integer">Integer</Label>
+                    <Input
+                      type="number"
                       id="integer"
-                      min="1"
+                      min="0"
                       max="100"
                       value={data.integer || '1'}
                       onChange={(e) => setData('integer', e.target.value)}
-                      className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
+                      className="w-full"
                     />
-                    <div className="text-center text-sm text-muted-foreground">{data.integer || '1'}</div>
+                    <div className="mt-2">
+                      <input
+                        type="range"
+                        id="integer-slider"
+                        min="0"
+                        max="100"
+                        value={data.integer || '1'}
+                        onChange={(e) => setData('integer', e.target.value)}
+                        className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
+                      />
+                    </div>
                     {errors.integer && <p className="text-sm text-destructive">{errors.integer}</p>}
                   </div>
 
