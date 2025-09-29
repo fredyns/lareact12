@@ -229,3 +229,49 @@
     margin: 1rem 0 0.5rem;
     font-weight: 600;
 }
+
+/* Fix for WYSIWYG list styling */
+.prose div[dangerouslySetInnerHTML] ul {
+    list-style-type: disc !important;
+    list-style-position: outside !important;
+    padding-left: 1.5rem !important;
+    margin: 0.5rem 0 1rem !important;
+}
+
+.prose div[dangerouslySetInnerHTML] ol {
+    list-style-type: decimal !important;
+    list-style-position: outside !important;
+    padding-left: 1.5rem !important;
+    margin: 0.5rem 0 1rem !important;
+}
+
+.prose div[dangerouslySetInnerHTML] li {
+    display: list-item !important;
+    margin: 0.25rem 0 !important;
+}
+
+.prose div[dangerouslySetInnerHTML] li > ul,
+.prose div[dangerouslySetInnerHTML] li > ol {
+    margin: 0.25rem 0 !important;
+}
+
+/* WYSIWYG Content List Styling */
+.prose .wysiwyg-content ul,
+.prose ul {
+    list-style-type: disc !important;
+    padding-left: 1.5rem !important;
+    margin: 0.5rem 0 !important;
+}
+
+.prose .wysiwyg-content ol,
+.prose ol {
+    list-style-type: decimal !important;
+    padding-left: 1.5rem !important;
+    margin: 0.5rem 0 !important;
+}
+
+.prose .wysiwyg-content li,
+.prose li {
+    display: list-item !important;
+    margin: 0.25rem 0 !important;
+}

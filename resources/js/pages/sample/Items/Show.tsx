@@ -295,10 +295,10 @@ export default function Show({ item, enumerateOptions }: Props) {
                   <div className="rounded-lg bg-muted/50 p-4 whitespace-pre-wrap">{item.text || '-'}</div>
                 </div>
 
-                {item.markdown_text && (
-                  <div className="mt-2">
-                    <h3 className="mb-2 text-sm font-medium text-muted-foreground">Markdown Content</h3>
-                    <div className="prose prose-sm dark:prose-invert max-w-none">
+                <div className="mt-2">
+                  <h3 className="mb-2 text-sm font-medium text-muted-foreground">Markdown Content</h3>
+                  <div className="prose prose-sm dark:prose-invert max-w-none">
+                    {item.markdown_text ? (
                       <ReactMarkdown
                         remarkPlugins={[remarkGfm]}
                         components={{
@@ -338,8 +338,8 @@ export default function Show({ item, enumerateOptions }: Props) {
                           a: ({ node, ...props }) => (
                             <a className="text-primary underline hover:text-primary/80" {...props} />
                           ),
-                          ul: ({ node, ...props }) => <ul className="my-4 list-disc pl-6" {...props} />,
-                          ol: ({ node, ...props }) => <ol className="my-4 list-decimal pl-6" {...props} />,
+                          ul: ({ node, ...props }) => <ul className="my-4 list-disc pl-5" {...props} />,
+                          ol: ({ node, ...props }) => <ol className="my-4 list-decimal pl-5" {...props} />,
                           li: ({ node, ...props }) => <li className="my-1" {...props} />,
                           blockquote: ({ node, ...props }) => (
                             <blockquote
@@ -365,9 +365,25 @@ export default function Show({ item, enumerateOptions }: Props) {
                       >
                         {normalizeMarkdown(item.markdown_text)}
                       </ReactMarkdown>
-                    </div>
+                    ) : (
+                      <div className="rounded-lg bg-muted/50 p-4 text-muted-foreground">-</div>
+                    )}
                   </div>
-                )}
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">WYSIWYG Content</p>
+                  {item.wysiwyg ? (
+                    <div
+                      className="prose prose-sm dark:prose-invert max-w-none [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-6 [&_ol]:pl-6 [&_li]:my-1 [&_li]:ml-0"
+                      dangerouslySetInnerHTML={{
+                        __html: item.wysiwyg,
+                      }}
+                    />
+                  ) : (
+                    <div className="rounded-lg bg-muted/50 p-4 text-muted-foreground">-</div>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </div>

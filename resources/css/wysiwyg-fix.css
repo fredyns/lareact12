@@ -1,0 +1,35 @@
+/* Fix for WYSIWYG list styling */
+.prose div[dangerouslySetInnerHTML] ul {
+    list-style-type: disc !important;
+    padding-left: 2rem !important;
+    margin: 0.75rem 0 !important;
+}
+
+.prose div[dangerouslySetInnerHTML] ol {
+    list-style-type: decimal !important;
+    padding-left: 2rem !important;
+    margin: 0.75rem 0 !important;
+}
+
+.prose div[dangerouslySetInnerHTML] li {
+    display: list-item !important;
+    margin: 0.5rem 0 !important;
+    padding-left: 0.5rem !important;
+}
+
+.prose div[dangerouslySetInnerHTML] li > ul,
+.prose div[dangerouslySetInnerHTML] li > ol {
+    margin: 0.5rem 0 !important;
+}
+
+/* Additional styling for better readability */
+.prose div[dangerouslySetInnerHTML] ul li::marker,
+.prose div[dangerouslySetInnerHTML] ol li::marker {
+    color: currentColor !important;
+    font-weight: bold !important;
+}
+
+/* Ensure proper spacing between list items and text */
+.prose div[dangerouslySetInnerHTML] li p {
+    margin: 0 !important;
+}
