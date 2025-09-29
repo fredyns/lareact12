@@ -667,6 +667,7 @@ export default function Create({ enumerateOptions }: Props) {
                       <div className="space-y-2">
                         <Label className="text-xs text-muted-foreground">Preview</Label>
                         <div className="min-h-[300px] rounded-md border border-input bg-background p-3 prose prose-sm max-w-none dark:prose-invert overflow-auto">
+                            {/*todo: fix markdown format and implement mermaid chart*/}
                           {data.markdown_text ? (
                             <ReactMarkdown
                               remarkPlugins={[remarkGfm]}
