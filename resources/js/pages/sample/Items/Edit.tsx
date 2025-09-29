@@ -245,7 +245,8 @@ export default function Edit({ item, enumerateOptions }: Props) {
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={`Edit Item: ${item.string}`} />
 
-      <div className="flex h-full flex-1 flex-col gap-4 p-4">
+      {/*set page width*/}
+        <div className="mx-auto flex h-full flex-1 flex-col gap-4 p-4 lg:w-7xl">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Edit Item</h1>
@@ -526,7 +527,7 @@ export default function Edit({ item, enumerateOptions }: Props) {
                   </div>
                 </div>
 
-                <div className="mt-2 h-64">
+                <div className="mt-2 h-96">
                   <MapContainer
                     center={[data.latitude || 0, data.longitude || 0]}
                     zoom={data.latitude && data.longitude ? 13 : 2}

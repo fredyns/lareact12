@@ -59,7 +59,8 @@ export default function Show({ item, enumerateOptions }: Props) {
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={`Item: ${item.string}`} />
 
-      <div className="flex h-full flex-1 flex-col gap-4 p-4">
+      {/*set page width*/}
+      <div className="mx-auto flex h-full flex-1 flex-col gap-4 p-4 lg:w-7xl">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">{item.string}</h1>
@@ -216,7 +217,7 @@ export default function Show({ item, enumerateOptions }: Props) {
                   </div>
                 </div>
 
-                <div className="mt-2 h-64">
+                <div className="mt-2 h-96">
                   {item.latitude !== null &&
                   item.longitude !== null &&
                   typeof item.latitude === 'number' &&

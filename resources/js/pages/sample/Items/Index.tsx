@@ -139,7 +139,8 @@ export default function ItemsIndex({ items, filters, enumerateOptions }: Props) 
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Sample Items" />
 
-      <div className="flex h-full flex-1 flex-col gap-4 p-4">
+      {/*set page width*/}
+      <div className="mx-auto flex h-full flex-1 flex-col gap-4 p-4 lg:w-7xl">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Sample Items</h1>
