@@ -171,12 +171,6 @@ export function FileDropzone({
                 {maxSize ? ` (Max ${Math.round(maxSize / (1024 * 1024))}MB)` : ""}
               </p>
             </div>
-            {currentFileName && (
-              <div className="flex items-center space-x-1 rounded-md bg-muted px-2 py-1">
-                <File className="h-4 w-4 text-muted-foreground" />
-                <span className="max-w-[200px] truncate text-xs">{currentFileName}</span>
-              </div>
-            )}
           </div>
         )}
         

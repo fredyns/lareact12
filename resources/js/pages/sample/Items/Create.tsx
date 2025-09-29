@@ -95,6 +95,8 @@ export default function Create({ enumerateOptions }: Props) {
 
   const [fileUploading, setFileUploading] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
+  const [fileUploadSuccess, setFileUploadSuccess] = useState(false);
+  const [imageUploadSuccess, setImageUploadSuccess] = useState(false);
 
   const { data, setData, post, processing, errors, reset, setError, clearErrors } = useForm({
     string: '',
@@ -218,6 +220,12 @@ export default function Create({ enumerateOptions }: Props) {
         if (filePath) {
           // Set the file path in form data
           setData(field, filePath);
+          // Mark this file as newly uploaded
+          if (field === 'file') {
+            setFileUploadSuccess(true);
+          } else {
+            setImageUploadSuccess(true);
+          }
         } else {
           setError(field, 'Failed to upload file');
         }
@@ -587,7 +595,7 @@ export default function Create({ enumerateOptions }: Props) {
                       onFileDrop={(file) => handleFileChange({ target: { files: [file] } } as any, 'file')}
                       disabled={fileUploading}
                       isUploading={fileUploading}
-                      isSuccess={!!data.file && !fileUploading}
+                      isSuccess={fileUploadSuccess}
                       currentFileName={data.file ? data.file.split('/').pop() : undefined}
                       error={errors.file}
                     />
@@ -602,7 +610,7 @@ export default function Create({ enumerateOptions }: Props) {
                       onFileDrop={(file) => handleFileChange({ target: { files: [file] } } as any, 'image')}
                       disabled={imageUploading}
                       isUploading={imageUploading}
-                      isSuccess={!!data.image && !imageUploading}
+                      isSuccess={imageUploadSuccess}
                       currentFileName={data.image ? data.image.split('/').pop() : undefined}
                       error={errors.image}
                     />

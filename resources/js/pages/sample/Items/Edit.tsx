@@ -97,6 +97,8 @@ export default function Edit({ item, enumerateOptions }: Props) {
   const [wysiwygValue, setWysiwygValue] = useState(item.wysiwyg || '');
   const [fileUploading, setFileUploading] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
+  const [fileUploadSuccess, setFileUploadSuccess] = useState(false);
+  const [imageUploadSuccess, setImageUploadSuccess] = useState(false);
 
   const { data, setData, put, processing, errors, setError, clearErrors } = useForm({
     string: item.string,
@@ -221,6 +223,11 @@ export default function Edit({ item, enumerateOptions }: Props) {
         if (filePath) {
           // Set the file path in form data
           setData(field, filePath);
+          if (field === 'file') {
+            setFileUploadSuccess(true);
+          } else {
+            setImageUploadSuccess(true);
+          }
         } else {
           setError(field, 'Failed to upload file');
         }
@@ -595,7 +602,7 @@ export default function Edit({ item, enumerateOptions }: Props) {
                     }}
                     disabled={fileUploading}
                     isUploading={fileUploading}
-                    isSuccess={!!data.file && !fileUploading}
+                    isSuccess={fileUploadSuccess}
                     currentFileName={data.file ? data.file.split('/').pop() : undefined}
                     error={errors.file}
                   />
@@ -627,7 +634,7 @@ export default function Edit({ item, enumerateOptions }: Props) {
                     }}
                     disabled={imageUploading}
                     isUploading={imageUploading}
-                    isSuccess={!!data.image && !imageUploading}
+                    isSuccess={imageUploadSuccess}
                     currentFileName={data.image ? data.image.split('/').pop() : undefined}
                     error={errors.image}
                   />
