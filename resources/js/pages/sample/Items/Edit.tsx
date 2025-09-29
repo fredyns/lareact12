@@ -17,7 +17,6 @@ import { ArrowLeft, Save } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet';
 import ReactMarkdown from 'react-markdown';
-import Select from 'react-select';
 import AsyncSelect from 'react-select/async';
 import remarkGfm from 'remark-gfm';
 import { route } from 'ziggy-js';
@@ -432,6 +431,64 @@ export default function Edit({ item, enumerateOptions }: Props) {
                       className="react-select-container"
                       classNamePrefix="react-select"
                       isClearable
+                      theme={(theme) => ({
+                        ...theme,
+                        colors: {
+                          ...theme.colors,
+                          primary: '#2563eb',
+                          primary75: '#3b82f6',
+                          primary50: '#60a5fa',
+                          primary25: '#93c5fd',
+                          danger: '#ef4444',
+                          dangerLight: '#fca5a5',
+                          neutral0: document.documentElement.classList.contains('dark') ? '#1f2937' : 'white',
+                          neutral5: document.documentElement.classList.contains('dark') ? '#374151' : '#f9fafb',
+                          neutral10: document.documentElement.classList.contains('dark') ? '#374151' : '#f3f4f6',
+                          neutral20: document.documentElement.classList.contains('dark') ? '#4b5563' : '#e5e7eb',
+                          neutral30: document.documentElement.classList.contains('dark') ? '#6b7280' : '#d1d5db',
+                          neutral40: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#9ca3af',
+                          neutral50: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280',
+                          neutral60: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#4b5563',
+                          neutral70: document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#374151',
+                          neutral80: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#1f2937',
+                          neutral90: document.documentElement.classList.contains('dark') ? '#f9fafb' : '#111827',
+                        },
+                      })}
+                      styles={{
+                        control: (baseStyles) => ({
+                          ...baseStyles,
+                          backgroundColor: document.documentElement.classList.contains('dark') ? '#1f2937' : 'white',
+                          borderColor: document.documentElement.classList.contains('dark') ? '#374151' : '#d1d5db',
+                        }),
+                        menu: (baseStyles) => ({
+                          ...baseStyles,
+                          backgroundColor: document.documentElement.classList.contains('dark') ? '#1f2937' : 'white',
+                          zIndex: 9999,
+                        }),
+                        option: (baseStyles, state) => ({
+                          ...baseStyles,
+                          backgroundColor: document.documentElement.classList.contains('dark')
+                            ? state.isFocused 
+                              ? '#374151' 
+                              : state.isSelected 
+                                ? '#4b5563' 
+                                : '#1f2937'
+                            : state.isFocused
+                              ? '#f3f4f6'
+                              : state.isSelected
+                                ? '#e5e7eb'
+                                : 'white',
+                          color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#111827',
+                        }),
+                        singleValue: (baseStyles) => ({
+                          ...baseStyles,
+                          color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#111827',
+                        }),
+                        input: (baseStyles) => ({
+                          ...baseStyles,
+                          color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#111827',
+                        }),
+                      }}
                     />
                     {errors.user_id && <p className="text-sm text-destructive">{errors.user_id}</p>}
                   </div>
