@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
+import { FileDropzone } from '@/components/ui/file-dropzone';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
@@ -579,59 +580,31 @@ export default function Create({ enumerateOptions }: Props) {
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="file">File (PDF, DOCX, PPTX, XLSX, ZIP, RAR)</Label>
-                    <Input
-                      type="file"
-                      id="file"
-                      onChange={(e) => handleFileChange(e, 'file')}
+                    <FileDropzone
                       accept=".pdf,.docx,.pptx,.xlsx,.zip,.rar"
-                      className={errors.file ? 'border-destructive' : ''}
+                      maxSize={10 * 1024 * 1024} // 10MB
+                      onFileDrop={(file) => handleFileChange({ target: { files: [file] } } as any, 'file')}
                       disabled={fileUploading}
+                      isUploading={fileUploading}
+                      isSuccess={!!data.file && !fileUploading}
+                      currentFileName={data.file ? data.file.split('/').pop() : undefined}
+                      error={errors.file}
                     />
-                    {fileUploading && (
-                      <div className="rounded-md bg-blue-50 p-2 text-sm text-blue-600">
-                        <p>Uploading file to MinIO...</p>
-                      </div>
-                    )}
-                    {data.file && !fileUploading && (
-                      <div className="rounded-md bg-green-50 p-2 text-sm text-green-600">
-                        <p>
-                          <strong>Uploaded:</strong> {data.file}
-                        </p>
-                        <p>
-                          <strong>Status:</strong> Ready for submission
-                        </p>
-                      </div>
-                    )}
-                    {errors.file && <p className="text-sm text-destructive">{errors.file}</p>}
                     <p className="text-xs text-muted-foreground">Maximum file size: 10MB</p>
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="image">Image (JPG, JPEG, PNG)</Label>
-                    <Input
-                      type="file"
-                      id="image"
-                      onChange={(e) => handleFileChange(e, 'image')}
+                    <FileDropzone
                       accept=".jpg,.jpeg,.png"
-                      className={errors.image ? 'border-destructive' : ''}
+                      maxSize={5 * 1024 * 1024} // 5MB
+                      onFileDrop={(file) => handleFileChange({ target: { files: [file] } } as any, 'image')}
                       disabled={imageUploading}
+                      isUploading={imageUploading}
+                      isSuccess={!!data.image && !imageUploading}
+                      currentFileName={data.image ? data.image.split('/').pop() : undefined}
+                      error={errors.image}
                     />
-                    {imageUploading && (
-                      <div className="rounded-md bg-blue-50 p-2 text-sm text-blue-600">
-                        <p>Uploading image to MinIO...</p>
-                      </div>
-                    )}
-                    {data.image && !imageUploading && (
-                      <div className="rounded-md bg-green-50 p-2 text-sm text-green-600">
-                        <p>
-                          <strong>Uploaded:</strong> {data.image}
-                        </p>
-                        <p>
-                          <strong>Status:</strong> Ready for submission
-                        </p>
-                      </div>
-                    )}
-                    {errors.image && <p className="text-sm text-destructive">{errors.image}</p>}
                     <p className="text-xs text-muted-foreground">Maximum file size: 5MB</p>
                   </div>
                 </CardContent>

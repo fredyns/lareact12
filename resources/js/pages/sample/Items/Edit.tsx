@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
+import { FileDropzone } from '@/components/ui/file-dropzone';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -94,8 +95,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Edit({ item, enumerateOptions }: Props) {
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [wysiwygValue, setWysiwygValue] = useState(item.wysiwyg || '');
+  const [fileUploading, setFileUploading] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
 
-  const { data, setData, put, processing, errors } = useForm({
+  const { data, setData, put, processing, errors, setError, clearErrors } = useForm({
     string: item.string,
     email: item.email || '',
     color: item.color || '',
@@ -109,8 +112,8 @@ export default function Edit({ item, enumerateOptions }: Props) {
     boolean: item.boolean || false,
     enumerate: item.enumerate || '',
     text: item.text || '',
-    file: null as File | null,
-    image: null as File | null,
+    file: item.file || '',
+    image: item.image || '',
     markdown_text: item.markdown_text || '',
     wysiwyg: item.wysiwyg || '',
     latitude: item.latitude || 0,
@@ -156,9 +159,81 @@ export default function Edit({ item, enumerateOptions }: Props) {
     });
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'file' | 'image') => {
+  const uploadFileToMinio = async (file: File, type: 'file' | 'image'): Promise<string | null> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    // Add folder parameter to organize uploads by context
+    formData.append('folder', type === 'file' ? 'items/files' : 'items/images');
+
+    // Use the appropriate endpoint based on file type
+    const endpoint = type === 'file' ? '/upload/file' : '/upload/image';
+
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+        },
+        credentials: 'same-origin',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Upload failed');
+      }
+
+      const data = await response.json();
+      return data.path;
+    } catch (error) {
+      console.error('Upload error:', error);
+      throw error;
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, field: 'file' | 'image') => {
     if (e.target.files && e.target.files[0]) {
-      setData(field, e.target.files[0]);
+      const file = e.target.files[0];
+
+      // Validate file size (max 10MB for files, 5MB for images)
+      const maxSize = field === 'file' ? 10 * 1024 * 1024 : 5 * 1024 * 1024;
+      if (file.size > maxSize) {
+        const maxSizeMB = field === 'file' ? '10MB' : '5MB';
+        setError(field, `File size must be less than ${maxSizeMB}`);
+        return;
+      }
+
+      // Clear any previous errors
+      clearErrors(field);
+
+      // Set uploading state
+      if (field === 'file') {
+        setFileUploading(true);
+      } else {
+        setImageUploading(true);
+      }
+
+      try {
+        // Upload file to MinIO
+        const filePath = await uploadFileToMinio(file, field);
+
+        if (filePath) {
+          // Set the file path in form data
+          setData(field, filePath);
+        } else {
+          setError(field, 'Failed to upload file');
+        }
+      } catch (error) {
+        setError(field, error instanceof Error ? error.message : 'Upload failed');
+      } finally {
+        // Clear uploading state
+        if (field === 'file') {
+          setFileUploading(false);
+        } else {
+          setImageUploading(false);
+        }
+      }
     }
   };
 
@@ -483,11 +558,12 @@ export default function Edit({ item, enumerateOptions }: Props) {
                       <a
                         href={item.file_url}
                         target="_blank"
-                        className="flex items-center text-blue-600 hover:underline"
+                        rel="noopener noreferrer"
+                        className="flex items-center text-blue-600 hover:text-blue-800"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="mr-2 h-5 w-5"
+                          className="mr-1 h-4 w-4"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -496,21 +572,24 @@ export default function Edit({ item, enumerateOptions }: Props) {
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             strokeWidth={2}
-                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                           />
                         </svg>
                         Current file: {(item.file ?? '').split('/').pop() || 'Download file'}
                       </a>
                     </div>
                   ) : null}
-                  <input
-                    type="file"
-                    id="file"
-                    onChange={(e) => handleFileChange(e, 'file')}
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
+                  <FileDropzone
                     accept=".pdf,.docx,.pptx,.xlsx,.zip,.rar"
+                    maxSize={10 * 1024 * 1024} // 10MB
+                    onFileDrop={(file) => handleFileChange({ target: { files: [file] } } as any, 'file')}
+                    disabled={fileUploading}
+                    isUploading={fileUploading}
+                    isSuccess={!!data.file && !fileUploading}
+                    currentFileName={data.file ? data.file.split('/').pop() : undefined}
+                    error={errors.file}
                   />
-                  {errors.file && <p className="text-sm text-destructive">{errors.file}</p>}
+                  <p className="text-xs text-muted-foreground">Maximum file size: 10MB</p>
                 </div>
 
                 <div className="space-y-2">
@@ -523,14 +602,17 @@ export default function Edit({ item, enumerateOptions }: Props) {
                       </p>
                     </div>
                   ) : null}
-                  <input
-                    type="file"
-                    id="image"
-                    onChange={(e) => handleFileChange(e, 'image')}
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
+                  <FileDropzone
                     accept=".jpg,.jpeg,.png"
+                    maxSize={5 * 1024 * 1024} // 5MB
+                    onFileDrop={(file) => handleFileChange({ target: { files: [file] } } as any, 'image')}
+                    disabled={imageUploading}
+                    isUploading={imageUploading}
+                    isSuccess={!!data.image && !imageUploading}
+                    currentFileName={data.image ? data.image.split('/').pop() : undefined}
+                    error={errors.image}
                   />
-                  {errors.image && <p className="text-sm text-destructive">{errors.image}</p>}
+                  <p className="text-xs text-muted-foreground">Maximum file size: 5MB</p>
                 </div>
               </CardContent>
             </Card>
