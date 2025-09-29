@@ -4,22 +4,21 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { MermaidChart } from '@/components/markdown/MermaidChart';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Item } from '@/types';
+import { normalizeMarkdown } from '@/utils/markdown';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Editor } from '@tinymce/tinymce-react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import { normalizeMarkdown } from '@/utils/markdown';
 import { Sketch } from '@uiw/react-color';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { ArrowLeft, Save } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet';
+import ReactMarkdown from 'react-markdown';
 import Select from 'react-select';
 import AsyncSelect from 'react-select/async';
+import remarkGfm from 'remark-gfm';
 import { route } from 'ziggy-js';
 
 // Define interface for Leaflet Icon prototype
@@ -130,7 +129,7 @@ export default function Edit({ item, enumerateOptions }: Props) {
       const response = await fetch(`/select-options/users?search=${inputValue}`, {
         method: 'GET',
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
           'Content-Type': 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
         },
@@ -162,7 +161,6 @@ export default function Edit({ item, enumerateOptions }: Props) {
       setData(field, e.target.files[0]);
     }
   };
-
 
   useEffect(() => {
     setData('wysiwyg', wysiwygValue);
@@ -520,7 +518,9 @@ export default function Edit({ item, enumerateOptions }: Props) {
                   {item.image_url ? (
                     <div className="mb-2">
                       <img src={item.image_url} alt={item.string} className="h-24 w-auto rounded" />
-                      <p className="mt-1 text-sm text-muted-foreground">Current image: {(item.image ?? '').split('/').pop()}</p>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        Current image: {(item.image ?? '').split('/').pop()}
+                      </p>
                     </div>
                   ) : null}
                   <input
@@ -556,7 +556,7 @@ export default function Edit({ item, enumerateOptions }: Props) {
 
                 <div className="space-y-2">
                   <Label htmlFor="markdown_text">Markdown Text</Label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div className="space-y-2">
                       <Label className="text-xs text-muted-foreground">Editor</Label>
                       <textarea
@@ -564,34 +564,82 @@ export default function Edit({ item, enumerateOptions }: Props) {
                         value={data.markdown_text || ''}
                         onChange={(e) => setData('markdown_text', e.target.value)}
                         rows={12}
-                        placeholder="Enter markdown text with mermaid diagrams...\n\nExample:\n**Bold text**\n*Italic text*\n~~Strikethrough~~\n\n```mermaid\ngraph TD\n    A[Start] --> B[End]\n```"
-                        className={`flex min-h-[300px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 font-mono ${errors.markdown_text ? 'border-destructive' : ''}`}
+                        placeholder="Enter markdown text...\n\nExamples:\n# Heading 1\n## Heading 2\n**Bold text**\n*Italic text*\n~~Strikethrough~~\n\n- List item 1\n- List item 2\n\n> Blockquote\n\n`inline code`\n\n```\ncode block\n```"
+                        className={`flex min-h-[300px] w-full rounded-md border border-input bg-background px-3 py-2 font-mono text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${errors.markdown_text ? 'border-destructive' : ''}`}
                       />
                     </div>
                     <div className="space-y-2">
                       <Label className="text-xs text-muted-foreground">Preview</Label>
-                      <div className="min-h-[300px] rounded-md border border-input bg-background p-3 prose prose-sm max-w-none dark:prose-invert overflow-auto">
+                      <div className="prose prose-sm dark:prose-invert min-h-[300px] max-w-none overflow-auto rounded-md border border-input bg-background p-3">
                         {data.markdown_text ? (
                           <ReactMarkdown
                             remarkPlugins={[remarkGfm]}
                             components={{
-                              code({ inline, className, children, ...props }: any) {
-                                const match = /language-(\w+)/.exec(className || '');
-                                const language = match ? match[1] : '';
-                                const code = String(children).replace(/\n$/, '');
-                                
-                                if (!inline && language === 'mermaid') {
-                                  return <MermaidChart code={code} />;
+                              h1: ({ node, ...props }) => <h1 className="mt-6 mb-2 text-2xl font-bold" {...props} />,
+                              h2: ({ node, ...props }) => <h2 className="mt-5 mb-2 text-xl font-bold" {...props} />,
+                              h3: ({ node, ...props }) => <h3 className="mt-4 mb-2 text-lg font-bold" {...props} />,
+                              h4: ({ node, ...props }) => <h4 className="mt-3 mb-1 text-base font-bold" {...props} />,
+                              h5: ({ node, ...props }) => <h5 className="mt-3 mb-1 text-sm font-bold" {...props} />,
+                              h6: ({ node, ...props }) => <h6 className="mt-3 mb-1 text-xs font-bold" {...props} />,
+                              code({
+                                inline,
+                                className,
+                                children,
+                                ...props
+                              }: {
+                                inline?: boolean;
+                                className?: string;
+                                children?: React.ReactNode;
+                                [key: string]: any;
+                              }) {
+                                if (inline) {
+                                  return (
+                                    <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm" {...props}>
+                                      {children}
+                                    </code>
+                                  );
                                 }
-                                
-                                return <code className={className} {...props}>{children}</code>;
+                                return (
+                                  <pre className="my-4 overflow-x-auto rounded-md bg-muted p-4">
+                                    <code className="font-mono text-sm" {...props}>
+                                      {children}
+                                    </code>
+                                  </pre>
+                                );
                               },
+                              p: ({ node, ...props }) => <p className="my-2" {...props} />,
+                              a: ({ node, ...props }) => (
+                                <a className="text-primary underline hover:text-primary/80" {...props} />
+                              ),
+                              ul: ({ node, ...props }) => <ul className="my-4 list-disc pl-6" {...props} />,
+                              ol: ({ node, ...props }) => <ol className="my-4 list-decimal pl-6" {...props} />,
+                              li: ({ node, ...props }) => <li className="my-1" {...props} />,
+                              blockquote: ({ node, ...props }) => (
+                                <blockquote
+                                  className="my-4 border-l-4 border-muted-foreground pl-4 text-muted-foreground italic"
+                                  {...props}
+                                />
+                              ),
+                              hr: ({ node, ...props }) => <hr className="my-6 border-muted" {...props} />,
+                              img: ({ node, ...props }) => (
+                                <img className="my-4 h-auto max-w-full rounded-md" {...props} alt={props.alt || ''} />
+                              ),
+                              table: ({ node, ...props }) => (
+                                <div className="my-4 overflow-x-auto">
+                                  <table className="w-full border-collapse" {...props} />
+                                </div>
+                              ),
+                              thead: ({ node, ...props }) => <thead className="bg-muted/50" {...props} />,
+                              tbody: ({ node, ...props }) => <tbody {...props} />,
+                              tr: ({ node, ...props }) => <tr className="border-b border-border" {...props} />,
+                              th: ({ node, ...props }) => <th className="px-4 py-2 text-left font-medium" {...props} />,
+                              td: ({ node, ...props }) => <td className="px-4 py-2" {...props} />,
                             }}
                           >
                             {normalizeMarkdown(data.markdown_text)}
                           </ReactMarkdown>
                         ) : (
-                          <div className="text-muted-foreground text-sm">Preview will appear here...</div>
+                          <div className="text-sm text-muted-foreground">Preview will appear here...</div>
                         )}
                       </div>
                     </div>

@@ -1,25 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { route } from 'ziggy-js';
-import AsyncSelect from 'react-select/async';
-import { Editor } from '@tinymce/tinymce-react';
-import { Editor as TinyMCEEditor } from 'tinymce';
-import { Sketch } from '@uiw/react-color';
-import { MapContainer, Marker, TileLayer, useMapEvents, ScaleControl } from 'react-leaflet';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import { MermaidChart } from '@/components/markdown/MermaidChart';
-import { normalizeMarkdown } from '@/utils/markdown';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowLeft, Save } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
+import { normalizeMarkdown } from '@/utils/markdown';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { Editor } from '@tinymce/tinymce-react';
+import { Sketch } from '@uiw/react-color';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import { ArrowLeft, Save } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { MapContainer, Marker, ScaleControl, TileLayer, useMapEvents } from 'react-leaflet';
+import ReactMarkdown from 'react-markdown';
+import AsyncSelect from 'react-select/async';
+import remarkGfm from 'remark-gfm';
+import { Editor as TinyMCEEditor } from 'tinymce';
+import { route } from 'ziggy-js';
 
 // Fix for Leaflet marker icons
 interface LeafletIcon {
@@ -192,7 +191,7 @@ export default function Create({ enumerateOptions }: Props) {
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, field: 'file' | 'image') => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      
+
       // Validate file size (max 10MB for files, 5MB for images)
       const maxSize = field === 'file' ? 10 * 1024 * 1024 : 5 * 1024 * 1024;
       if (file.size > maxSize) {
@@ -200,10 +199,10 @@ export default function Create({ enumerateOptions }: Props) {
         setError(field, `File size must be less than ${maxSizeMB}`);
         return;
       }
-      
+
       // Clear any previous errors
       clearErrors(field);
-      
+
       // Set uploading state
       if (field === 'file') {
         setFileUploading(true);
@@ -214,7 +213,7 @@ export default function Create({ enumerateOptions }: Props) {
       try {
         // Upload file to MinIO
         const filePath = await uploadFileToMinio(file, field);
-        
+
         if (filePath) {
           // Set the file path in form data
           setData(field, filePath);
@@ -233,7 +232,6 @@ export default function Create({ enumerateOptions }: Props) {
       }
     }
   };
-
 
   useEffect(() => {
     setData('wysiwyg', wysiwygValue);
@@ -386,7 +384,7 @@ export default function Create({ enumerateOptions }: Props) {
                           key={option.value}
                           type="button"
                           onClick={() => setData('enumerate', option.value)}
-                          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                          className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                             data.enumerate === option.value
                               ? 'bg-indigo-600 text-white'
                               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -399,7 +397,7 @@ export default function Create({ enumerateOptions }: Props) {
                         <button
                           type="button"
                           onClick={() => setData('enumerate', '')}
-                          className="px-3 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors"
+                          className="rounded-full bg-gray-100 px-3 py-2 text-sm font-medium text-gray-500 transition-colors hover:bg-gray-200"
                           title="Clear selection"
                         >
                           ×
@@ -590,14 +588,18 @@ export default function Create({ enumerateOptions }: Props) {
                       disabled={fileUploading}
                     />
                     {fileUploading && (
-                      <div className="text-sm text-blue-600 bg-blue-50 p-2 rounded-md">
+                      <div className="rounded-md bg-blue-50 p-2 text-sm text-blue-600">
                         <p>Uploading file to MinIO...</p>
                       </div>
                     )}
                     {data.file && !fileUploading && (
-                      <div className="text-sm text-green-600 bg-green-50 p-2 rounded-md">
-                        <p><strong>Uploaded:</strong> {data.file}</p>
-                        <p><strong>Status:</strong> Ready for submission</p>
+                      <div className="rounded-md bg-green-50 p-2 text-sm text-green-600">
+                        <p>
+                          <strong>Uploaded:</strong> {data.file}
+                        </p>
+                        <p>
+                          <strong>Status:</strong> Ready for submission
+                        </p>
                       </div>
                     )}
                     {errors.file && <p className="text-sm text-destructive">{errors.file}</p>}
@@ -615,14 +617,18 @@ export default function Create({ enumerateOptions }: Props) {
                       disabled={imageUploading}
                     />
                     {imageUploading && (
-                      <div className="text-sm text-blue-600 bg-blue-50 p-2 rounded-md">
+                      <div className="rounded-md bg-blue-50 p-2 text-sm text-blue-600">
                         <p>Uploading image to MinIO...</p>
                       </div>
                     )}
                     {data.image && !imageUploading && (
-                      <div className="text-sm text-green-600 bg-green-50 p-2 rounded-md">
-                        <p><strong>Uploaded:</strong> {data.image}</p>
-                        <p><strong>Status:</strong> Ready for submission</p>
+                      <div className="rounded-md bg-green-50 p-2 text-sm text-green-600">
+                        <p>
+                          <strong>Uploaded:</strong> {data.image}
+                        </p>
+                        <p>
+                          <strong>Status:</strong> Ready for submission
+                        </p>
                       </div>
                     )}
                     {errors.image && <p className="text-sm text-destructive">{errors.image}</p>}
@@ -652,7 +658,7 @@ export default function Create({ enumerateOptions }: Props) {
 
                   <div className="space-y-2">
                     <Label htmlFor="markdown_text">Markdown Text</Label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                       <div className="space-y-2">
                         <Label className="text-xs text-muted-foreground">Editor</Label>
                         <textarea
@@ -660,40 +666,84 @@ export default function Create({ enumerateOptions }: Props) {
                           value={data.markdown_text || ''}
                           onChange={(e) => setData('markdown_text', e.target.value)}
                           rows={12}
-                          placeholder="Enter markdown text with mermaid diagrams...\n\nExample:\n**Bold text**\n*Italic text*\n~~Strikethrough~~\n\n```mermaid\ngraph TD\n    A[Start] --> B[End]\n```"
-                          className={`flex min-h-[300px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 font-mono ${errors.markdown_text ? 'border-destructive' : ''}`}
+                          placeholder="Enter markdown text...\n\nExamples:\n# Heading 1\n## Heading 2\n**Bold text**\n*Italic text*\n~~Strikethrough~~\n\n- List item 1\n- List item 2\n\n> Blockquote\n\n`inline code`\n\n```\ncode block\n```"
+                          className={`flex min-h-[300px] w-full rounded-md border border-input bg-background px-3 py-2 font-mono text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${errors.markdown_text ? 'border-destructive' : ''}`}
                         />
                       </div>
                       <div className="space-y-2">
                         <Label className="text-xs text-muted-foreground">Preview</Label>
-                        <div className="min-h-[300px] rounded-md border border-input bg-background p-3 prose prose-sm max-w-none dark:prose-invert overflow-auto">
-                            {/*todo: fix markdown format and implement mermaid chart*/}
+                        <div className="prose prose-sm dark:prose-invert min-h-[300px] max-w-none overflow-auto rounded-md border border-input bg-background p-3">
                           {data.markdown_text ? (
                             <ReactMarkdown
                               remarkPlugins={[remarkGfm]}
                               components={{
-                                code({ inline, className, children, ...props }: { 
-                                  inline?: boolean; 
-                                  className?: string; 
-                                  children?: React.ReactNode; 
-                                  [key: string]: any; 
+                                h1: ({ node, ...props }) => <h1 className="mt-6 mb-2 text-2xl font-bold" {...props} />,
+                                h2: ({ node, ...props }) => <h2 className="mt-5 mb-2 text-xl font-bold" {...props} />,
+                                h3: ({ node, ...props }) => <h3 className="mt-4 mb-2 text-lg font-bold" {...props} />,
+                                h4: ({ node, ...props }) => <h4 className="mt-3 mb-1 text-base font-bold" {...props} />,
+                                h5: ({ node, ...props }) => <h5 className="mt-3 mb-1 text-sm font-bold" {...props} />,
+                                h6: ({ node, ...props }) => <h6 className="mt-3 mb-1 text-xs font-bold" {...props} />,
+                                code({
+                                  inline,
+                                  className,
+                                  children,
+                                  ...props
+                                }: {
+                                  inline?: boolean;
+                                  className?: string;
+                                  children?: React.ReactNode;
+                                  [key: string]: any;
                                 }) {
-                                  const match = /language-(\w+)/.exec(className || '');
-                                  const language = match ? match[1] : '';
-                                  const code = String(children).replace(/\n$/, '');
-                                  
-                                  if (!inline && language === 'mermaid') {
-                                    return <MermaidChart code={code} />;
+                                  if (inline) {
+                                    return (
+                                      <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm" {...props}>
+                                        {children}
+                                      </code>
+                                    );
                                   }
-                                  
-                                  return <code className={className} {...props}>{children}</code>;
+                                  return (
+                                    <pre className="my-4 overflow-x-auto rounded-md bg-muted p-4">
+                                      <code className="font-mono text-sm" {...props}>
+                                        {children}
+                                      </code>
+                                    </pre>
+                                  );
                                 },
+                                p: ({ node, ...props }) => <p className="my-2" {...props} />,
+                                a: ({ node, ...props }) => (
+                                  <a className="text-primary underline hover:text-primary/80" {...props} />
+                                ),
+                                ul: ({ node, ...props }) => <ul className="my-4 list-disc pl-6" {...props} />,
+                                ol: ({ node, ...props }) => <ol className="my-4 list-decimal pl-6" {...props} />,
+                                li: ({ node, ...props }) => <li className="my-1" {...props} />,
+                                blockquote: ({ node, ...props }) => (
+                                  <blockquote
+                                    className="my-4 border-l-4 border-muted-foreground pl-4 text-muted-foreground italic"
+                                    {...props}
+                                  />
+                                ),
+                                hr: ({ node, ...props }) => <hr className="my-6 border-muted" {...props} />,
+                                img: ({ node, ...props }) => (
+                                  <img className="my-4 h-auto max-w-full rounded-md" {...props} alt={props.alt || ''} />
+                                ),
+                                table: ({ node, ...props }) => (
+                                  <div className="my-4 overflow-x-auto">
+                                    <table className="w-full border-collapse" {...props} />
+                                  </div>
+                                ),
+                                thead: ({ node, ...props }) => <thead className="bg-muted/50" {...props} />,
+                                tbody: ({ node, ...props }) => <tbody {...props} />,
+                                tr: ({ node, ...props }) => <tr className="border-b border-border" {...props} />,
+                                th: ({ node, ...props }) => (
+                                  <th className="px-4 py-2 text-left font-medium" {...props} />
+                                ),
+                                td: ({ node, ...props }) => <td className="px-4 py-2" {...props} />,
                               }}
                             >
                               {normalizeMarkdown(data.markdown_text)}
                             </ReactMarkdown>
                           ) : (
-                            <div className="text-muted-foreground text-sm">Preview will appear here...</div>
+                            <div className="text-sm text-muted-foreground">Preview will appear here...</div>
                           )}
                         </div>
                       </div>

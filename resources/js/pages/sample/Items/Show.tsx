@@ -1,17 +1,17 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MermaidChart } from '@/components/markdown/MermaidChart';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, Item } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { normalizeMarkdown } from '@/utils/markdown';
+import { Head, Link, router } from '@inertiajs/react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { ArrowLeft, Edit, FileText, Trash2 } from 'lucide-react';
+import React from 'react';
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { route } from 'ziggy-js';
 
 // Fix for Leaflet marker icons
@@ -54,7 +54,6 @@ export default function Show({ item, enumerateOptions }: Props) {
     const option = enumerateOptions.find((opt) => opt.value === value);
     return option ? option.label : value;
   };
-
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -277,11 +276,7 @@ export default function Show({ item, enumerateOptions }: Props) {
                 <div className="space-y-2">
                   <p className="text-sm text-muted-foreground">Image (JPG, JPEG, PNG)</p>
                   {item.image_url ? (
-                    <img
-                      src={item.image_url}
-                      alt={item.string}
-                      className="h-auto max-w-full rounded-lg border"
-                    />
+                    <img src={item.image_url} alt={item.string} className="h-auto max-w-full rounded-lg border" />
                   ) : (
                     <p className="text-sm text-muted-foreground">No image available</p>
                   )}
@@ -300,49 +295,79 @@ export default function Show({ item, enumerateOptions }: Props) {
                   <div className="rounded-lg bg-muted/50 p-4 whitespace-pre-wrap">{item.text || '-'}</div>
                 </div>
 
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Markdown Text</p>
-                  {item.markdown_text ? (
-                    <div className="prose prose-sm max-w-none dark:prose-invert">
+                {item.markdown_text && (
+                  <div className="mt-2">
+                    <h3 className="mb-2 text-sm font-medium text-muted-foreground">Markdown Content</h3>
+                    <div className="prose prose-sm dark:prose-invert max-w-none">
                       <ReactMarkdown
                         remarkPlugins={[remarkGfm]}
                         components={{
-                          code({ className, children, ...props }: any) {
-                            const inline = (props as any).inline;
-                            const match = /language-(\w+)/.exec(className || '');
-                            const language = match ? match[1] : '';
-                            const code = String(children).replace(/\n$/, '');
-                            
-                            if (!inline && language === 'mermaid') {
-                              return <MermaidChart code={code} />;
+                          h1: ({ node, ...props }) => <h1 className="mt-6 mb-2 text-2xl font-bold" {...props} />,
+                          h2: ({ node, ...props }) => <h2 className="mt-5 mb-2 text-xl font-bold" {...props} />,
+                          h3: ({ node, ...props }) => <h3 className="mt-4 mb-2 text-lg font-bold" {...props} />,
+                          h4: ({ node, ...props }) => <h4 className="mt-3 mb-1 text-base font-bold" {...props} />,
+                          h5: ({ node, ...props }) => <h5 className="mt-3 mb-1 text-sm font-bold" {...props} />,
+                          h6: ({ node, ...props }) => <h6 className="mt-3 mb-1 text-xs font-bold" {...props} />,
+                          code({
+                            inline,
+                            className,
+                            children,
+                            ...props
+                          }: {
+                            inline?: boolean;
+                            className?: string;
+                            children?: React.ReactNode;
+                            [key: string]: any;
+                          }) {
+                            if (inline) {
+                              return (
+                                <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm" {...props}>
+                                  {children}
+                                </code>
+                              );
                             }
-                            
-                            return <code className={className} {...props}>{children}</code>;
+                            return (
+                              <pre className="my-4 overflow-x-auto rounded-md bg-muted p-4">
+                                <code className="font-mono text-sm" {...props}>
+                                  {children}
+                                </code>
+                              </pre>
+                            );
                           },
+                          p: ({ node, ...props }) => <p className="my-2" {...props} />,
+                          a: ({ node, ...props }) => (
+                            <a className="text-primary underline hover:text-primary/80" {...props} />
+                          ),
+                          ul: ({ node, ...props }) => <ul className="my-4 list-disc pl-6" {...props} />,
+                          ol: ({ node, ...props }) => <ol className="my-4 list-decimal pl-6" {...props} />,
+                          li: ({ node, ...props }) => <li className="my-1" {...props} />,
+                          blockquote: ({ node, ...props }) => (
+                            <blockquote
+                              className="my-4 border-l-4 border-muted-foreground pl-4 text-muted-foreground italic"
+                              {...props}
+                            />
+                          ),
+                          hr: ({ node, ...props }) => <hr className="my-6 border-muted" {...props} />,
+                          img: ({ node, ...props }) => (
+                            <img className="my-4 h-auto max-w-full rounded-md" {...props} alt={props.alt || ''} />
+                          ),
+                          table: ({ node, ...props }) => (
+                            <div className="my-4 overflow-x-auto">
+                              <table className="w-full border-collapse" {...props} />
+                            </div>
+                          ),
+                          thead: ({ node, ...props }) => <thead className="bg-muted/50" {...props} />,
+                          tbody: ({ node, ...props }) => <tbody {...props} />,
+                          tr: ({ node, ...props }) => <tr className="border-b border-border" {...props} />,
+                          th: ({ node, ...props }) => <th className="px-4 py-2 text-left font-medium" {...props} />,
+                          td: ({ node, ...props }) => <td className="px-4 py-2" {...props} />,
                         }}
                       >
                         {normalizeMarkdown(item.markdown_text)}
                       </ReactMarkdown>
                     </div>
-                  ) : (
-                    <div className="rounded-lg bg-muted/50 p-4 text-muted-foreground">-</div>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">WYSIWYG Content</p>
-                  <div className="prose dark:prose-invert max-w-none">
-                    {item.wysiwyg ? (
-                      <div
-                        dangerouslySetInnerHTML={{
-                          __html: item.wysiwyg,
-                        }}
-                      />
-                    ) : (
-                      <>-</>
-                    )}
                   </div>
-                </div>
+                )}
               </CardContent>
             </Card>
           </div>
