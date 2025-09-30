@@ -553,13 +553,31 @@ export default function Edit({ item, enumerateOptions }: Props) {
 
                 <div className="space-y-2">
                   <Label htmlFor="datetime">Datetime</Label>
-                  <Input
-                    id="datetime"
-                    type="datetime-local"
-                    value={data.datetime}
-                    onChange={(e) => setData('datetime', e.target.value)}
-                    className={errors.datetime ? 'border-destructive' : ''}
-                  />
+                  <div className="relative">
+                    <Input
+                      id="datetime"
+                      type="datetime-local"
+                      value={data.datetime}
+                      onChange={(e) => setData('datetime', e.target.value)}
+                      className={errors.datetime ? 'border-destructive' : ''}
+                      onClick={(e) => {
+                        // Ensure the datetime picker opens on click
+                        const input = e.target as HTMLInputElement;
+                        input.showPicker?.();
+                      }}
+                      placeholder="Select date and time"
+                    />
+                    {data.datetime && data.datetime.trim() !== '' && (
+                      <button
+                        type="button"
+                        onClick={() => setData('datetime', '')}
+                        className="absolute top-2.5 right-2 h-4 w-4 text-muted-foreground hover:text-foreground"
+                        title="Clear datetime"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
                   {errors.datetime && <p className="text-sm text-destructive">{errors.datetime}</p>}
                 </div>
               </CardContent>
