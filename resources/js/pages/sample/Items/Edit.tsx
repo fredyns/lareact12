@@ -254,7 +254,7 @@ export default function Edit({ item, enumerateOptions }: Props) {
       <Head title={`Edit Item: ${item.string}`} />
 
       {/*set page width*/}
-        <div className="mx-auto flex h-full flex-1 flex-col gap-4 p-4 lg:w-7xl">
+      <div className="mx-auto flex h-full flex-1 flex-col gap-4 p-4 lg:w-7xl">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Edit Item</h1>
@@ -470,10 +470,10 @@ export default function Edit({ item, enumerateOptions }: Props) {
                         option: (baseStyles, state) => ({
                           ...baseStyles,
                           backgroundColor: document.documentElement.classList.contains('dark')
-                            ? state.isFocused 
-                              ? '#374151' 
-                              : state.isSelected 
-                                ? '#4b5563' 
+                            ? state.isFocused
+                              ? '#374151'
+                              : state.isSelected
+                                ? '#4b5563'
                                 : '#1f2937'
                             : state.isFocused
                               ? '#f3f4f6'
@@ -506,24 +506,52 @@ export default function Edit({ item, enumerateOptions }: Props) {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="date">Date</Label>
-                  <DatePicker
-                    date={data.date ? new Date(data.date) : undefined}
-                    onDateChange={(date) => setData('date', date ? date.toISOString().split('T')[0] : '')}
-                    placeholder="Select a date"
-                    className={errors.date ? 'border-destructive' : ''}
-                  />
+                  <div className="flex gap-2">
+                    <DatePicker
+                      date={data.date ? new Date(data.date) : undefined}
+                      onDateChange={(date) => setData('date', date ? date.toISOString().split('T')[0] : '')}
+                      placeholder="Select a date"
+                      className={`flex-1 ${errors.date ? 'border-destructive' : ''}`}
+                    />
+                    {data.date && data.date.trim() !== '' && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setData('date', '')}
+                        className="shrink-0"
+                        title="Clear date"
+                      >
+                        ×
+                      </Button>
+                    )}
+                  </div>
                   {errors.date && <p className="text-sm text-destructive">{errors.date}</p>}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="time">Time</Label>
-                  <TimePicker
-                    id="time"
-                    value={data.time}
-                    onChange={(value) => setData('time', value)}
-                    className={errors.time ? 'border-destructive' : ''}
-                    placeholder="Select time"
-                  />
+                  <div className="flex gap-2">
+                    <TimePicker
+                      id="time"
+                      value={data.time}
+                      onChange={(value) => setData('time', value)}
+                      className={`flex-1 ${errors.time ? 'border-destructive' : ''}`}
+                      placeholder="Select time"
+                    />
+                    {data.time && data.time.trim() !== '' && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setData('time', '')}
+                        className="shrink-0"
+                        title="Clear time"
+                      >
+                        ×
+                      </Button>
+                    )}
+                  </div>
                   {errors.time && <p className="text-sm text-destructive">{errors.time}</p>}
                 </div>
 
@@ -680,10 +708,10 @@ export default function Edit({ item, enumerateOptions }: Props) {
                       // Create a properly typed synthetic event object
                       const syntheticEvent = {
                         target: {
-                          files: [file]
-                        }
+                          files: [file],
+                        },
                       } as unknown as React.ChangeEvent<HTMLInputElement>;
-                      
+
                       handleFileChange(syntheticEvent, 'file');
                     }}
                     disabled={fileUploading}
@@ -712,10 +740,10 @@ export default function Edit({ item, enumerateOptions }: Props) {
                       // Create a properly typed synthetic event object
                       const syntheticEvent = {
                         target: {
-                          files: [file]
-                        }
+                          files: [file],
+                        },
                       } as unknown as React.ChangeEvent<HTMLInputElement>;
-                      
+
                       handleFileChange(syntheticEvent, 'image');
                     }}
                     disabled={imageUploading}
@@ -779,12 +807,12 @@ export default function Edit({ item, enumerateOptions }: Props) {
                                 inline,
                                 children,
                                 ...props
-                              }: React.ClassAttributes<HTMLElement> & 
-                                 React.HTMLAttributes<HTMLElement> & {
-                                   inline?: boolean;
-                                   className?: string;
-                                   children?: React.ReactNode;
-                                 }) {
+                              }: React.ClassAttributes<HTMLElement> &
+                                React.HTMLAttributes<HTMLElement> & {
+                                  inline?: boolean;
+                                  className?: string;
+                                  children?: React.ReactNode;
+                                }) {
                                 if (inline) {
                                   return (
                                     <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm" {...props}>
