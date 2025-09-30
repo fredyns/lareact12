@@ -157,8 +157,8 @@ export default function Edit({ item, enumerateOptions }: Props) {
   const handlePositionChange = (lat: number, lng: number) => {
     setData({
       ...data,
-      latitude: lat,
-      longitude: lng,
+      latitude: parseFloat(lat.toFixed(3)),
+      longitude: parseFloat(lng.toFixed(3)),
     });
   };
 
