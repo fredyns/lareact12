@@ -554,18 +554,12 @@ export default function Edit({ item, enumerateOptions }: Props) {
                 <div className="space-y-2">
                   <Label htmlFor="datetime">Datetime</Label>
                   <div className="relative">
-                    <Input
-                      id="datetime"
-                      type="datetime-local"
-                      value={data.datetime}
-                      onChange={(e) => setData('datetime', e.target.value)}
-                      className={errors.datetime ? 'border-destructive' : ''}
-                      onClick={(e) => {
-                        // Ensure the datetime picker opens on click
-                        const input = e.target as HTMLInputElement;
-                        input.showPicker?.();
-                      }}
+                    <DatePicker
+                      date={data.datetime ? new Date(data.datetime) : undefined}
+                      onDateChange={(date) => setData('datetime', date ? date.toISOString().slice(0, 16) : '')}
                       placeholder="Select date and time"
+                      className={errors.datetime ? 'border-destructive' : ''}
+                      showTime={true}
                     />
                     {data.datetime && data.datetime.trim() !== '' && (
                       <button
