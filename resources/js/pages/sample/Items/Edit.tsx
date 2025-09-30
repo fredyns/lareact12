@@ -589,8 +589,52 @@ export default function Edit({ item, enumerateOptions }: Props) {
                     id="ip_address"
                     type="text"
                     value={data.ip_address}
-                    onChange={(e) => setData('ip_address', e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      // Remove any non-digit and non-dot characters
+                      const cleaned = value.replace(/[^\d.]/g, '');
+
+                      // Split by dots and process each part
+                      const parts = cleaned.split('.');
+                      const processedParts = parts.map((part) => {
+                        // Limit each part to 3 digits
+                        if (part.length > 3) {
+                          part = part.slice(0, 3);
+                        }
+                        // Ensure each part doesn't exceed 255
+                        const num = parseInt(part, 10);
+                        if (!isNaN(num) && num > 255) {
+                          part = '255';
+                        }
+                        return part;
+                      });
+
+                      // Limit to 4 parts maximum
+                      if (processedParts.length > 4) {
+                        processedParts.splice(4);
+                      }
+
+                      // Auto-add dots after complete octets
+                      let formatted = processedParts[0] || '';
+                      for (let i = 1; i < processedParts.length; i++) {
+                        formatted += '.' + processedParts[i];
+                      }
+
+                      // Auto-add dot when typing the 4th digit of an octet (except the last one)
+                      if (processedParts.length < 4) {
+                        const lastPart = processedParts[processedParts.length - 1];
+                        if (lastPart && lastPart.length === 3 && /^\d{3}$/.test(lastPart)) {
+                          const num = parseInt(lastPart, 10);
+                          if (num <= 255 && value.length > formatted.length) {
+                            formatted += '.';
+                          }
+                        }
+                      }
+
+                      setData('ip_address', formatted);
+                    }}
                     placeholder="192.168.1.1"
+                    maxLength={15}
                     className={errors.ip_address ? 'border-destructive' : ''}
                   />
                   {errors.ip_address && <p className="text-sm text-destructive">{errors.ip_address}</p>}
