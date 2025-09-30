@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
+import { DatePicker } from '@/components/ui/date-picker';
 import { FileDropzone } from '@/components/ui/file-dropzone';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -504,11 +505,10 @@ export default function Edit({ item, enumerateOptions }: Props) {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="date">Date</Label>
-                  <Input
-                    id="date"
-                    type="date"
-                    value={data.date}
-                    onChange={(e) => setData('date', e.target.value)}
+                  <DatePicker
+                    date={data.date ? new Date(data.date) : undefined}
+                    onDateChange={(date) => setData('date', date ? date.toISOString().split('T')[0] : '')}
+                    placeholder="Select a date"
                     className={errors.date ? 'border-destructive' : ''}
                   />
                   {errors.date && <p className="text-sm text-destructive">{errors.date}</p>}
