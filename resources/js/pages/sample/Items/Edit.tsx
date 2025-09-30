@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DatePicker } from '@/components/ui/date-picker';
+import { TimePicker } from '@/components/ui/time-picker';
 import { FileDropzone } from '@/components/ui/file-dropzone';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -516,12 +517,12 @@ export default function Edit({ item, enumerateOptions }: Props) {
 
                 <div className="space-y-2">
                   <Label htmlFor="time">Time</Label>
-                  <Input
+                  <TimePicker
                     id="time"
-                    type="time"
                     value={data.time}
-                    onChange={(e) => setData('time', e.target.value)}
+                    onChange={(value) => setData('time', value)}
                     className={errors.time ? 'border-destructive' : ''}
+                    placeholder="Select time"
                   />
                   {errors.time && <p className="text-sm text-destructive">{errors.time}</p>}
                 </div>
