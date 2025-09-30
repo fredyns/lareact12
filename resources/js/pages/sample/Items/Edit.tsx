@@ -15,7 +15,7 @@ import { Editor } from '@tinymce/tinymce-react';
 import { Sketch } from '@uiw/react-color';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Save, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet';
 import ReactMarkdown from 'react-markdown';
@@ -506,24 +506,22 @@ export default function Edit({ item, enumerateOptions }: Props) {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="date">Date</Label>
-                  <div className="flex gap-2">
+                  <div className="relative">
                     <DatePicker
                       date={data.date ? new Date(data.date) : undefined}
                       onDateChange={(date) => setData('date', date ? date.toISOString().split('T')[0] : '')}
                       placeholder="Select a date"
-                      className={`flex-1 ${errors.date ? 'border-destructive' : ''}`}
+                      className={errors.date ? 'border-destructive' : ''}
                     />
                     {data.date && data.date.trim() !== '' && (
-                      <Button
+                      <button
                         type="button"
-                        variant="outline"
-                        size="icon"
                         onClick={() => setData('date', '')}
-                        className="shrink-0"
+                        className="absolute top-2.5 right-2 h-4 w-4 text-muted-foreground hover:text-foreground"
                         title="Clear date"
                       >
-                        ×
-                      </Button>
+                        <X className="h-4 w-4" />
+                      </button>
                     )}
                   </div>
                   {errors.date && <p className="text-sm text-destructive">{errors.date}</p>}
@@ -531,25 +529,23 @@ export default function Edit({ item, enumerateOptions }: Props) {
 
                 <div className="space-y-2">
                   <Label htmlFor="time">Time</Label>
-                  <div className="flex gap-2">
+                  <div className="relative">
                     <TimePicker
                       id="time"
                       value={data.time}
                       onChange={(value) => setData('time', value)}
-                      className={`flex-1 ${errors.time ? 'border-destructive' : ''}`}
+                      className={errors.time ? 'border-destructive' : ''}
                       placeholder="Select time"
                     />
                     {data.time && data.time.trim() !== '' && (
-                      <Button
+                      <button
                         type="button"
-                        variant="outline"
-                        size="icon"
                         onClick={() => setData('time', '')}
-                        className="shrink-0"
+                        className="absolute top-2.5 right-2 h-4 w-4 text-muted-foreground hover:text-foreground"
                         title="Clear time"
                       >
-                        ×
-                      </Button>
+                        <X className="h-4 w-4" />
+                      </button>
                     )}
                   </div>
                   {errors.time && <p className="text-sm text-destructive">{errors.time}</p>}
