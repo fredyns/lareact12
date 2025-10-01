@@ -107,9 +107,29 @@ export function FileDropzone({
         return;
       }
       
+      // Check file type if accept is provided
+      if (accept) {
+        const acceptedTypes = accept.split(',').map(type => type.trim());
+        const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
+        const fileType = file.type;
+        
+        const isAccepted = acceptedTypes.some(type => {
+          if (type.startsWith('.')) {
+            return fileExtension === type.toLowerCase();
+          } else {
+            return fileType.match(new RegExp(type.replace('*', '.*')));
+          }
+        });
+        
+        if (!isAccepted) {
+          alert(`File type not accepted. Please use: ${accept}`);
+          return;
+        }
+      }
+      
       onFileDrop(file);
     }
-  }, [maxSize, onFileDrop]);
+  }, [maxSize, accept, onFileDrop]);
 
   const handleButtonClick = useCallback(() => {
     if (!disabled && !isUploading && fileInputRef.current) {
