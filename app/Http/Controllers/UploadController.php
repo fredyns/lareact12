@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Services\MinioService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class UploadController extends Controller
 {
@@ -18,7 +18,7 @@ class UploadController extends Controller
     /**
      * Upload a file to MinIO.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function uploadFile(Request $request): JsonResponse
@@ -30,11 +30,11 @@ class UploadController extends Controller
 
         $file = $request->file('file');
         // Use provided folder or default to uploads/files
-        $folder = $request->input('folder', 'uploads/files');
+        $folder = $request->input('folder', 'uploads/files/' . date('Y/m/d'));
 
         try {
             $filePath = $this->minioService->uploadFile($file, $folder);
-            
+
             if (!$filePath) {
                 return response()->json([
                     'success' => false,
@@ -53,7 +53,7 @@ class UploadController extends Controller
             ]);
         } catch (\Exception $e) {
             \Log::error('File upload failed: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'error' => 'Failed to upload file: ' . $e->getMessage()
@@ -64,7 +64,7 @@ class UploadController extends Controller
     /**
      * Upload an image to MinIO.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function uploadImage(Request $request): JsonResponse
@@ -76,11 +76,11 @@ class UploadController extends Controller
 
         $file = $request->file('file');
         // Use provided folder or default to uploads/images
-        $folder = $request->input('folder', 'uploads/images');
+        $folder = $request->input('folder', 'uploads/images/' . date('Y/m/d'));
 
         try {
             $filePath = $this->minioService->uploadFile($file, $folder);
-            
+
             if (!$filePath) {
                 return response()->json([
                     'success' => false,
@@ -112,7 +112,7 @@ class UploadController extends Controller
             ]);
         } catch (\Exception $e) {
             \Log::error('Image upload failed: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'error' => 'Failed to upload image: ' . $e->getMessage()
