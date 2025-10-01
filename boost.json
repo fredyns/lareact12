@@ -1,0 +1,11 @@
+{
+    "agents": [
+        "claude_code",
+        "windsurf"
+    ],
+    "editors": [
+        "phpstorm",
+        "windsurf"
+    ],
+    "guidelines": []
+}
