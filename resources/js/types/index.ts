@@ -70,6 +70,7 @@ export interface Item {
   wysiwyg: string | null;
   latitude: number | null;
   longitude: number | null;
+  upload_path: string | null;
   user?: User;
   creator?: User;
   updater?: User;

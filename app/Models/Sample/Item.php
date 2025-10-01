@@ -37,6 +37,7 @@ use Illuminate\Support\Str;
  * @property string|null $wysiwyg
  * @property float|null $latitude
  * @property float|null $longitude
+ * @property string|null $upload_path
  * @property-read User|null $user
  * @property-read User|null $creator
  * @property-read User|null $updater
@@ -99,6 +100,7 @@ class Item extends Model
         'wysiwyg',
         'latitude',
         'longitude',
+        'upload_path',
     ];
 
     /**
@@ -133,6 +135,11 @@ class Item extends Model
                 $model->{$model->getKeyName()} = (string) Str::uuid();
             }
             
+            // Generate upload_path based on creation date and ID
+            if (empty($model->upload_path)) {
+                $model->upload_path = $model->generateUploadPath();
+            }
+            
             if (auth()->check()) {
                 $model->created_by = auth()->id();
                 $model->updated_by = auth()->id();
@@ -140,6 +147,11 @@ class Item extends Model
         });
 
         static::updating(function ($model) {
+            // Generate upload_path if empty (for existing records)
+            if (empty($model->upload_path)) {
+                $model->upload_path = $model->generateUploadPath();
+            }
+            
             if (auth()->check()) {
                 $model->updated_by = auth()->id();
             }
@@ -174,5 +186,36 @@ class Item extends Model
     public function updater(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    /**
+     * Generate the upload path for this item.
+     * Format: {tableName}/{year}/{month}/{day}/{modelID}
+     *
+     * @return string
+     */
+    public function generateUploadPath(): string
+    {
+        $createdAt = $this->created_at ?? now();
+        
+        return sprintf(
+            '%s/%s/%s/%s/%s',
+            $this->getTable(),
+            $createdAt->format('Y'),
+            $createdAt->format('m'),
+            $createdAt->format('d'),
+            $this->id
+        );
+    }
+
+    /**
+     * Get the full file path within the upload directory.
+     *
+     * @param string $filename
+     * @return string
+     */
+    public function getFilePath(string $filename): string
+    {
+        return $this->upload_path . '/' . $filename;
     }
 }

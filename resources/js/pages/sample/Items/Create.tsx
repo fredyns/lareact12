@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { normalizeMarkdown } from '@/utils/markdown';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import { Editor } from '@tinymce/tinymce-react';
 import { Sketch } from '@uiw/react-color';
 import L from 'leaflet';
@@ -39,6 +39,7 @@ interface SelectOption {
 }
 
 interface Props {
+  tempUploadPath: string;
   enumerateOptions: SelectOption[];
 }
 
@@ -89,14 +90,12 @@ const DraggableMarker = ({ position, onPositionChange }: DraggableMarkerProps) =
   );
 };
 
-export default function Create({ enumerateOptions }: Props) {
+export default function Create({ tempUploadPath, enumerateOptions }: Props) {
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [wysiwygValue, setWysiwygValue] = useState('');
 
   const [fileUploading, setFileUploading] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
-  const [fileUploadSuccess, setFileUploadSuccess] = useState(false);
-  const [imageUploadSuccess, setImageUploadSuccess] = useState(false);
 
   const { data, setData, post, processing, errors, reset, setError, clearErrors } = useForm({
     string: '',
@@ -123,6 +122,8 @@ export default function Create({ enumerateOptions }: Props) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Simple one-step submission - files are already uploaded and paths are in data.file and data.image
     post(route('sample.items.store'));
   };
 
@@ -158,11 +159,11 @@ export default function Create({ enumerateOptions }: Props) {
     });
   };
 
-  const uploadFileToMinio = async (file: File, type: 'file' | 'image'): Promise<string | null> => {
+  const uploadFileToMinio = async (file: File, type: 'file' | 'image', uploadPath: string): Promise<string | null> => {
     const formData = new FormData();
     formData.append('file', file);
-    // Add folder parameter to organize uploads by context
-    formData.append('folder', type === 'file' ? 'items/files' : 'items/images');
+    // Use the item's specific upload_path for organized storage
+    formData.append('folder', uploadPath);
 
     // Use the appropriate endpoint based on file type
     const endpoint = type === 'file' ? '/upload/file' : '/upload/image';
@@ -206,7 +207,7 @@ export default function Create({ enumerateOptions }: Props) {
       // Clear any previous errors
       clearErrors(field);
 
-      // Set uploading state
+      // Upload file immediately to MinIO using preparedItem.upload_path
       if (field === 'file') {
         setFileUploading(true);
       } else {
@@ -214,25 +215,15 @@ export default function Create({ enumerateOptions }: Props) {
       }
 
       try {
-        // Upload file to MinIO
-        const filePath = await uploadFileToMinio(file, field);
-
+        const filePath = await uploadFileToMinio(file, field, tempUploadPath);
         if (filePath) {
-          // Set the file path in form data
           setData(field, filePath);
-          // Mark this file as newly uploaded
-          if (field === 'file') {
-            setFileUploadSuccess(true);
-          } else {
-            setImageUploadSuccess(true);
-          }
-        } else {
-          setError(field, 'Failed to upload file');
+          console.log(`${field} uploaded successfully:`, filePath);
         }
       } catch (error) {
-        setError(field, error instanceof Error ? error.message : 'Upload failed');
+        console.error(`Error uploading ${field}:`, error);
+        setError(field, `Failed to upload ${field}`);
       } finally {
-        // Clear uploading state
         if (field === 'file') {
           setFileUploading(false);
         } else {
@@ -595,7 +586,7 @@ export default function Create({ enumerateOptions }: Props) {
                       onFileDrop={(file) => handleFileChange({ target: { files: [file] } } as any, 'file')}
                       disabled={fileUploading}
                       isUploading={fileUploading}
-                      isSuccess={fileUploadSuccess}
+                      isSuccess={!!data.file}
                       currentFileName={data.file ? data.file.split('/').pop() : undefined}
                       error={errors.file}
                     />
@@ -610,7 +601,7 @@ export default function Create({ enumerateOptions }: Props) {
                       onFileDrop={(file) => handleFileChange({ target: { files: [file] } } as any, 'image')}
                       disabled={imageUploading}
                       isUploading={imageUploading}
-                      isSuccess={imageUploadSuccess}
+                      isSuccess={!!data.image}
                       currentFileName={data.image ? data.image.split('/').pop() : undefined}
                       error={errors.image}
                     />

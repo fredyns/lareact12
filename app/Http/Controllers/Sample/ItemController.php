@@ -98,7 +98,18 @@ class ItemController extends Controller
     {
         $this->authorize('create', Item::class);
 
+        // Generate temporary upload path without model ID
+        // Format: tmp/{tableName}/{yyyy}/{mm}/{dd}
+        $now = now();
+        $tempUploadPath = sprintf(
+            'tmp/sample_items/%s/%s/%s',
+            $now->format('Y'),
+            $now->format('m'),
+            $now->format('d')
+        );
+
         return Inertia::render('sample/Items/Create', [
+            'tempUploadPath' => $tempUploadPath,
             'enumerateOptions' => collect(ItemEnumerate::cases())->map(fn($case) => [
                 'value' => $case->value,
                 'label' => Str::title($case->value),
@@ -118,11 +129,36 @@ class ItemController extends Controller
 
         $data = $request->validated();
 
-        // Files are now uploaded via separate API endpoint
-        // The 'file' and 'image' fields contain MinIO paths as strings
-        // No additional file processing needed here
-
+        // Create the item first to generate ID and upload_path
         $item = Item::create($data);
+
+        // Move uploaded files from temporary location to final location
+        // Temporary: tmp/sample_items/2025/10/01/filename.ext
+        // Final: sample_items/2025/10/01/{modelID}/filename.ext
+        if ($item->file && $this->minioService->fileExists($item->file)) {
+            $oldPath = $item->file;
+            $fileName = basename($oldPath);
+            $newPath = $item->upload_path . '/' . $fileName;
+            
+            if ($this->minioService->moveFile($oldPath, $newPath)) {
+                $item->file = $newPath;
+            }
+        }
+
+        if ($item->image && $this->minioService->fileExists($item->image)) {
+            $oldPath = $item->image;
+            $fileName = basename($oldPath);
+            $newPath = $item->upload_path . '/' . $fileName;
+            
+            if ($this->minioService->moveFile($oldPath, $newPath)) {
+                $item->image = $newPath;
+            }
+        }
+
+        // Save updated file paths if any files were moved
+        if ($item->isDirty(['file', 'image'])) {
+            $item->save();
+        }
 
         if ($request->wantsJson()) {
             return (new ItemResource($item))
@@ -193,19 +229,29 @@ class ItemController extends Controller
 
         $data = $request->validated();
 
-        // Handle file uploads using MinIO
+        // Handle file uploads using MinIO with item's upload_path
         if ($request->hasFile('file')) {
             // Delete old file if exists
             if ($item->file && $this->minioService->fileExists($item->file)) {
                 $this->minioService->deleteFile($item->file);
             }
+            
+            // Ensure upload_path is set
+            if (empty($item->upload_path)) {
+                $item->upload_path = $item->generateUploadPath();
+                $item->save();
+            }
+            
             $filePath = $this->minioService->uploadFile(
                 $request->file('file'),
-                'items/files'
+                $item->upload_path
             );
             if ($filePath) {
                 $data['file'] = $filePath;
             }
+        } elseif ($request->has('file') && is_string($request->input('file'))) {
+            // Handle file path from already-uploaded file (two-step upload process)
+            $data['file'] = $request->input('file');
         }
 
         if ($request->hasFile('image')) {
@@ -213,13 +259,23 @@ class ItemController extends Controller
             if ($item->image && $this->minioService->fileExists($item->image)) {
                 $this->minioService->deleteFile($item->image);
             }
+            
+            // Ensure upload_path is set
+            if (empty($item->upload_path)) {
+                $item->upload_path = $item->generateUploadPath();
+                $item->save();
+            }
+            
             $imagePath = $this->minioService->uploadFile(
                 $request->file('image'),
-                'items/images'
+                $item->upload_path
             );
             if ($imagePath) {
                 $data['image'] = $imagePath;
             }
+        } elseif ($request->has('image') && is_string($request->input('image'))) {
+            // Handle image path from already-uploaded image (two-step upload process)
+            $data['image'] = $request->input('image');
         }
 
         $item->update($data);

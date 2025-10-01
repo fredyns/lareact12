@@ -168,8 +168,9 @@ export default function Edit({ item, enumerateOptions }: Props) {
   const uploadFileToMinio = async (file: File, type: 'file' | 'image'): Promise<string | null> => {
     const formData = new FormData();
     formData.append('file', file);
-    // Add folder parameter to organize uploads by context
-    formData.append('folder', type === 'file' ? 'items/files' : 'items/images');
+    // Use the item's specific upload_path for organized storage
+    // This ensures all files for this item are in the same folder
+    formData.append('folder', item.upload_path || 'items/files');
 
     // Use the appropriate endpoint based on file type
     const endpoint = type === 'file' ? '/upload/file' : '/upload/image';

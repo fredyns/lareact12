@@ -25,10 +25,11 @@ class UploadController extends Controller
     {
         $request->validate([
             'file' => 'required|file|mimes:pdf,docx,pptx,xlsx,zip,rar|max:10240', // 10MB max
-            'folder' => 'string|nullable', // Optional folder parameter
+            'folder' => 'string|nullable', // Optional folder parameter for organized uploads
         ]);
 
         $file = $request->file('file');
+        // Use provided folder or default to uploads/files
         $folder = $request->input('folder', 'uploads/files');
 
         try {
@@ -44,6 +45,7 @@ class UploadController extends Controller
             return response()->json([
                 'success' => true,
                 'path' => $filePath,
+                'folder' => $folder,
                 'original_name' => $file->getClientOriginalName(),
                 'size' => $file->getSize(),
                 'mime_type' => $file->getMimeType(),
@@ -69,10 +71,11 @@ class UploadController extends Controller
     {
         $request->validate([
             'file' => 'required|image|mimes:jpg,jpeg,png,gif,webp|max:5120', // 5MB max
-            'folder' => 'string|nullable', // Optional folder parameter
+            'folder' => 'string|nullable', // Optional folder parameter for organized uploads
         ]);
 
         $file = $request->file('file');
+        // Use provided folder or default to uploads/images
         $folder = $request->input('folder', 'uploads/images');
 
         try {
@@ -100,6 +103,7 @@ class UploadController extends Controller
             return response()->json([
                 'success' => true,
                 'path' => $filePath,
+                'folder' => $folder,
                 'original_name' => $file->getClientOriginalName(),
                 'size' => $file->getSize(),
                 'mime_type' => $file->getMimeType(),

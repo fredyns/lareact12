@@ -53,6 +53,7 @@ class ItemResource extends JsonResource
             'wysiwyg' => $this->wysiwyg,
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
+            'upload_path' => $this->upload_path,
             
             // Include relationships when they are loaded
             'user' => $this->whenLoaded('user', function () {
