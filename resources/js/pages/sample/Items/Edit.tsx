@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DatePicker } from '@/components/ui/date-picker';
 import { TimePicker } from '@/components/ui/time-picker';
+import { Dialog, DialogHeader, DialogTitle, DialogPortal, DialogOverlay } from '@/components/ui/dialog';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { FileDropzone } from '@/components/ui/file-dropzone';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -100,6 +102,7 @@ export default function Edit({ item, enumerateOptions }: Props) {
   const [imageUploading, setImageUploading] = useState(false);
   const [fileUploadSuccess, setFileUploadSuccess] = useState(false);
   const [imageUploadSuccess, setImageUploadSuccess] = useState(false);
+  const [showImagePreview, setShowImagePreview] = useState(false);
 
   const { data, setData, put, processing, errors, setError, clearErrors } = useForm({
     string: item.string,
@@ -779,7 +782,12 @@ export default function Edit({ item, enumerateOptions }: Props) {
                   <Label htmlFor="image">Image (JPG, JPEG, PNG)</Label>
                   {item.image_url ? (
                     <div className="mb-2">
-                      <img src={item.image_url} alt={item.string} className="h-24 w-auto rounded" />
+                      <img 
+                        src={item.image_url} 
+                        alt={item.string} 
+                        className="h-24 w-auto rounded cursor-pointer hover:opacity-80 transition-opacity" 
+                        onClick={() => setShowImagePreview(true)}
+                      />
                       <p className="mt-1 text-sm text-muted-foreground">
                         Current image: {(item.image ?? '').split('/').pop()}
                       </p>
@@ -988,6 +996,34 @@ export default function Edit({ item, enumerateOptions }: Props) {
           </CardContent>
         </Card>
       </div>
+
+      {/* Image Preview Modal */}
+      <Dialog open={showImagePreview} onOpenChange={setShowImagePreview}>
+        <DialogPortal>
+          <DialogOverlay className="!z-[9998]" style={{ zIndex: 9998 }} />
+          <DialogPrimitive.Content
+            className="!max-w-[98vw] !w-[98vw] h-full max-h-[95vh] p-1 md:p-2 !z-[9999] bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] grid translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border shadow-lg duration-200"
+            style={{ maxWidth: '98vw', width: '98vw', zIndex: 9999 }}
+          >
+            <DialogHeader className="p-1 md:p-2">
+              <DialogTitle>Image Preview</DialogTitle>
+            </DialogHeader>
+            <div className="flex items-center justify-center p-1 md:p-2 h-full min-h-[70vh]">
+              {item.image_url && (
+                <img 
+                  src={item.image_url} 
+                  alt={item.string} 
+                  className="w-full max-w-none max-h-[85vh] object-contain rounded-lg shadow-lg"
+                />
+              )}
+            </div>
+            <DialogPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
+              <X />
+              <span className="sr-only">Close</span>
+            </DialogPrimitive.Close>
+          </DialogPrimitive.Content>
+        </DialogPortal>
+      </Dialog>
     </AppLayout>
   );
 }
