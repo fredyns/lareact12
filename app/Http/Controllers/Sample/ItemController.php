@@ -102,7 +102,7 @@ class ItemController extends Controller
         // Format: tmp/{tableName}/{yyyy}/{mm}/{dd}
         $now = now();
         $tempUploadPath = sprintf(
-            'tmp/sample_items/%s/%s/%s',
+            'tmp/%s/%s/%s/sample_items',
             $now->format('Y'),
             $now->format('m'),
             $now->format('d')
