@@ -1,11 +1,7 @@
 import { Label } from '@/components/ui/label';
 import React from 'react';
 import AsyncSelect from 'react-select/async';
-
-interface SelectOption {
-  value: string;
-  label: string;
-}
+import { SelectOption } from '@/types';
 
 interface InputSelectFromTableProps {
   id: string;
@@ -116,10 +112,10 @@ export function InputSelectFromTable({
                   : 'white',
             color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#111827',
           }),
-          singleValue: (baseStyles) => ({
-            ...baseStyles,
-            color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#111827',
-          }),
+          // singleValue: (baseStyles) => ({
+          //   ...baseStyles,
+          //   color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#111827',
+          // }),
           input: (baseStyles) => ({
             ...baseStyles,
             color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#111827',

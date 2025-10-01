@@ -1,15 +1,16 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Item } from '@/types';
+import type { BreadcrumbItem, Item, SelectOption } from '@/types';
+import { getItemUploadPath } from '@/utils/upload';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft, Save } from 'lucide-react';
 import { route } from 'ziggy-js';
-import { FormFields } from './FormFields';
+import { FormField } from './FormField';
 
 interface Props {
   item: Item;
-  enumerateOptions: { value: string; label: string }[];
+  enumerateOptions: SelectOption[];
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -77,12 +78,13 @@ export default function Edit({ item, enumerateOptions }: Props) {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <FormFields
+          <FormField
             data={data}
             setData={setData}
             errors={errors}
             enumerateOptions={enumerateOptions}
             item={item}
+            uploadPath={getItemUploadPath(item)}
           />
 
           <Card className="col-span-full">

@@ -98,18 +98,7 @@ class ItemController extends Controller
     {
         $this->authorize('create', Item::class);
 
-        // Generate temporary upload path without model ID
-        // Format: tmp/{tableName}/{yyyy}/{mm}/{dd}
-        $now = now();
-        $tempUploadPath = sprintf(
-            'tmp/%s/%s/%s/sample_items',
-            $now->format('Y'),
-            $now->format('m'),
-            $now->format('d')
-        );
-
         return Inertia::render('sample/Items/Create', [
-            'tempUploadPath' => $tempUploadPath,
             'enumerateOptions' => collect(ItemEnumerate::cases())->map(fn($case) => [
                 'value' => $case->value,
                 'label' => Str::title($case->value),

@@ -65,23 +65,33 @@ interface FormErrors {
   user_id?: string;
 }
 
-interface ItemFormProps {
+interface FormFieldProps {
   data: FormData;
   setData: <K extends keyof FormData>(key: K, value: FormData[K]) => void;
   errors: FormErrors;
   enumerateOptions: { value: string; label: string }[];
   // Optional: Pass item for edit mode to auto-populate optional props
   item?: Item;
+  // Optional: Pass uploadPath directly for create mode
+  uploadPath: string;
 }
 
-export function FormFields({ data, setData, errors, enumerateOptions, item }: ItemFormProps) {
+export function FormField({
+  data,
+  setData,
+  errors,
+  enumerateOptions,
+  item,
+  uploadPath: uploadPathProp,
+}: FormFieldProps) {
   // Extract optional props from item if provided (edit mode)
   const currentFileUrl = item?.file_url ?? undefined;
   const currentFileName = (item?.file ?? '').split('/').pop() || 'Download file';
   const currentImageUrl = item?.image_url ?? undefined;
   const currentImageName = (item?.image ?? '').split('/').pop();
   const currentImageAlt = item?.string;
-  const uploadPath = item?.upload_path ?? undefined;
+  // Use uploadPath from prop (create mode) or from item (edit mode)
+  const uploadPath = uploadPathProp;
   const userDefaultValue = item?.user ? { value: item.user.id, label: item.user.name } : null;
   const wysiwygInitialValue = item?.wysiwyg || '';
   return (
@@ -263,7 +273,7 @@ export function FormFields({ data, setData, errors, enumerateOptions, item }: It
                 currentFileName={currentFileName}
                 onFileChange={(filePath) => setData('file', filePath)}
                 uploadPath={uploadPath}
-                accept="pdf, docx, pptx, xlsx, zip, rar"
+                accept=".pdf,.docx,.pptx,.xlsx,.zip,.rar"
                 maxSize={10 * 1024 * 1024} // 10MB
               />
 
@@ -275,7 +285,7 @@ export function FormFields({ data, setData, errors, enumerateOptions, item }: It
                 currentImageAlt={currentImageAlt}
                 onImageChange={(imagePath) => setData('image', imagePath)}
                 uploadPath={uploadPath}
-                accept="jpg, jpeg, png"
+                accept=".jpg,.jpeg,.png,.heic"
                 maxSize={5 * 1024 * 1024} // 5MB
               />
             </CardContent>

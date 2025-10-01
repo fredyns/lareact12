@@ -1,6 +1,7 @@
 import { FileDropzone } from '@/components/ui/file-dropzone';
 import { Label } from '@/components/ui/label';
-import React, { useState } from 'react';
+import { formatFileSize } from '@/utils/upload';
+import { useState } from 'react';
 
 interface InputFileProps {
   id: string;
@@ -8,7 +9,7 @@ interface InputFileProps {
   currentFileUrl?: string | null;
   currentFileName?: string;
   onFileChange: (filePath: string) => void;
-  uploadPath?: string;
+  uploadPath: string;
   accept: string;
   maxSize: number;
   required?: boolean;
@@ -31,30 +32,12 @@ export function InputFile({
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
 
-  // Helper function to format bytes to human-readable size
-  const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round(bytes / Math.pow(k, i)) + sizes[i];
-  };
-
   const maxSizeLabel = formatFileSize(maxSize);
-
-  // Helper function to generate temporary upload path
-  const getTempUploadPath = (): string => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    return `tmp/${year}/${month}/${day}/sample_items`;
-  };
 
   const uploadFileToS3 = async (file: File): Promise<string | null> => {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('folder', uploadPath || getTempUploadPath());
+    formData.append('folder', uploadPath);
 
     // Always use the file upload endpoint
     const endpoint = '/upload/file';

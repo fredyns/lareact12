@@ -1,6 +1,8 @@
 import { InertiaLinkProps } from '@inertiajs/react';
 import { LucideIcon } from 'lucide-react';
 
+// Models
+
 export interface User {
   id: string;
   name: string;
@@ -11,35 +13,6 @@ export interface User {
   created_at: string;
   updated_at: string;
   [key: string]: unknown;
-}
-
-export interface Auth {
-  user: User;
-}
-
-export interface SharedData {
-  name: string;
-  quote: { message: string; author: string };
-  auth: Auth;
-  sidebarOpen: boolean;
-  [key: string]: unknown;
-}
-
-export interface NavItem {
-  title: string;
-  href: NonNullable<InertiaLinkProps['href']>;
-  icon?: LucideIcon | null;
-  isActive?: boolean;
-}
-
-export interface NavGroup {
-  title: string;
-  items: NavItem[];
-}
-
-export interface BreadcrumbItem {
-  title: string;
-  href: string;
 }
 
 export interface Item {
@@ -74,4 +47,42 @@ export interface Item {
   user?: User;
   creator?: User;
   updater?: User;
+}
+
+// Data Structures
+
+export interface Auth {
+  user: User;
+}
+
+export interface SharedData {
+  name: string;
+  quote: { message: string; author: string };
+  auth: Auth;
+  sidebarOpen: boolean;
+  [key: string]: unknown;
+}
+
+export interface SelectOption {
+  value: string;
+  label: string;
+}
+
+// Widgets
+
+export interface NavItem {
+  title: string;
+  href: NonNullable<InertiaLinkProps['href']>;
+  icon?: LucideIcon | null;
+  isActive?: boolean;
+}
+
+export interface NavGroup {
+  title: string;
+  items: NavItem[];
+}
+
+export interface BreadcrumbItem {
+  title: string;
+  href: string;
 }
