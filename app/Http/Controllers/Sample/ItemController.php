@@ -82,10 +82,7 @@ class ItemController extends Controller
                 'links' => $items->linkCollection()->toArray(),
             ],
             'filters' => $request->only(['search', 'user_id', 'enumerate', 'sort_field', 'sort_direction']),
-            'enumerateOptions' => collect(ItemEnumerate::cases())->map(fn($case) => [
-                'value' => $case->value,
-                'label' => Str::title($case->value),
-            ])->toArray(),
+            'enumerateOptions' => ItemEnumerate::toSelectOptions(),
         ]);
     }
 
@@ -99,10 +96,7 @@ class ItemController extends Controller
         $this->authorize('create', Item::class);
 
         return Inertia::render('sample/Items/Create', [
-            'enumerateOptions' => collect(ItemEnumerate::cases())->map(fn($case) => [
-                'value' => $case->value,
-                'label' => Str::title($case->value),
-            ])->toArray(),
+            'enumerateOptions' => ItemEnumerate::toSelectOptions(),
         ]);
     }
 
@@ -177,10 +171,7 @@ class ItemController extends Controller
 
         return Inertia::render('sample/Items/Show', [
             'item' => (new ItemResource($item))->toArray(request()),
-            'enumerateOptions' => collect(ItemEnumerate::cases())->map(fn($case) => [
-                'value' => $case->value,
-                'label' => Str::title($case->value),
-            ])->toArray(),
+            'enumerateOptions' => ItemEnumerate::toSelectOptions(),
         ]);
     }
 
@@ -198,10 +189,7 @@ class ItemController extends Controller
 
         return Inertia::render('sample/Items/Edit', [
             'item' => (new ItemResource($item))->toArray(request()),
-            'enumerateOptions' => collect(ItemEnumerate::cases())->map(fn($case) => [
-                'value' => $case->value,
-                'label' => Str::title($case->value),
-            ])->toArray(),
+            'enumerateOptions' => ItemEnumerate::toSelectOptions(),
         ]);
     }
 
