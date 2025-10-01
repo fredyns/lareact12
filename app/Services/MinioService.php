@@ -235,4 +235,47 @@ class MinioService
             return false;
         }
     }
+
+    /**
+     * Get application download URL (serves through application domain)
+     *
+     * @param string $path
+     * @param bool $forceDownload If true, uses 'downloading' route to force download
+     * @return string|null
+     */
+    public function getDownloadUrl(string $path, bool $forceDownload = false): ?string
+    {
+        try {
+            if (!$this->disk->exists($path)) {
+                return null;
+            }
+
+            // Use 'downloads.serve' for inline view, 'downloads.force' for forced download
+            $routeName = $forceDownload ? 'downloads.force' : 'downloads.serve';
+            return route($routeName, ['path' => $path]);
+        } catch (\Exception $e) {
+            \Log::error('Download URL generation failed: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Get MIME type of a file
+     *
+     * @param string $path
+     * @return string|null
+     */
+    public function getMimeType(string $path): ?string
+    {
+        try {
+            if (!$this->disk->exists($path)) {
+                return null;
+            }
+
+            return $this->disk->mimeType($path);
+        } catch (\Exception $e) {
+            \Log::error('MIME type retrieval failed: ' . $e->getMessage());
+            return null;
+        }
+    }
 }

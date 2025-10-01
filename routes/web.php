@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\RBAC\PermissionController;
 use App\Http\Controllers\RBAC\RoleController;
 use App\Http\Controllers\Sample\ItemController;
@@ -12,6 +13,15 @@ use Inertia\Inertia;
 Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
+
+// File Download Routes - Serve files from S3/MinIO through application domain
+Route::get('downloads/{path}', [DownloadController::class, 'serve'])
+    ->where('path', '.*')
+    ->name('downloads.serve');
+
+Route::get('downloading/{path}', [DownloadController::class, 'download'])
+    ->where('path', '.*')
+    ->name('downloads.force');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {

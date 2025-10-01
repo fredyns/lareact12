@@ -44,9 +44,11 @@ class ItemResource extends JsonResource
             'enumerate' => $this->enumerate?->value,
             'text' => $this->text,
             'file' => $this->file,
-            'file_url' => $this->file ? $minioService->getFileUrl($this->file, 1440) : null, // 24 hours
+            'file_url' => $this->file ? $minioService->getDownloadUrl($this->file) : null,
+            'file_download_url' => $this->file ? $minioService->getDownloadUrl($this->file, true) : null,
             'image' => $this->image,
-            'image_url' => $this->image ? $minioService->getFileUrl($this->image, 1440) : null, // 24 hours
+            'image_url' => $this->image ? $minioService->getDownloadUrl($this->image) : null,
+            'image_download_url' => $this->image ? $minioService->getDownloadUrl($this->image, true) : null,
             'markdown_text' => $this->markdown_text,
             'wysiwyg' => $this->wysiwyg,
             'latitude' => $this->latitude,
