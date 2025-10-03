@@ -5,7 +5,7 @@ import { type BreadcrumbItem, SelectOption } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft, Save } from 'lucide-react';
 import { route } from 'ziggy-js';
-import { FormField } from './FormField';
+import { FormField } from './form-field';
 import { getTempUploadPath } from '@/utils/upload';
 
 interface Props {

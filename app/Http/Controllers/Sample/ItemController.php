@@ -72,7 +72,7 @@ class ItemController extends Controller
         }
 
         // Return Inertia view
-        return Inertia::render('sample/Items/Index', [
+        return Inertia::render('sample/items/index', [
             'items' => [
                 'data' => $items->items(),
                 'current_page' => $items->currentPage(),
@@ -95,7 +95,7 @@ class ItemController extends Controller
     {
         $this->authorize('create', Item::class);
 
-        return Inertia::render('sample/Items/Create', [
+        return Inertia::render('sample/items/create', [
             'enumerateOptions' => ItemEnumerate::toSelectOptions(),
         ]);
     }
@@ -169,7 +169,7 @@ class ItemController extends Controller
             return new ItemResource($item);
         }
 
-        return Inertia::render('sample/Items/Show', [
+        return Inertia::render('sample/items/show', [
             'item' => (new ItemResource($item))->toArray(request()),
             'enumerateOptions' => ItemEnumerate::toSelectOptions(),
         ]);
@@ -187,7 +187,7 @@ class ItemController extends Controller
 
         $item->load(['user', 'creator', 'updater']);
 
-        return Inertia::render('sample/Items/Edit', [
+        return Inertia::render('sample/items/edit', [
             'item' => (new ItemResource($item))->toArray(request()),
             'enumerateOptions' => ItemEnumerate::toSelectOptions(),
         ]);

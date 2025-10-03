@@ -14,7 +14,7 @@ interface InputDateTimeProps {
   className?: string;
 }
 
-export function InputDateTime({
+export function InputDatetime({
   id,
   label,
   value,

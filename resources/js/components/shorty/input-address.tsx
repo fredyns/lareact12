@@ -13,7 +13,7 @@ interface InputIpAddressProps {
   className?: string;
 }
 
-export function InputIpAddress({
+export function InputAddress({
   id,
   label,
   value,

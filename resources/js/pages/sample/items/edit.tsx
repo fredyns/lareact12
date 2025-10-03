@@ -6,7 +6,7 @@ import { getItemUploadPath } from '@/utils/upload';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft, Save } from 'lucide-react';
 import { route } from 'ziggy-js';
-import { FormField } from './FormField';
+import { FormField } from './form-field';
 
 interface Props {
   item: Item;

@@ -33,7 +33,7 @@ class RoleController extends Controller
 
         $roles = $query->withCount('permissions')->paginate(10)->withQueryString();
 
-        return Inertia::render('rbac/Roles/Index', [
+        return Inertia::render('rbac/roles/index', [
             'roles' => $roles,
             'filters' => [
                 'search' => $request->search,
@@ -50,7 +50,7 @@ class RoleController extends Controller
     {
         $permissions = Permission::all();
 
-        return Inertia::render('rbac/Roles/Create', [
+        return Inertia::render('rbac/roles/create', [
             'permissions' => $permissions,
         ]);
     }
@@ -87,7 +87,7 @@ class RoleController extends Controller
     {
         $role->load('permissions');
 
-        return Inertia::render('rbac/Roles/Show', [
+        return Inertia::render('rbac/roles/show', [
             'role' => $role,
         ]);
     }
@@ -100,7 +100,7 @@ class RoleController extends Controller
         $permissions = Permission::all();
         $role->load('permissions');
 
-        return Inertia::render('rbac/Roles/Edit', [
+        return Inertia::render('rbac/roles/edit', [
             'role' => $role,
             'permissions' => $permissions,
         ]);

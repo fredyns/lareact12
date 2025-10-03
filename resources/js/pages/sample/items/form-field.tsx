@@ -1,21 +1,21 @@
-import { InputCheckbox } from '@/components/shorty/InputCheckbox';
-import { InputColor } from '@/components/shorty/InputColor';
-import { InputDate } from '@/components/shorty/InputDate';
-import { InputDateTime } from '@/components/shorty/InputDateTime';
-import { InputEmail } from '@/components/shorty/InputEmail';
-import { InputEnum } from '@/components/shorty/InputEnum';
-import { InputFile } from '@/components/shorty/InputFile';
-import { InputImage } from '@/components/shorty/InputImage';
-import { InputIpAddress } from '@/components/shorty/InputIpAddress';
-import { InputMap } from '@/components/shorty/InputMap';
-import { InputMarkdown } from '@/components/shorty/InputMarkdown';
-import { InputNpwp } from '@/components/shorty/InputNpwp';
-import { InputNumber } from '@/components/shorty/InputNumber';
-import { InputSelectFromTable } from '@/components/shorty/InputSelectFromTable';
-import { InputString } from '@/components/shorty/InputString';
-import { InputTextarea } from '@/components/shorty/InputTextarea';
-import { InputTime } from '@/components/shorty/InputTime';
-import { InputWysiwyg } from '@/components/shorty/InputWysiwyg';
+import { InputCheckbox } from '@/components/shorty/input-checkbox';
+import { InputColor } from '@/components/shorty/input-color';
+import { InputDate } from '@/components/shorty/input-date';
+import { InputDatetime } from '@/components/shorty/input-datetime';
+import { InputEmail } from '@/components/shorty/input-email';
+import { InputEnum } from '@/components/shorty/input-enum';
+import { InputFile } from '@/components/shorty/input-file';
+import { InputImage } from '@/components/shorty/input-image';
+import { InputAddress } from '@/components/shorty/input-address';
+import { InputMap } from '@/components/shorty/input-map';
+import { InputMarkdown } from '@/components/shorty/input-markdown';
+import { InputNpwp } from '@/components/shorty/input-npwp';
+import { InputNumber } from '@/components/shorty/input-number';
+import { InputSelectFromTable } from '@/components/shorty/input-select-from-table';
+import { InputString } from '@/components/shorty/input-string';
+import { InputTextarea } from '@/components/shorty/input-textarea';
+import { InputTime } from '@/components/shorty/input-time';
+import { InputWysiwyg } from '@/components/shorty/input-wysiwyg';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { Item } from '@/types';
 
@@ -204,7 +204,7 @@ export function FormField({
                 error={errors.time}
               />
 
-              <InputDateTime
+              <InputDatetime
                 id="datetime"
                 label="Datetime"
                 value={data.datetime}
@@ -221,7 +221,7 @@ export function FormField({
               <CardTitle>Other Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <InputIpAddress
+              <InputAddress
                 id="ip_address"
                 label="IP Address"
                 value={data.ip_address}

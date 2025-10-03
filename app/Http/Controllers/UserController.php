@@ -33,7 +33,7 @@ class UserController extends Controller
 
         $users = $query->paginate(10)->withQueryString();
 
-        return Inertia::render('Users/Index', [
+        return Inertia::render('users/index', [
             'users' => $users,
             'filters' => [
                 'search' => $request->search,
@@ -50,7 +50,7 @@ class UserController extends Controller
     {
         $this->authorize('create', User::class);
 
-        return Inertia::render('Users/Create');
+        return Inertia::render('users/create');
     }
 
     /**
@@ -86,7 +86,7 @@ class UserController extends Controller
         // Get all roles in the system
         $allRoles = Role::all();
 
-        return Inertia::render('Users/Show', [
+        return Inertia::render('users/show', [
             'user' => $user->only(['id', 'name', 'email', 'email_verified_at', 'created_at', 'updated_at']),
             'userRoles' => $user->roles->map(function ($role) {
                 return [
@@ -111,7 +111,7 @@ class UserController extends Controller
     {
         $this->authorize('update', $user);
 
-        return Inertia::render('Users/Edit', [
+        return Inertia::render('users/edit', [
             'user' => $user->only(['id', 'name', 'email', 'email_verified_at']),
         ]);
     }
