@@ -1,9 +1,7 @@
 import { FileDropzone } from '@/components/ui/file-dropzone';
 import { Label } from '@/components/ui/label';
-import { Dialog, DialogHeader, DialogOverlay, DialogPortal, DialogTitle } from '@/components/ui/dialog';
+import { ImagePreview } from '@/components/shorty/image-preview';
 import { formatFileSize } from '@/utils/upload';
-import * as DialogPrimitive from '@radix-ui/react-dialog';
-import { X } from 'lucide-react';
 import React, { useState } from 'react';
 
 interface InputImageProps {
@@ -135,23 +133,12 @@ export function InputImage({
 
       {/* Image Preview Dialog */}
       {currentImageUrl && (
-        <Dialog open={showImagePreview} onOpenChange={setShowImagePreview}>
-          <DialogPortal>
-            <DialogOverlay className="bg-black/80" />
-            <DialogPrimitive.Content className="fixed top-[50%] left-[50%] z-50 max-h-[90vh] w-[90vw] max-w-4xl translate-x-[-50%] translate-y-[-50%] overflow-auto rounded-lg bg-background p-6 shadow-lg">
-              <DialogHeader>
-                <DialogTitle>Image Preview</DialogTitle>
-                <DialogPrimitive.Close className="absolute top-4 right-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none disabled:pointer-events-none">
-                  <X className="h-4 w-4" />
-                  <span className="sr-only">Close</span>
-                </DialogPrimitive.Close>
-              </DialogHeader>
-              <div className="mt-4">
-                <img src={currentImageUrl} alt={currentImageAlt} className="h-auto w-full rounded" />
-              </div>
-            </DialogPrimitive.Content>
-          </DialogPortal>
-        </Dialog>
+        <ImagePreview
+          imageUrl={currentImageUrl}
+          imageAlt={currentImageAlt}
+          open={showImagePreview}
+          onOpenChange={setShowImagePreview}
+        />
       )}
     </div>
   );

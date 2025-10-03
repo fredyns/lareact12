@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ImagePreview } from '@/components/shorty/image-preview';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, Item } from '@/types';
 import { normalizeMarkdown } from '@/utils/markdown';
@@ -8,7 +9,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { ArrowLeft, Edit, FileText, Trash2 } from 'lucide-react';
-import React from 'react';
+import React, { useState } from 'react';
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -43,6 +44,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Show({ item, enumerateOptions }: Props) {
+  const [showImagePreview, setShowImagePreview] = useState(false);
+
   const handleDelete = () => {
     if (confirm('Are you sure you want to delete this item?')) {
       router.delete(route('sample.items.destroy', item.id));
@@ -277,7 +280,20 @@ export default function Show({ item, enumerateOptions }: Props) {
                 <div className="space-y-2">
                   <p className="text-sm text-muted-foreground">Image (JPG, JPEG, PNG)</p>
                   {item.image_url ? (
-                    <img src={item.image_url} alt={item.string} className="h-auto max-w-full rounded-lg border" />
+                    <>
+                      <img
+                        src={item.image_url}
+                        alt={item.string}
+                        className="h-auto max-w-full cursor-pointer rounded-lg border transition-opacity hover:opacity-80"
+                        onClick={() => setShowImagePreview(true)}
+                      />
+                      <ImagePreview
+                        imageUrl={item.image_url}
+                        imageAlt={item.string}
+                        open={showImagePreview}
+                        onOpenChange={setShowImagePreview}
+                      />
+                    </>
                   ) : (
                     <p className="text-sm text-muted-foreground">No image available</p>
                   )}
