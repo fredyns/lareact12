@@ -1,7 +1,7 @@
+import { ImagePreview } from '@/components/shorty/image-preview';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ImagePreview } from '@/components/shorty/image-preview';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, Item } from '@/types';
 import { normalizeMarkdown } from '@/utils/markdown';
@@ -200,9 +200,7 @@ export default function Show({ item, enumerateOptions }: Props) {
                 </div>
               </CardContent>
             </Card>
-          </div>
 
-          <div className="space-y-6">
             {/* Location */}
             <Card>
               <CardHeader>
@@ -251,7 +249,9 @@ export default function Show({ item, enumerateOptions }: Props) {
                 </div>
               </CardContent>
             </Card>
+          </div>
 
+          <div className="space-y-6">
             {/* Files */}
             <Card>
               <CardHeader>
@@ -392,7 +392,7 @@ export default function Show({ item, enumerateOptions }: Props) {
                   <p className="text-sm text-muted-foreground">WYSIWYG Content</p>
                   {item.wysiwyg ? (
                     <div
-                      className="prose prose-sm dark:prose-invert max-w-none [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-6 [&_ol]:pl-6 [&_li]:my-1 [&_li]:ml-0"
+                      className="prose prose-sm dark:prose-invert max-w-none [&_li]:my-1 [&_li]:ml-0 [&_ol]:list-decimal [&_ol]:pl-6 [&_ul]:list-disc [&_ul]:pl-6"
                       dangerouslySetInnerHTML={{
                         __html: item.wysiwyg,
                       }}
