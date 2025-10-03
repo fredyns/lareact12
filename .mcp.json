@@ -6,6 +6,13 @@
         "shadcn@latest",
         "mcp"
       ]
+    },
+    "laravel-boost": {
+      "command": "C:\\laragon\\bin\\php\\php-8.3.10-Win32-vs16-x64\\php.exe",
+      "args": [
+        "C:\\Dev\\_php\\lareact12\\artisan",
+        "boost:mcp"
+      ]
     }
   }
 }
