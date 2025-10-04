@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class MinioService
@@ -23,13 +23,13 @@ class MinioService
      * @param string|null $filename
      * @return string|false
      */
-    public function uploadFile(UploadedFile $file, string $directory = 'uploads', ?string $filename = null): string|false
+    public function uploadFile(UploadedFile $file, string $directory = 'uploads'): string|false
     {
-        if (!$filename) {
-            $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
-        }
-
-        $path = $directory . '/' . $filename;
+        // Get original filename without extension
+        $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        // Convert to slug and append UUID for uniqueness
+        $slug = Str::slug($originalName);
+        $filename = $slug . '-' . Str::uuid() . '.' . $file->getClientOriginalExtension();
 
         try {
             $uploaded = $this->disk->putFileAs($directory, $file, $filename);
