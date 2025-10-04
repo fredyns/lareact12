@@ -217,7 +217,7 @@ export default function ItemsIndex({ items, filters, enumerateOptions }: Props) 
                           {getSortIcon('string')}
                         </Button>
                       </th>
-                      <th className="h-12 px-4 text-left align-middle font-medium">
+                      <th className="h-12 px-4 text-left align-middle font-medium hidden sm:table-cell">
                         <Button variant="ghost" onClick={() => handleSort('email')} className="h-auto p-0 font-medium">
                           Email
                           {getSortIcon('email')}
@@ -256,8 +256,9 @@ export default function ItemsIndex({ items, filters, enumerateOptions }: Props) 
                         </td>
                         <td className="p-4 align-middle">
                           <div className="font-medium">{item.string}</div>
+                          <div className="text-sm text-muted-foreground sm:hidden">{item.email}</div>
                         </td>
-                        <td className="p-4 align-middle">
+                        <td className="p-4 align-middle hidden sm:table-cell">
                           <div className="text-sm text-muted-foreground">{item.email}</div>
                         </td>
                         <td className="p-4 align-middle">
