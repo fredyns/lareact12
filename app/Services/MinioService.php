@@ -28,8 +28,8 @@ class MinioService
         // Get original filename without extension
         $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         // Convert to slug and append UUID for uniqueness
-        $slug = Str::slug($originalName);
-        $filename = $slug . '-' . Str::random(5) . '.' . $file->getClientOriginalExtension();
+        $slug = Str::slug($originalName . '-' . Str::random(5));
+        $filename = $slug . '.' . $file->getClientOriginalExtension();
 
         try {
             $uploaded = $this->disk->putFileAs($directory, $file, $filename);
