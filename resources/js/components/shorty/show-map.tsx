@@ -19,6 +19,7 @@ interface ShowMapProps {
   longitude: number | null;
   popupText?: string;
   zoom?: number;
+  ratio?: number;
 }
 
 // Zoom level 11 is approximately 5km view
@@ -40,8 +41,9 @@ function ScaleControl() {
   return null;
 }
 
-export function ShowMap({ latitude, longitude, popupText = 'Location', zoom = DEFAULT_ZOOM }: ShowMapProps) {
+export function ShowMap({ latitude, longitude, popupText = 'Location', zoom = DEFAULT_ZOOM, ratio = 1 }: ShowMapProps) {
   const [showMapModal, setShowMapModal] = useState(false);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const thumbnailMapRef = useRef<L.Map | null>(null);
   const thumbnailContainerRef = useRef<HTMLDivElement>(null);
 
@@ -51,8 +53,74 @@ export function ShowMap({ latitude, longitude, popupText = 'Location', zoom = DE
     !isNaN(latitude) &&
     !isNaN(longitude);
 
+  // Clamp ratio between 1/3 and 3/1
+  const clampedRatio = Math.max(1 / 3, Math.min(3, ratio));
+
   useEffect(() => {
-    if (!isValidLocation || !thumbnailContainerRef.current) return;
+    const updateDimensions = () => {
+      if (thumbnailContainerRef.current) {
+        const parent = thumbnailContainerRef.current.parentElement;
+        if (!parent) return;
+
+        // Get the actual available width (accounting for padding)
+        const parentStyle = window.getComputedStyle(parent);
+        const parentPaddingLeft = parseFloat(parentStyle.paddingLeft) || 0;
+        const parentPaddingRight = parseFloat(parentStyle.paddingRight) || 0;
+        const availableWidth = parent.clientWidth - parentPaddingLeft - parentPaddingRight;
+
+        // Calculate dimensions based on ratio
+        let width = Math.min(availableWidth, parent.clientWidth);
+        let height = width / clampedRatio;
+
+        // Apply minimum constraints
+        if (width < 360) {
+          width = 360;
+          height = width / clampedRatio;
+        }
+
+        if (height < 360) {
+          height = 360;
+          width = height * clampedRatio;
+        }
+
+        // Ensure width doesn't exceed available space after height adjustment
+        if (width > availableWidth) {
+          width = availableWidth;
+          height = width / clampedRatio;
+
+          // Re-check minimum height constraint
+          if (height < 360) {
+            height = 360;
+            width = height * clampedRatio;
+            // If width still exceeds, use available width and adjust ratio
+            if (width > availableWidth) {
+              width = availableWidth;
+              height = width / clampedRatio;
+            }
+          }
+        }
+
+        setDimensions({ width, height });
+      }
+    };
+
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+
+    // Use ResizeObserver for better responsiveness
+    const resizeObserver = new ResizeObserver(updateDimensions);
+    if (thumbnailContainerRef.current?.parentElement) {
+      resizeObserver.observe(thumbnailContainerRef.current.parentElement);
+    }
+
+    return () => {
+      window.removeEventListener('resize', updateDimensions);
+      resizeObserver.disconnect();
+    };
+  }, [clampedRatio]);
+
+  useEffect(() => {
+    if (!isValidLocation || !thumbnailContainerRef.current || dimensions.width === 0) return;
 
     // Create thumbnail map
     const map = L.map(thumbnailContainerRef.current, {
@@ -76,10 +144,15 @@ export function ShowMap({ latitude, longitude, popupText = 'Location', zoom = DE
 
     thumbnailMapRef.current = map;
 
+    // Invalidate size after a short delay to ensure proper rendering
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 100);
+
     return () => {
       map.remove();
     };
-  }, [latitude, longitude, zoom, isValidLocation]);
+  }, [latitude, longitude, zoom, isValidLocation, dimensions]);
 
   return (
     <>
@@ -98,7 +171,13 @@ export function ShowMap({ latitude, longitude, popupText = 'Location', zoom = DE
         {isValidLocation ? (
           <div
             ref={thumbnailContainerRef}
-            className="h-64 w-full cursor-pointer rounded-lg border transition-opacity hover:opacity-80"
+            className="w-full cursor-pointer rounded-lg border transition-opacity hover:opacity-80"
+            style={{
+              width: dimensions.width > 0 ? `${dimensions.width}px` : '100%',
+              height: dimensions.height > 0 ? `${dimensions.height}px` : '360px',
+              minWidth: '360px',
+              minHeight: '360px',
+            }}
             onClick={() => setShowMapModal(true)}
           />
         ) : (
