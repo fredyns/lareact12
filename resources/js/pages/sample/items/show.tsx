@@ -1,27 +1,20 @@
-import { ImagePreview } from '@/components/shorty/image-preview';
-import { Badge } from '@/components/ui/badge';
+import { ShowBadge } from '@/components/shorty/show-badge';
+import { ShowColor } from '@/components/shorty/show-color';
+import { ShowDatetime } from '@/components/shorty/show-datetime';
+import { ShowField } from '@/components/shorty/show-field';
+import { ShowFile } from '@/components/shorty/show-file';
+import { ShowImage } from '@/components/shorty/show-image';
+import { ShowMap } from '@/components/shorty/show-map';
+import { ShowMarkdown } from '@/components/shorty/show-markdown';
+import { ShowText } from '@/components/shorty/show-text';
+import { ShowWysiwyg } from '@/components/shorty/show-wysiwyg';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, Item } from '@/types';
-import { normalizeMarkdown } from '@/utils/markdown';
 import { Head, Link, router } from '@inertiajs/react';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import { ArrowLeft, Edit, FileText, Trash2 } from 'lucide-react';
-import React, { useState } from 'react';
-import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
 import { route } from 'ziggy-js';
-
-// Fix for Leaflet marker icons
-delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-});
 
 interface Props {
   item: Item;
@@ -44,8 +37,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Show({ item, enumerateOptions }: Props) {
-  const [showImagePreview, setShowImagePreview] = useState(false);
-
   const handleDelete = () => {
     if (confirm('Are you sure you want to delete this item?')) {
       router.delete(route('sample.items.destroy', item.id));
@@ -76,19 +67,12 @@ export default function Show({ item, enumerateOptions }: Props) {
                 Back to Items
               </Button>
             </Link>
-            {item.id ? (
-              <Link href={route('sample.items.edit', item.id)}>
-                <Button>
-                  <Edit className="mr-2 h-4 w-4" />
-                  Edit Item
-                </Button>
-              </Link>
-            ) : (
-              <Button disabled>
+            <Link href={route('sample.items.edit', item.id)}>
+              <Button>
                 <Edit className="mr-2 h-4 w-4" />
                 Edit Item
               </Button>
-            )}
+            </Link>
             <Button variant="destructive" onClick={handleDelete}>
               <Trash2 className="mr-2 h-4 w-4" />
               Delete Item
@@ -104,59 +88,25 @@ export default function Show({ item, enumerateOptions }: Props) {
                 <CardTitle>Basic Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">String</p>
-                  <p className="font-medium">{item.string}</p>
-                </div>
+                <ShowField label="String" value={item.string} />
 
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Email</p>
-                  <p className="font-medium">{item.email || '-'}</p>
-                </div>
+                <ShowField label="Email" value={item.email} />
 
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Color</p>
-                  <div className="flex items-center space-x-2">
-                    {item.color && (
-                      <div
-                        className="h-6 w-6 rounded border"
-                        style={{
-                          backgroundColor: item.color,
-                        }}
-                      />
-                    )}
-                    <p className="font-medium">{item.color || '-'}</p>
-                  </div>
-                </div>
+                <ShowColor color={item.color} />
 
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Integer</p>
-                  <p className="font-medium">{item.integer || '-'}</p>
-                </div>
+                <ShowField label="Integer" value={item.integer} />
 
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Decimal</p>
-                  <p className="font-medium">{item.decimal || '-'}</p>
-                </div>
+                <ShowField label="Decimal" value={item.decimal} />
 
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">NPWP</p>
-                  <p className="font-medium">{item.npwp || '-'}</p>
-                </div>
+                <ShowField label="NPWP" value={item.npwp} />
 
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Status</p>
-                  {item.enumerate && (
-                    <Badge variant={item.enumerate === 'enable' ? 'default' : 'secondary'}>
-                      {getEnumerateLabel(item.enumerate)}
-                    </Badge>
-                  )}
-                </div>
+                <ShowBadge
+                  label="Status"
+                  value={getEnumerateLabel(item.enumerate)}
+                  variant={item.enumerate === 'enable' ? 'default' : 'secondary'}
+                />
 
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">User</p>
-                  <p className="font-medium">{item.user?.name || '-'}</p>
-                </div>
+                <ShowField label="User" value={item.user?.name} />
               </CardContent>
             </Card>
 
@@ -166,20 +116,11 @@ export default function Show({ item, enumerateOptions }: Props) {
                 <CardTitle>Date & Time</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Date</p>
-                  <p className="font-medium">{item.date || '-'}</p>
-                </div>
+                <ShowDatetime label="Date" value={item.date} format="ddd, MMM dd, yyyy" />
 
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Time</p>
-                  <p className="font-medium">{item.time || '-'}</p>
-                </div>
+                <ShowDatetime label="Time" value={item.time} format="HH:mm" />
 
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Datetime</p>
-                  <p className="font-medium">{item.datetime ? new Date(item.datetime).toLocaleString() : '-'}</p>
-                </div>
+                <ShowDatetime label="Datetime" value={item.datetime} format="ddd, MMM dd, yyyy HH:mm" />
               </CardContent>
             </Card>
 
@@ -189,15 +130,9 @@ export default function Show({ item, enumerateOptions }: Props) {
                 <CardTitle>Other Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">IP Address</p>
-                  <p className="font-medium">{item.ip_address || '-'}</p>
-                </div>
+                <ShowField label="IP Address" value={item.ip_address} />
 
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Boolean</p>
-                  <p className="font-medium">{item.boolean ? 'True' : 'False'}</p>
-                </div>
+                <ShowField label="Boolean" value={item.boolean ? 'True' : 'False'} />
               </CardContent>
             </Card>
 
@@ -207,44 +142,7 @@ export default function Show({ item, enumerateOptions }: Props) {
                 <CardTitle>Location</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <p className="text-sm text-muted-foreground">Latitude</p>
-                    <p className="font-medium">{item.latitude ?? '-'}</p>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-sm text-muted-foreground">Longitude</p>
-                    <p className="font-medium">{item.longitude ?? '-'}</p>
-                  </div>
-                </div>
-
-                <div className="mt-2 h-96">
-                  {item.latitude !== null &&
-                  item.longitude !== null &&
-                  !isNaN(item.latitude) &&
-                  !isNaN(item.longitude) ? (
-                    <>
-                      <MapContainer
-                        center={[item.latitude, item.longitude]}
-                        zoom={13}
-                        style={{
-                          height: '100%',
-                          width: '100%',
-                        }}
-                      >
-                        <TileLayer
-                          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                        />
-                        <Marker position={[item.latitude, item.longitude]}>
-                          <Popup>{item.string}</Popup>
-                        </Marker>
-                      </MapContainer>
-                    </>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">No location data available</p>
-                  )}
-                </div>
+                <ShowMap latitude={item.latitude} longitude={item.longitude} popupText={item.string} />
               </CardContent>
             </Card>
           </div>
@@ -256,46 +154,9 @@ export default function Show({ item, enumerateOptions }: Props) {
                 <CardTitle>Files</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">File (PDF, DOCX, PPTX, XLSX, ZIP, RAR)</p>
-                  {item.file_url ? (
-                    <a
-                      href={item.file_url}
-                      target="_blank"
-                      className="flex items-center rounded-lg border p-3 transition-colors hover:bg-muted/50"
-                    >
-                      <FileText className="mr-3 h-8 w-8 text-blue-600" />
-                      <div>
-                        <p className="font-medium">{(item.file ?? '').split('/').pop() || 'Download file'}</p>
-                        <p className="text-sm text-muted-foreground">Click to download</p>
-                      </div>
-                    </a>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">No data available</p>
-                  )}
-                </div>
+                <ShowFile label="File (PDF, DOCX, PPTX, XLSX, ZIP, RAR)" url={item.file_url} path={item.file} />
 
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Image (JPG, JPEG, PNG)</p>
-                  {item.image_url ? (
-                    <>
-                      <img
-                        src={item.image_url}
-                        alt={item.string}
-                        className="h-auto max-w-full cursor-pointer rounded-lg border transition-opacity hover:opacity-80"
-                        onClick={() => setShowImagePreview(true)}
-                      />
-                      <ImagePreview
-                        imageUrl={item.image_url}
-                        imageAlt={item.string}
-                        open={showImagePreview}
-                        onOpenChange={setShowImagePreview}
-                      />
-                    </>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">No image available</p>
-                  )}
-                </div>
+                <ShowImage label="Image (JPG, JPEG, PNG)" url={item.image_url} alt={item.string} />
               </CardContent>
             </Card>
 
@@ -305,95 +166,11 @@ export default function Show({ item, enumerateOptions }: Props) {
                 <CardTitle>Text Content</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Text</p>
-                  <div className="rounded-lg bg-muted/50 p-4 whitespace-pre-wrap">{item.text || '-'}</div>
-                </div>
+                <ShowText label="Text" value={item.text} />
 
-                <div className="mt-2">
-                  <h3 className="mb-2 text-sm font-medium text-muted-foreground">Markdown Content</h3>
-                  <div className="prose prose-sm dark:prose-invert max-w-none">
-                    {item.markdown_text ? (
-                      <ReactMarkdown
-                        remarkPlugins={[remarkGfm]}
-                        components={{
-                          h1: (props) => <h1 className="mt-6 mb-2 text-2xl font-bold" {...props} />,
-                          h2: (props) => <h2 className="mt-5 mb-2 text-xl font-bold" {...props} />,
-                          h3: (props) => <h3 className="mt-4 mb-2 text-lg font-bold" {...props} />,
-                          h4: (props) => <h4 className="mt-3 mb-1 text-base font-bold" {...props} />,
-                          h5: (props) => <h5 className="mt-3 mb-1 text-sm font-bold" {...props} />,
-                          h6: (props) => <h6 className="mt-3 mb-1 text-xs font-bold" {...props} />,
-                          code({
-                            inline,
-                            children,
-                            ...props
-                          }: {
-                            inline?: boolean;
-                            children?: React.ReactNode;
-                          } & React.HTMLAttributes<HTMLElement>) {
-                            if (inline) {
-                              return (
-                                <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm" {...props}>
-                                  {children}
-                                </code>
-                              );
-                            }
-                            return (
-                              <pre className="my-4 overflow-x-auto rounded-md bg-muted p-4">
-                                <code className="font-mono text-sm" {...props}>
-                                  {children}
-                                </code>
-                              </pre>
-                            );
-                          },
-                          p: (props) => <p className="my-2" {...props} />,
-                          a: (props) => <a className="text-primary underline hover:text-primary/80" {...props} />,
-                          ul: (props) => <ul className="my-4 list-disc pl-5" {...props} />,
-                          ol: (props) => <ol className="my-4 list-decimal pl-5" {...props} />,
-                          li: (props) => <li className="my-1" {...props} />,
-                          blockquote: (props) => (
-                            <blockquote
-                              className="my-4 border-l-4 border-muted-foreground pl-4 text-muted-foreground italic"
-                              {...props}
-                            />
-                          ),
-                          hr: (props) => <hr className="my-6 border-muted" {...props} />,
-                          img: (props) => (
-                            <img className="my-4 h-auto max-w-full rounded-md" {...props} alt={props.alt || ''} />
-                          ),
-                          table: (props) => (
-                            <div className="my-4 overflow-x-auto">
-                              <table className="w-full border-collapse" {...props} />
-                            </div>
-                          ),
-                          thead: (props) => <thead className="bg-muted/50" {...props} />,
-                          tbody: (props) => <tbody {...props} />,
-                          tr: (props) => <tr className="border-b border-border" {...props} />,
-                          th: (props) => <th className="px-4 py-2 text-left font-medium" {...props} />,
-                          td: (props) => <td className="px-4 py-2" {...props} />,
-                        }}
-                      >
-                        {normalizeMarkdown(item.markdown_text)}
-                      </ReactMarkdown>
-                    ) : (
-                      <div className="rounded-lg bg-muted/50 p-4 text-muted-foreground">-</div>
-                    )}
-                  </div>
-                </div>
+                <ShowMarkdown label="Markdown Content" value={item.markdown_text} />
 
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">WYSIWYG Content</p>
-                  {item.wysiwyg ? (
-                    <div
-                      className="prose prose-sm dark:prose-invert max-w-none [&_li]:my-1 [&_li]:ml-0 [&_ol]:list-decimal [&_ol]:pl-6 [&_ul]:list-disc [&_ul]:pl-6"
-                      dangerouslySetInnerHTML={{
-                        __html: item.wysiwyg,
-                      }}
-                    />
-                  ) : (
-                    <div className="rounded-lg bg-muted/50 p-4 text-muted-foreground">-</div>
-                  )}
-                </div>
+                <ShowWysiwyg label="WYSIWYG Content" value={item.wysiwyg} />
               </CardContent>
             </Card>
           </div>
