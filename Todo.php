@@ -2,7 +2,6 @@
 /**
  * Todo:
  *  9. review CRUD codebase
- *  15. implement Searchable trait to models & controllers
  *  16. add property 'disable' to shorty components
  *  17. implement shorty components to other pages
  *  18. flatten cards layout in items pages

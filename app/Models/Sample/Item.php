@@ -3,6 +3,7 @@
 namespace App\Models\Sample;
 
 use App\Enums\Sample\ItemEnumerate;
+use App\Models\Traits\Searchable;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -45,6 +46,7 @@ use Illuminate\Support\Str;
 class Item extends Model
 {
     use HasFactory;
+    use Searchable;
 
     /**
      * The table associated with the model.
@@ -101,6 +103,20 @@ class Item extends Model
         'latitude',
         'longitude',
         'upload_path',
+    ];
+
+    /**
+     * The attributes that are searchable from a single keyword.
+     *
+     * @var list<string>
+     */
+    protected $searchableFields = [
+        'string',
+        'email',
+        'text',
+        'npwp',
+        'markdown_text',
+        'wysiwyg',
     ];
 
     /**

@@ -39,16 +39,12 @@ class ItemController extends Controller
     {
         $this->authorize('viewAny', Item::class);
 
-        $query = Item::query()
+        // Search functionality and build query
+        $search = (string)$request->get('search', '');
+        $query = Item::search($search)
             ->with(['user', 'creator', 'updater']);
 
-        // Apply filters
-        if ($request->filled('search')) {
-            $query->where('string', 'like', '%' . $request->search . '%')
-                ->orWhere('email', 'like', '%' . $request->search . '%')
-                ->orWhere('text', 'like', '%' . $request->search . '%');
-        }
-
+        // Apply additional filters
         if ($request->filled('user_id')) {
             $query->where('user_id', $request->user_id);
         }
@@ -60,7 +56,11 @@ class ItemController extends Controller
         // Apply sorting
         $sortField = $request->input('sort_field', 'created_at');
         $sortDirection = $request->input('sort_direction', 'desc');
-        $query->orderBy($sortField, $sortDirection);
+        
+        $allowedSorts = ['string', 'email', 'integer', 'decimal', 'datetime', 'date', 'created_at', 'updated_at'];
+        if (in_array($sortField, $allowedSorts)) {
+            $query->orderBy($sortField, $sortDirection);
+        }
 
         // Paginate results
         $items = $query->paginate($request->input('per_page', 10))

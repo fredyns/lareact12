@@ -15,12 +15,9 @@ class RoleController extends Controller
      */
     public function index(Request $request)
     {
+        // Search functionality and build query
         $search = (string)$request->get('search', '');
-        $query = Role::query();
-
-        if ($search) {
-            $query->where('name', 'like', "%{$search}%");
-        }
+        $query = Role::search($search);
 
         // Sorting
         $sortField = $request->get('sort', 'created_at');
