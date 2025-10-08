@@ -12,6 +12,13 @@ class Role extends \Spatie\Permission\Models\Role
     use Searchable;
 
     /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'rbac_roles';
+
+    /**
      * The "type" of the primary key ID.
      *
      * @var string

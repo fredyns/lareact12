@@ -20,6 +20,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        $tableNames = config('permission.table_names');
         $permissions = [
             'sample.items.index',
             'sample.items.show',
@@ -34,11 +35,11 @@ return new class extends Migration
         $now = now();
         
         foreach ($permissions as $permission) {
-            $exists = DB::table('permissions')->where('name', $permission)->exists();
+            $exists = DB::table($tableNames['permissions'])->where('name', $permission)->exists();
             
             if (!$exists) {
                 $permId = (string) Str::uuid();
-                DB::table('permissions')->insert([
+                DB::table($tableNames['permissions'])->insert([
                     'id' => $permId,
                     'name' => $permission,
                     'guard_name' => 'web',
@@ -47,23 +48,23 @@ return new class extends Migration
                 ]);
                 $permissionIds[$permission] = $permId;
             } else {
-                $permissionIds[$permission] = DB::table('permissions')
+                $permissionIds[$permission] = DB::table($tableNames['permissions'])
                     ->where('name', $permission)
                     ->value('id');
             }
         }
         
         // Find the super-admin role and assign all sample items permissions
-        $superAdminRoleId = DB::table('roles')->where('name', 'super-admin')->value('id');
+        $superAdminRoleId = DB::table($tableNames['roles'])->where('name', 'super-admin')->value('id');
         if ($superAdminRoleId) {
             foreach ($permissionIds as $permName => $permId) {
-                $exists = DB::table('role_has_permissions')
+                $exists = DB::table($tableNames['role_has_permissions'])
                     ->where('permission_id', $permId)
                     ->where('role_id', $superAdminRoleId)
                     ->exists();
                     
                 if (!$exists) {
-                    DB::table('role_has_permissions')->insert([
+                    DB::table($tableNames['role_has_permissions'])->insert([
                         'permission_id' => $permId,
                         'role_id' => $superAdminRoleId,
                     ]);
@@ -77,6 +78,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        $tableNames = config('permission.table_names');
         $permissions = [
             'sample.items.index',
             'sample.items.show',
@@ -86,21 +88,21 @@ return new class extends Migration
         ];
 
         // Remove permissions from super-admin role
-        $superAdminRoleId = DB::table('roles')->where('name', 'super-admin')->value('id');
+        $superAdminRoleId = DB::table($tableNames['roles'])->where('name', 'super-admin')->value('id');
         if ($superAdminRoleId) {
-            $permissionIds = DB::table('permissions')
+            $permissionIds = DB::table($tableNames['permissions'])
                 ->whereIn('name', $permissions)
                 ->pluck('id')
                 ->toArray();
                 
-            DB::table('role_has_permissions')
+            DB::table($tableNames['role_has_permissions'])
                 ->where('role_id', $superAdminRoleId)
                 ->whereIn('permission_id', $permissionIds)
                 ->delete();
         }
 
         // Delete permissions
-        DB::table('permissions')
+        DB::table($tableNames['permissions'])
             ->whereIn('name', $permissions)
             ->delete();
     }

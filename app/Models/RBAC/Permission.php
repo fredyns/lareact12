@@ -12,6 +12,13 @@ class Permission extends \Spatie\Permission\Models\Permission
     use Searchable;
 
     /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'rbac_permissions';
+
+    /**
      * The "type" of the primary key ID.
      *
      * @var string
