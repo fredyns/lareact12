@@ -56,13 +56,6 @@ class Item extends Model
     protected $table = 'sample_items';
 
     /**
-     * The primary key for the model.
-     *
-     * @var string
-     */
-    protected $primaryKey = 'id';
-
-    /**
      * The "type" of the primary key ID.
      *
      * @var string
@@ -70,7 +63,7 @@ class Item extends Model
     protected $keyType = 'string';
 
     /**
-     * Indicates if the IDs are auto-incrementing.
+     * Indicates if the IDs are NOT auto-incrementing.
      *
      * @var bool
      */
@@ -148,14 +141,14 @@ class Item extends Model
 
         static::creating(function ($model) {
             if (empty($model->{$model->getKeyName()})) {
-                $model->{$model->getKeyName()} = (string) Str::uuid();
+                $model->{$model->getKeyName()} = (string)Str::uuid();
             }
-            
+
             // Generate upload_path based on creation date and ID
             if (empty($model->upload_path)) {
                 $model->upload_path = $model->generateUploadPath();
             }
-            
+
             if (auth()->check()) {
                 $model->created_by = auth()->id();
                 $model->updated_by = auth()->id();
@@ -167,7 +160,7 @@ class Item extends Model
             if (empty($model->upload_path)) {
                 $model->upload_path = $model->generateUploadPath();
             }
-            
+
             if (auth()->check()) {
                 $model->updated_by = auth()->id();
             }
@@ -213,7 +206,7 @@ class Item extends Model
     public function generateUploadPath(): string
     {
         $createdAt = $this->created_at ?? now();
-        
+
         return sprintf(
             '%s/%s/%s/%s/%s',
             $this->getTable(),

@@ -10,7 +10,21 @@ class Role extends \Spatie\Permission\Models\Role
 {
     use HasUuids;
     use Searchable;
-    
+
+    /**
+     * The "type" of the primary key ID.
+     *
+     * @var string
+     */
+    protected $keyType = 'string';
+
+    /**
+     * Indicates if the IDs are NOT auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = false;
+
     /**
      * The attributes that are searchable from a single keyword.
      *
@@ -20,7 +34,7 @@ class Role extends \Spatie\Permission\Models\Role
         'name',
         'guard_name',
     ];
-    
+
     /**
      * The "booted" method of the model.
      */
@@ -28,7 +42,7 @@ class Role extends \Spatie\Permission\Models\Role
     {
         static::creating(function ($model) {
             if (empty($model->id)) {
-                $model->id = (string) Str::uuid();
+                $model->id = (string)Str::uuid();
             }
         });
     }

@@ -31,6 +31,20 @@ class User extends Authenticatable
     use HasRoles;
 
     /**
+     * The "type" of the primary key ID.
+     *
+     * @var string
+     */
+    protected $keyType = 'string';
+
+    /**
+     * Indicates if the IDs are NOT auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = false;
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
@@ -63,7 +77,7 @@ class User extends Authenticatable
 
     /**
      * The guard name for spatie/permission package.
-     * 
+     *
      * @var string
      */
     protected string $guard_name = 'web';

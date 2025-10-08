@@ -10,7 +10,21 @@ class Permission extends \Spatie\Permission\Models\Permission
 {
     use HasUuids;
     use Searchable;
-    
+
+    /**
+     * The "type" of the primary key ID.
+     *
+     * @var string
+     */
+    protected $keyType = 'string';
+
+    /**
+     * Indicates if the IDs are NOT auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = false;
+
     /**
      * The attributes that are searchable from a single keyword.
      *
@@ -20,7 +34,7 @@ class Permission extends \Spatie\Permission\Models\Permission
         'name',
         'guard_name',
     ];
-    
+
     /**
      * The "booted" method of the model.
      */
@@ -28,7 +42,7 @@ class Permission extends \Spatie\Permission\Models\Permission
     {
         static::creating(function ($model) {
             if (empty($model->id)) {
-                $model->id = (string) Str::uuid();
+                $model->id = (string)Str::uuid();
             }
         });
     }
