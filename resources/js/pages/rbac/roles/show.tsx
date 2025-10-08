@@ -12,7 +12,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { ArrowLeft, Edit, Shield, Trash2 } from 'lucide-react';
-import AuthenticatedLayout from '@/layouts/app-layout';
+import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 
 interface Permission {
@@ -57,7 +57,7 @@ export default function ShowRole({ role }: Props) {
     };
 
     return (
-        <AuthenticatedLayout breadcrumbs={breadcrumbs}>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Role: ${role.name}`} />
             
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
@@ -225,6 +225,6 @@ export default function ShowRole({ role }: Props) {
                     </CardContent>
                 </Card>
             </div>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }

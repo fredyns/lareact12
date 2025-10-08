@@ -14,7 +14,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { ArrowLeft, Save } from 'lucide-react';
-import AuthenticatedLayout from '@/layouts/app-layout';
+import AppLayout from '@/layouts/app-layout';
 
 interface Permission {
     id: string;
@@ -75,7 +75,7 @@ export default function EditRole({ role, permissions }: Props) {
     };
 
     return (
-        <AuthenticatedLayout breadcrumbs={breadcrumbs}>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Edit Role: ${role.name}`} />
             
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
@@ -185,6 +185,6 @@ export default function EditRole({ role, permissions }: Props) {
                     </CardContent>
                 </Card>
             </div>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }
