@@ -1,6 +1,7 @@
 import React from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { route } from 'ziggy-js';
+import { dashboard } from '@/routes';
+import rbac from '@/routes/rbac';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -29,15 +30,15 @@ interface Props {
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
-        href: route('dashboard'),
+        href: dashboard.url(),
     },
     {
         title: 'Roles',
-        href: route('rbac.roles.index'),
+        href: rbac.roles.index.url(),
     },
     {
         title: 'Create Role',
-        href: route('rbac.roles.create'),
+        href: rbac.roles.create.url(),
     },
 ];
 
@@ -50,7 +51,7 @@ export default function CreateRole({ permissions }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('rbac.roles.store'));
+        post(rbac.roles.store.url());
     };
 
     const handlePermissionChange = (permissionId: string, checked: boolean) => {
@@ -73,7 +74,7 @@ export default function CreateRole({ permissions }: Props) {
                             Create a new role and assign permissions
                         </p>
                     </div>
-                    <Link href={route('rbac.roles.index')}>
+                    <Link href={rbac.roles.index.url()}>
                         <Button variant="outline">
                             <ArrowLeft className="mr-2 h-4 w-4" />
                             Back to Roles
@@ -162,7 +163,7 @@ export default function CreateRole({ permissions }: Props) {
                     </Card>
 
                     <div className="flex items-center justify-end space-x-2 pt-4">
-                        <Link href={route('rbac.roles.index')}>
+                        <Link href={rbac.roles.index.url()}>
                             <Button type="button" variant="outline">
                                 Cancel
                             </Button>

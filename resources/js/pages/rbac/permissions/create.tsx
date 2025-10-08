@@ -1,6 +1,7 @@
 import React from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { route } from 'ziggy-js';
+import { dashboard } from '@/routes';
+import rbac from '@/routes/rbac';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,15 +19,15 @@ import { type BreadcrumbItem } from '@/types';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
-        href: route('dashboard'),
+        href: dashboard.url(),
     },
     {
         title: 'Permissions',
-        href: route('rbac.permissions.index'),
+        href: rbac.permissions.index.url(),
     },
     {
         title: 'Create Permission',
-        href: route('rbac.permissions.create'),
+        href: rbac.permissions.create.url(),
     },
 ];
 
@@ -38,7 +39,7 @@ export default function CreatePermission() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('rbac.permissions.store'));
+        post(rbac.permissions.store.url());
     };
 
     return (
@@ -53,7 +54,7 @@ export default function CreatePermission() {
                             Create a new permission for access control
                         </p>
                     </div>
-                    <Link href={route('rbac.permissions.index')}>
+                    <Link href={rbac.permissions.index.url()}>
                         <Button variant="outline">
                             <ArrowLeft className="mr-2 h-4 w-4" />
                             Back to Permissions
@@ -107,7 +108,7 @@ export default function CreatePermission() {
                             </div>
 
                             <div className="flex items-center justify-end space-x-2 pt-4">
-                                <Link href={route('rbac.permissions.index')}>
+                                <Link href={rbac.permissions.index.url()}>
                                     <Button type="button" variant="outline">
                                         Cancel
                                     </Button>

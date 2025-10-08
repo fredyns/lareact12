@@ -5,7 +5,8 @@ import type { BreadcrumbItem, Item, SelectOption } from '@/types';
 import { getItemUploadPath } from '@/utils/upload';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft, Save } from 'lucide-react';
-import { route } from 'ziggy-js';
+import { dashboard } from '@/routes';
+import sample from '@/routes/sample';
 import { FormField } from './form-field';
 
 interface Props {
@@ -16,11 +17,11 @@ interface Props {
 const breadcrumbs: BreadcrumbItem[] = [
   {
     title: 'Dashboard',
-    href: route('dashboard'),
+    href: dashboard.url(),
   },
   {
     title: 'Sample Items',
-    href: route('sample.items.index'),
+    href: sample.items.index.url(),
   },
   {
     title: 'Edit Item',
@@ -55,7 +56,7 @@ export default function Edit({ item, enumerateOptions }: Props) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    put(route('sample.items.update', item.id));
+    put(sample.items.update.url(item.id));
   };
 
   return (
@@ -69,7 +70,7 @@ export default function Edit({ item, enumerateOptions }: Props) {
             <h1 className="text-2xl font-bold tracking-tight">Edit Item</h1>
             <p className="text-muted-foreground">Update item information and settings</p>
           </div>
-          <Link href={route('sample.items.index')}>
+          <Link href={sample.items.index.url()}>
             <Button variant="outline">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Items
@@ -90,7 +91,7 @@ export default function Edit({ item, enumerateOptions }: Props) {
           <Card className="col-span-full">
             <CardContent className="pt-6">
               <div className="flex items-center justify-end space-x-2">
-                <Link href={route('sample.items.index')}>
+                <Link href={sample.items.index.url()}>
                   <Button type="button" variant="outline">
                     Cancel
                   </Button>

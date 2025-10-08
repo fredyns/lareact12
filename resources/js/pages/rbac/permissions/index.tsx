@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
-import { route } from 'ziggy-js';
+import { dashboard } from '@/routes';
+import rbac from '@/routes/rbac';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -61,11 +62,11 @@ interface Props {
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
-        href: route('dashboard'),
+        href: dashboard.url(),
     },
     {
         title: 'Permissions',
-        href: route('rbac.permissions.index'),
+        href: rbac.permissions.index.url(),
     },
 ];
 
@@ -74,17 +75,17 @@ export default function PermissionsIndex({ permissions, filters }: Props) {
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        router.get(route('rbac.permissions.index'), { search }, { preserveState: true });
+        router.get(rbac.permissions.index.url(), { search }, { preserveState: true });
     };
 
     const handleClearSearch = () => {
         setSearch('');
-        router.get(route('rbac.permissions.index'), {}, { preserveState: true });
+        router.get(rbac.permissions.index.url(), {}, { preserveState: true });
     };
 
     const handleSort = (field: string) => {
         const direction = filters.sort === field && filters.direction === 'asc' ? 'desc' : 'asc';
-        router.get(route('rbac.permissions.index'), {
+        router.get(rbac.permissions.index.url(), {
             ...filters,
             sort: field,
             direction,
@@ -93,7 +94,7 @@ export default function PermissionsIndex({ permissions, filters }: Props) {
 
     const handleDelete = (permission: Permission) => {
         if (confirm(`Are you sure you want to delete the permission "${permission.name}"?`)) {
-            router.delete(route('rbac.permissions.destroy', permission.id));
+            router.delete(rbac.permissions.destroy.url(permission.id));
         }
     };
 
@@ -124,7 +125,7 @@ export default function PermissionsIndex({ permissions, filters }: Props) {
                             Manage system permissions and access controls
                         </p>
                     </div>
-                    <Link href={route('rbac.permissions.create')}>
+                    <Link href={rbac.permissions.create.url()}>
                         <Button>
                             <Plus className="mr-2 h-4 w-4" />
                             Create Permission
@@ -237,13 +238,13 @@ export default function PermissionsIndex({ permissions, filters }: Props) {
                                                             </DropdownMenuTrigger>
                                                             <DropdownMenuContent align="end">
                                                                 <DropdownMenuItem asChild>
-                                                                    <Link href={route('rbac.permissions.show', permission.id)}>
+                                                                    <Link href={rbac.permissions.show.url(permission.id)}>
                                                                         <Eye className="mr-2 h-4 w-4" />
                                                                         View
                                                                     </Link>
                                                                 </DropdownMenuItem>
                                                                 <DropdownMenuItem asChild>
-                                                                    <Link href={route('rbac.permissions.edit', permission.id)}>
+                                                                    <Link href={rbac.permissions.edit.url(permission.id)}>
                                                                         <Edit className="mr-2 h-4 w-4" />
                                                                         Edit
                                                                     </Link>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { route } from 'ziggy-js';
+import { dashboard } from '@/routes';
+import rbac from '@/routes/rbac';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -32,7 +33,7 @@ export default function EditPermission({ permission }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(route('rbac.permissions.update', permission.id));
+        put(rbac.permissions.update.url(permission.id));
     };
 
     interface BreadcrumbItem {
@@ -43,11 +44,11 @@ export default function EditPermission({ permission }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Dashboard',
-            href: route('dashboard'),
+            href: dashboard.url(),
         },
         {
             title: 'Permissions',
-            href: route('rbac.permissions.index'),
+            href: rbac.permissions.index.url(),
         },
         {
             title: 'Edit Permission',
@@ -67,7 +68,7 @@ export default function EditPermission({ permission }: Props) {
                             Update permission details
                         </p>
                     </div>
-                    <Link href={route('rbac.permissions.index')}>
+                    <Link href={rbac.permissions.index.url()}>
                         <Button variant="outline">
                             <ArrowLeft className="mr-2 h-4 w-4" />
                             Back to Permissions
@@ -120,7 +121,7 @@ export default function EditPermission({ permission }: Props) {
                                 </p>
                             </div>
                             <div className="flex items-center justify-end space-x-2 pt-4">
-                                <Link href={route('rbac.permissions.index')}>
+                                <Link href={rbac.permissions.index.url()}>
                                     <Button type="button" variant="outline">
                                         Cancel
                                     </Button>

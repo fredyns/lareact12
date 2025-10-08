@@ -14,7 +14,8 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, Item } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
-import { route } from 'ziggy-js';
+import { dashboard } from '@/routes';
+import sample from '@/routes/sample';
 
 interface Props {
   item: Item;
@@ -24,11 +25,11 @@ interface Props {
 const breadcrumbs: BreadcrumbItem[] = [
   {
     title: 'Dashboard',
-    href: route('dashboard'),
+    href: dashboard.url(),
   },
   {
     title: 'Sample Items',
-    href: route('sample.items.index'),
+    href: sample.items.index.url(),
   },
   {
     title: 'Item Details',
@@ -39,7 +40,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Show({ item, enumerateOptions }: Props) {
   const handleDelete = () => {
     if (confirm('Are you sure you want to delete this item?')) {
-      router.delete(route('sample.items.destroy', item.id));
+      router.delete(sample.items.destroy.url(item.id));
     }
   };
 
@@ -61,13 +62,13 @@ export default function Show({ item, enumerateOptions }: Props) {
             <p className="text-muted-foreground">Item details and information</p>
           </div>
           <div className="flex items-center space-x-2">
-            <Link href={route('sample.items.index')}>
+            <Link href={sample.items.index.url()}>
               <Button variant="outline">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to Items
               </Button>
             </Link>
-            <Link href={route('sample.items.edit', item.id)}>
+            <Link href={sample.items.edit.url(item.id)}>
               <Button>
                 <Edit className="mr-2 h-4 w-4" />
                 Edit Item

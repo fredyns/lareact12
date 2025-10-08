@@ -41,11 +41,3 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
-
-// Global route function declaration for Ziggy
-declare global {
-    function route(
-        name: string, 
-        params?: string | number | Record<string, string | number | boolean | null | undefined>
-    ): string;
-}

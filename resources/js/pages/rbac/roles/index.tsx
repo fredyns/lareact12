@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
-import { route } from 'ziggy-js';
+import { dashboard } from '@/routes';
+import rbac from '@/routes/rbac';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -62,11 +63,11 @@ interface Props {
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
-        href: route('dashboard'),
+        href: dashboard.url(),
     },
     {
         title: 'Roles',
-        href: route('rbac.roles.index'),
+        href: rbac.roles.index.url(),
     },
 ];
 
@@ -75,17 +76,17 @@ export default function RolesIndex({ roles, filters }: Props) {
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        router.get(route('rbac.roles.index'), { search }, { preserveState: true });
+        router.get(rbac.roles.index.url(), { search }, { preserveState: true });
     };
 
     const handleClearSearch = () => {
         setSearch('');
-        router.get(route('rbac.roles.index'), {}, { preserveState: true });
+        router.get(rbac.roles.index.url(), {}, { preserveState: true });
     };
 
     const handleSort = (field: string) => {
         const direction = filters.sort === field && filters.direction === 'asc' ? 'desc' : 'asc';
-        router.get(route('rbac.roles.index'), {
+        router.get(rbac.roles.index.url(), {
             ...filters,
             sort: field,
             direction,
@@ -94,7 +95,7 @@ export default function RolesIndex({ roles, filters }: Props) {
 
     const handleDelete = (role: Role) => {
         if (confirm(`Are you sure you want to delete the role "${role.name}"?`)) {
-            router.delete(route('rbac.roles.destroy', role.id));
+            router.delete(rbac.roles.destroy.url(role.id));
         }
     };
 
@@ -125,7 +126,7 @@ export default function RolesIndex({ roles, filters }: Props) {
                             Manage system roles and their permissions
                         </p>
                     </div>
-                    <Link href={route('rbac.roles.create')}>
+                    <Link href={rbac.roles.create.url()}>
                         <Button>
                             <Plus className="mr-2 h-4 w-4" />
                             Create Role
@@ -246,13 +247,13 @@ export default function RolesIndex({ roles, filters }: Props) {
                                                             </DropdownMenuTrigger>
                                                             <DropdownMenuContent align="end">
                                                                 <DropdownMenuItem asChild>
-                                                                    <Link href={route('rbac.roles.show', role.id)}>
+                                                                    <Link href={rbac.roles.show.url(role.id)}>
                                                                         <Eye className="mr-2 h-4 w-4" />
                                                                         View
                                                                     </Link>
                                                                 </DropdownMenuItem>
                                                                 <DropdownMenuItem asChild>
-                                                                    <Link href={route('rbac.roles.edit', role.id)}>
+                                                                    <Link href={rbac.roles.edit.url(role.id)}>
                                                                         <Edit className="mr-2 h-4 w-4" />
                                                                         Edit
                                                                     </Link>

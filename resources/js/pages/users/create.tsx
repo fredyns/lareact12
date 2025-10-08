@@ -1,5 +1,6 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { route } from 'ziggy-js';
+import { dashboard } from '@/routes';
+import users from '@/routes/users';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,15 +19,15 @@ interface FormData {
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
-        href: route('dashboard'),
+        href: dashboard.url(),
     },
     {
         title: 'Users',
-        href: route('users.index'),
+        href: users.index.url(),
     },
     {
         title: 'Create User',
-        href: route('users.create'),
+        href: users.create.url(),
     },
 ];
 
@@ -40,7 +41,7 @@ export default function CreateUser() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('users.store'), {
+        post(users.store.url(), {
             onSuccess: () => reset(),
         });
     };
@@ -57,7 +58,7 @@ export default function CreateUser() {
                             Add a new user to the system
                         </p>
                     </div>
-                    <Link href={route('users.index')}>
+                    <Link href={users.index.url()}>
                         <Button variant="outline">
                             <ArrowLeft className="mr-2 h-4 w-4" />
                             Back to Users
@@ -132,7 +133,7 @@ export default function CreateUser() {
                             </div>
 
                             <div className="flex items-center justify-end space-x-2 pt-4">
-                                <Link href={route('users.index')}>
+                                <Link href={users.index.url()}>
                                     <Button type="button" variant="outline">
                                         Cancel
                                     </Button>

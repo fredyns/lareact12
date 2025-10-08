@@ -26,7 +26,8 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import Select from 'react-select';
-import { route } from 'ziggy-js';
+import { dashboard } from '@/routes';
+import sample from '@/routes/sample';
 
 interface PaginationLink {
   url: string | null;
@@ -58,11 +59,11 @@ interface Props {
 const breadcrumbs: BreadcrumbItem[] = [
   {
     title: 'Dashboard',
-    href: route('dashboard'),
+    href: dashboard.url(),
   },
   {
     title: 'Sample Items',
-    href: route('sample.items.index'),
+    href: sample.items.index.url(),
   },
 ];
 
@@ -75,7 +76,7 @@ export default function ItemsIndex({ items, filters, enumerateOptions }: Props) 
   const handleSort = (field: string) => {
     const direction = filters.sort_field === field && filters.sort_direction === 'asc' ? 'desc' : 'asc';
     router.get(
-      route('sample.items.index'),
+      sample.items.index.url(),
       {
         search,
         enumerate: enumerate?.value,
@@ -91,18 +92,18 @@ export default function ItemsIndex({ items, filters, enumerateOptions }: Props) 
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    router.get(route('sample.items.index'), { search, enumerate: enumerate?.value }, { preserveState: true });
+    router.get(sample.items.index.url(), { search, enumerate: enumerate?.value }, { preserveState: true });
   };
 
   const handleClearSearch = () => {
     setSearch('');
-    router.get(route('sample.items.index'), { enumerate: enumerate?.value }, { preserveState: true });
+    router.get(sample.items.index.url(), { enumerate: enumerate?.value }, { preserveState: true });
   };
 
   const handleEnumerateChange = (selected: { value: string; label: string } | null) => {
     setEnumerate(selected);
     router.get(
-      route('sample.items.index'),
+      sample.items.index.url(),
       {
         search,
         enumerate: selected?.value || null,
@@ -116,7 +117,7 @@ export default function ItemsIndex({ items, filters, enumerateOptions }: Props) 
 
   const handleDelete = (item: Item) => {
     if (confirm(`Are you sure you want to delete "${item.string}"?`)) {
-      router.delete(route('sample.items.destroy', item.id));
+      router.delete(sample.items.destroy.url(item.id));
     }
   };
 
@@ -146,7 +147,7 @@ export default function ItemsIndex({ items, filters, enumerateOptions }: Props) 
             <h1 className="text-2xl font-bold tracking-tight">Sample Items</h1>
             <p className="text-muted-foreground">Manage sample items and their properties</p>
           </div>
-          <Link href={route('sample.items.create')}>
+          <Link href={sample.items.create.url()}>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
               Add Item
@@ -278,13 +279,13 @@ export default function ItemsIndex({ items, filters, enumerateOptions }: Props) 
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem asChild>
-                                <Link href={route('sample.items.show', item.id)}>
+                                <Link href={sample.items.show.url(item.id)}>
                                   <Eye className="mr-2 h-4 w-4" />
                                   View
                                 </Link>
                               </DropdownMenuItem>
                               <DropdownMenuItem asChild>
-                                <Link href={route('sample.items.edit', item.id)}>
+                                <Link href={sample.items.edit.url(item.id)}>
                                   <Edit className="mr-2 h-4 w-4" />
                                   Edit
                                 </Link>

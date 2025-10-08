@@ -4,7 +4,8 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, SelectOption } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft, Save } from 'lucide-react';
-import { route } from 'ziggy-js';
+import { dashboard } from '@/routes';
+import sample from '@/routes/sample';
 import { FormField } from './form-field';
 import { getTempUploadPath } from '@/utils/upload';
 
@@ -15,15 +16,15 @@ interface Props {
 const breadcrumbs: BreadcrumbItem[] = [
   {
     title: 'Dashboard',
-    href: route('dashboard'),
+    href: dashboard.url(),
   },
   {
     title: 'Sample Items',
-    href: route('sample.items.index'),
+    href: sample.items.index.url(),
   },
   {
     title: 'Create Item',
-    href: route('sample.items.create'),
+    href: sample.items.create.url(),
   },
 ];
 
@@ -53,7 +54,7 @@ export default function Create({ enumerateOptions }: Props) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    post(route('sample.items.store'));
+    post(sample.items.store.url());
   };
 
   return (
@@ -67,7 +68,7 @@ export default function Create({ enumerateOptions }: Props) {
             <h1 className="text-2xl font-bold tracking-tight">Create Item</h1>
             <p className="text-muted-foreground">Add a new sample item to the system</p>
           </div>
-          <Link href={route('sample.items.index')}>
+          <Link href={sample.items.index.url()}>
             <Button variant="outline">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Items

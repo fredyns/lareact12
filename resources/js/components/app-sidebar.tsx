@@ -11,9 +11,11 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import rbac from '@/routes/rbac';
+import sample from '@/routes/sample';
+import users from '@/routes/users';
 import { type NavItem, type NavGroup } from '@/types';
 import { Link } from '@inertiajs/react';
-import { route } from 'ziggy-js';
 import { BookOpen, Folder, LayoutGrid, Users, Shield, Key, Package } from 'lucide-react';
 import AppLogo from './app-logo';
 
@@ -31,7 +33,7 @@ const navGroups: NavGroup[] = [
         items: [
             {
                 title: 'Users',
-                href: route('users.index'),
+                href: users.index.url(),
                 icon: Users,
             },
         ],
@@ -41,7 +43,7 @@ const navGroups: NavGroup[] = [
         items: [
             {
                 title: 'Items',
-                href: route('sample.items.index'),
+                href: sample.items.index.url(),
                 icon: Package,
             },
         ],
@@ -51,12 +53,12 @@ const navGroups: NavGroup[] = [
         items: [
             {
                 title: 'Roles',
-                href: route('rbac.roles.index'),
+                href: rbac.roles.index.url(),
                 icon: Shield,
             },
             {
                 title: 'Permissions',
-                href: route('rbac.permissions.index'),
+                href: rbac.permissions.index.url(),
                 icon: Key,
             },
         ],

@@ -1,5 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { route } from 'ziggy-js';
+import { dashboard } from '@/routes';
+import users from '@/routes/users';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -60,11 +61,11 @@ interface Props {
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
-        href: route('dashboard'),
+        href: dashboard.url(),
     },
     {
         title: 'Users',
-        href: route('users.index'),
+        href: users.index.url(),
     },
     {
         title: 'User Details',
@@ -86,7 +87,7 @@ export default function ShowUser({ user, userRoles, allRoles }: Props) {
 
     const handleDelete = () => {
         if (confirm(`Are you sure you want to delete ${user.name}?`)) {
-            router.delete(route('users.destroy', user.id));
+            router.delete(users.destroy.url(user.id));
         }
     };
 
@@ -104,7 +105,7 @@ export default function ShowUser({ user, userRoles, allRoles }: Props) {
     const handleRemoveRole = () => {
         if (roleToRemove) {
             router.delete(
-                route('users.roles.remove', [user.id, roleToRemove.id]),
+                users.roles.remove.url([user.id, roleToRemove.id]),
             );
             setRoleToRemove(null);
         }
@@ -113,7 +114,7 @@ export default function ShowUser({ user, userRoles, allRoles }: Props) {
     // Handle role addition
     const handleAddRole = () => {
         if (roleToAdd) {
-            router.post(route('users.roles.add', user.id), {
+            router.post(users.roles.add.url(user.id), {
                 role_id: roleToAdd.id,
             });
             setRoleToAdd(null);
@@ -136,13 +137,13 @@ export default function ShowUser({ user, userRoles, allRoles }: Props) {
                         </p>
                     </div>
                     <div className="flex items-center space-x-2">
-                        <Link href={route('users.index')}>
+                        <Link href={users.index.url()}>
                             <Button variant="outline">
                                 <ArrowLeft className="mr-2 h-4 w-4" />
                                 Back to Users
                             </Button>
                         </Link>
-                        <Link href={route('users.edit', user.id)}>
+                        <Link href={users.edit.url(user.id)}>
                             <Button>
                                 <Edit className="mr-2 h-4 w-4" />
                                 Edit User

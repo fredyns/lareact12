@@ -1,6 +1,7 @@
 import React from 'react';
 import { Head, Link, router } from '@inertiajs/react';
-import { route } from 'ziggy-js';
+import { dashboard } from '@/routes';
+import rbac from '@/routes/rbac';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -29,11 +30,11 @@ interface Props {
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
-        href: route('dashboard'),
+        href: dashboard.url(),
     },
     {
         title: 'Permissions',
-        href: route('rbac.permissions.index'),
+        href: rbac.permissions.index.url(),
     },
     {
         title: 'Permission Details',
@@ -44,7 +45,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function ShowPermission({ permission }: Props) {
     const handleDelete = () => {
         if (confirm(`Are you sure you want to delete ${permission.name}?`)) {
-            router.delete(route('rbac.permissions.destroy', permission.id));
+            router.delete(rbac.permissions.destroy.url(permission.id));
         }
     };
 
@@ -64,13 +65,13 @@ export default function ShowPermission({ permission }: Props) {
                         </p>
                     </div>
                     <div className="flex items-center space-x-2">
-                        <Link href={route('rbac.permissions.index')}>
+                        <Link href={rbac.permissions.index.url()}>
                             <Button variant="outline">
                                 <ArrowLeft className="mr-2 h-4 w-4" />
                                 Back to Permissions
                             </Button>
                         </Link>
-                        <Link href={route('rbac.permissions.edit', permission.id)}>
+                        <Link href={rbac.permissions.edit.url(permission.id)}>
                             <Button>
                                 <Edit className="mr-2 h-4 w-4" />
                                 Edit Permission

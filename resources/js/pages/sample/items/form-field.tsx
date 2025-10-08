@@ -253,7 +253,6 @@ export function FormField({
                 onLongitudeChange={(value) => setData('longitude', value)}
                 latitudeError={errors.latitude}
                 longitudeError={errors.longitude}
-                mapHeight="h-96"
               />
             </CardContent>
           </Card>
