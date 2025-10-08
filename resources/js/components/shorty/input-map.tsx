@@ -39,16 +39,19 @@ function ScaleControl() {
 interface ClickableMarkerProps {
   position: [number, number];
   onPositionChange: (lat: number, lng: number) => void;
+  disabled?: boolean;
 }
 
-const ClickableMarker = ({ position, onPositionChange }: ClickableMarkerProps) => {
+const ClickableMarker = ({ position, onPositionChange, disabled = false }: ClickableMarkerProps) => {
   const [markerPosition, setMarkerPosition] = useState<[number, number]>(position);
 
   useMapEvents({
     click(e) {
-      const { lat, lng } = e.latlng;
-      setMarkerPosition([lat, lng]);
-      onPositionChange(lat, lng);
+      if (!disabled) {
+        const { lat, lng } = e.latlng;
+        setMarkerPosition([lat, lng]);
+        onPositionChange(lat, lng);
+      }
     },
   });
 
@@ -65,6 +68,7 @@ interface InputMapProps {
   ratio?: number;
   zoom?: number;
   required?: boolean;
+  disabled?: boolean;
 }
 
 export function InputMap({
@@ -77,6 +81,7 @@ export function InputMap({
   ratio = 1,
   zoom = DEFAULT_ZOOM,
   required = false,
+  disabled = false,
 }: InputMapProps) {
   const [showMapModal, setShowMapModal] = useState(false);
   const [tempLat, setTempLat] = useState(latitude);
@@ -213,6 +218,7 @@ export function InputMap({
             }}
             placeholder="Enter latitude"
             className={latitudeError ? 'border-destructive' : ''}
+            disabled={disabled}
           />
           {latitudeError && <p className="text-sm text-destructive">{latitudeError}</p>}
         </div>
@@ -234,6 +240,7 @@ export function InputMap({
             }}
             placeholder="Enter longitude"
             className={longitudeError ? 'border-destructive' : ''}
+            disabled={disabled}
           />
           {longitudeError && <p className="text-sm text-destructive">{longitudeError}</p>}
         </div>
@@ -243,19 +250,19 @@ export function InputMap({
         {isValidLocation ? (
           <div
             ref={thumbnailContainerRef}
-            className="w-full cursor-pointer rounded-lg border transition-opacity hover:opacity-80"
+            className={`w-full rounded-lg border ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer transition-opacity hover:opacity-80'}`}
             style={{
               width: dimensions.width > 0 ? `${dimensions.width}px` : '100%',
               height: dimensions.height > 0 ? `${dimensions.height}px` : '360px',
               minWidth: '360px',
               minHeight: '360px',
             }}
-            onClick={handleOpenModal}
+            onClick={disabled ? undefined : handleOpenModal}
           />
         ) : (
           <div
-            className="flex h-64 w-full cursor-pointer items-center justify-center rounded-lg border bg-muted/50 transition-opacity hover:opacity-80"
-            onClick={handleOpenModal}
+            className={`flex h-64 w-full items-center justify-center rounded-lg border bg-muted/50 ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer transition-opacity hover:opacity-80'}`}
+            onClick={disabled ? undefined : handleOpenModal}
           >
             <div className="text-center">
               <MapPin className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
@@ -303,7 +310,7 @@ export function InputMap({
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
-                  <ClickableMarker position={[tempLat || 0, tempLng || 0]} onPositionChange={handleTempPositionChange} />
+                  <ClickableMarker position={[tempLat || 0, tempLng || 0]} onPositionChange={handleTempPositionChange} disabled={disabled} />
                   <ScaleControl />
                 </MapContainer>
               </div>
@@ -311,7 +318,7 @@ export function InputMap({
                 <Button variant="outline" onClick={() => setShowMapModal(false)}>
                   Cancel
                 </Button>
-                <Button onClick={handleSelectLocation}>
+                <Button onClick={handleSelectLocation} disabled={disabled}>
                   <MapPin className="mr-2 h-4 w-4" />
                   Select This Location
                 </Button>

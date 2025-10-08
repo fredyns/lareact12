@@ -2,16 +2,12 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import React from 'react';
 
-interface InputTextareaProps {
+interface InputTextareaProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'> {
   id: string;
   label: string;
   value: string;
   onChange: (value: string) => void;
-  rows?: number;
-  placeholder?: string;
   error?: string;
-  required?: boolean;
-  disabled?: boolean;
 }
 
 export function InputTextarea({
@@ -19,11 +15,10 @@ export function InputTextarea({
   label,
   value,
   onChange,
-  rows = 3,
-  placeholder,
   error,
   required = false,
-  disabled = false,
+  className = '',
+  ...props
 }: InputTextareaProps) {
   return (
     <div className="space-y-2">
@@ -34,10 +29,9 @@ export function InputTextarea({
         id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        rows={rows}
-        placeholder={placeholder}
-        disabled={disabled}
-        className={error ? 'border-destructive' : ''}
+        className={error ? 'border-destructive' : className}
+        required={required}
+        {...props}
       />
       {error && <p className="text-sm text-destructive">{error}</p>}
     </div>

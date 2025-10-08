@@ -12,6 +12,7 @@ interface InputDateTimeProps {
   placeholder?: string;
   required?: boolean;
   className?: string;
+  disabled?: boolean;
 }
 
 export function InputDatetime({
@@ -23,6 +24,7 @@ export function InputDatetime({
   placeholder = 'Select date and time',
   required = false,
   className = '',
+  disabled = false,
 }: InputDateTimeProps) {
   return (
     <div className="space-y-2">
@@ -36,8 +38,9 @@ export function InputDatetime({
           placeholder={placeholder}
           className={error ? 'border-destructive' : className}
           showTime={true}
+          disabled={disabled}
         />
-        {value && value.trim() !== '' && (
+        {value && value.trim() !== '' && !disabled && (
           <button
             type="button"
             onClick={() => onChange('')}

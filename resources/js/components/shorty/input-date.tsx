@@ -12,6 +12,7 @@ interface InputDateProps {
   placeholder?: string;
   required?: boolean;
   className?: string;
+  disabled?: boolean;
 }
 
 export function InputDate({
@@ -23,6 +24,7 @@ export function InputDate({
   placeholder = 'Select a date',
   required = false,
   className = '',
+  disabled = false,
 }: InputDateProps) {
   return (
     <div className="space-y-2">
@@ -35,8 +37,9 @@ export function InputDate({
           onDateChange={(date) => onChange(date ? date.toISOString().split('T')[0] : '')}
           placeholder={placeholder}
           className={error ? 'border-destructive' : className}
+          disabled={disabled}
         />
-        {value && value.trim() !== '' && (
+        {value && value.trim() !== '' && !disabled && (
           <button
             type="button"
             onClick={() => onChange('')}

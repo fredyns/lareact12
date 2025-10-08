@@ -12,6 +12,7 @@ interface InputSelectFromTableProps {
   error?: string;
   required?: boolean;
   placeholder?: string;
+  disabled?: boolean;
 }
 
 export function InputSelectFromTable({
@@ -23,6 +24,7 @@ export function InputSelectFromTable({
   error,
   required = false,
   placeholder = 'Select...',
+  disabled = false,
 }: InputSelectFromTableProps) {
   const loadOptions = async (inputValue: string): Promise<SelectOption[]> => {
     try {
@@ -63,6 +65,7 @@ export function InputSelectFromTable({
         classNamePrefix="react-select"
         isClearable
         placeholder={placeholder}
+        isDisabled={disabled}
         theme={(theme) => ({
           ...theme,
           colors: {

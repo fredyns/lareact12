@@ -2,15 +2,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import React from 'react';
 
-interface InputNPWPProps {
+interface InputNPWPProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
   id: string;
   label: string;
   value: string;
   onChange: (value: string) => void;
   error?: string;
-  placeholder?: string;
-  required?: boolean;
-  className?: string;
 }
 
 export function InputNpwp({
@@ -22,6 +19,7 @@ export function InputNpwp({
   placeholder = '99.999.999.9-999.999',
   required = false,
   className = '',
+  ...props
 }: InputNPWPProps) {
   return (
     <div className="space-y-2">
@@ -38,6 +36,7 @@ export function InputNpwp({
         title="Please enter NPWP in format: 99.999.999.9-999.999"
         className={error ? 'border-destructive' : className}
         required={required}
+        {...props}
       />
       {error && <p className="text-sm text-destructive">{error}</p>}
     </div>

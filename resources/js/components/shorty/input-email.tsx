@@ -2,15 +2,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import React from 'react';
 
-interface InputEmailProps {
+interface InputEmailProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
   id: string;
   label: string;
   value: string;
   onChange: (value: string) => void;
   error?: string;
-  placeholder?: string;
-  required?: boolean;
-  className?: string;
 }
 
 export function InputEmail({
@@ -19,9 +16,9 @@ export function InputEmail({
   value,
   onChange,
   error,
-  placeholder,
   required = false,
   className = '',
+  ...props
 }: InputEmailProps) {
   return (
     <div className="space-y-2">
@@ -33,9 +30,9 @@ export function InputEmail({
         type="email"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
         className={error ? 'border-destructive' : className}
         required={required}
+        {...props}
       />
       {error && <p className="text-sm text-destructive">{error}</p>}
     </div>

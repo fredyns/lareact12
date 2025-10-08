@@ -119,17 +119,21 @@ export function InputImage({
           <p className="mt-1 text-sm text-muted-foreground">Current image: {currentImageName || 'View image'}</p>
         </div>
       ) : null}
-      <FileDropzone
-        accept={accept}
-        maxSize={maxSize}
-        onFileDrop={handleFileDrop}
-        disabled={disabled}
-        isUploading={isUploading}
-        isSuccess={isSuccess}
-        currentFileName={currentImageName}
-        error={error}
-      />
-      <p className="text-xs text-muted-foreground">Maximum file size: {maxSizeLabel}</p>
+      {!disabled && (
+        <>
+          <FileDropzone
+            accept={accept}
+            maxSize={maxSize}
+            onFileDrop={handleFileDrop}
+            disabled={disabled}
+            isUploading={isUploading}
+            isSuccess={isSuccess}
+            currentFileName={currentImageName}
+            error={error}
+          />
+          <p className="text-xs text-muted-foreground">Maximum file size: {maxSizeLabel}</p>
+        </>
+      )}
 
       {/* Image Preview Dialog */}
       {currentImageUrl && (

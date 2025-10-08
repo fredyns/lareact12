@@ -1,8 +1,9 @@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import React from 'react';
+import type { CheckboxProps } from '@radix-ui/react-checkbox';
 
-interface InputCheckboxProps {
+interface InputCheckboxProps extends Omit<CheckboxProps, 'checked' | 'onCheckedChange' | 'onChange'> {
   id: string;
   label: string;
   checked: boolean;
@@ -18,6 +19,7 @@ export function InputCheckbox({
   onChange,
   error,
   required = false,
+  ...props
 }: InputCheckboxProps) {
   return (
     <div className="flex items-center space-x-2">
@@ -25,6 +27,7 @@ export function InputCheckbox({
         id={id}
         checked={checked}
         onCheckedChange={(checked) => onChange(!!checked)}
+        {...props}
       />
       <Label htmlFor={id}>
         {label} {required && <span className="text-destructive">*</span>}

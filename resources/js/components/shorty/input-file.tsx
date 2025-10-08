@@ -130,17 +130,21 @@ export function InputFile({
           </a>
         </div>
       ) : null}
-      <FileDropzone
-        accept={accept}
-        maxSize={maxSize}
-        onFileDrop={handleFileDrop}
-        disabled={disabled}
-        isUploading={isUploading}
-        isSuccess={isSuccess}
-        currentFileName={currentFileName}
-        error={error}
-      />
-      <p className="text-xs text-muted-foreground">Maximum file size: {maxSizeLabel}</p>
+      {!disabled && (
+        <>
+          <FileDropzone
+            accept={accept}
+            maxSize={maxSize}
+            onFileDrop={handleFileDrop}
+            disabled={disabled}
+            isUploading={isUploading}
+            isSuccess={isSuccess}
+            currentFileName={currentFileName}
+            error={error}
+          />
+          <p className="text-xs text-muted-foreground">Maximum file size: {maxSizeLabel}</p>
+        </>
+      )}
     </div>
   );
 }

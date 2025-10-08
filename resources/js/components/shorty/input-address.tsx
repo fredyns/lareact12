@@ -2,15 +2,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import React from 'react';
 
-interface InputIpAddressProps {
+interface InputIpAddressProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
   id: string;
   label: string;
   value: string;
   onChange: (value: string) => void;
   error?: string;
-  placeholder?: string;
-  required?: boolean;
-  className?: string;
 }
 
 export function InputAddress({
@@ -22,6 +19,7 @@ export function InputAddress({
   placeholder = '192.168.1.1',
   required = false,
   className = '',
+  ...props
 }: InputIpAddressProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
@@ -82,6 +80,7 @@ export function InputAddress({
         maxLength={15}
         className={error ? 'border-destructive' : className}
         required={required}
+        {...props}
       />
       {error && <p className="text-sm text-destructive">{error}</p>}
     </div>

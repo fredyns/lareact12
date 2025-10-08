@@ -14,6 +14,7 @@ interface InputEnumProps {
   options: EnumOption[];
   error?: string;
   required?: boolean;
+  disabled?: boolean;
 }
 
 export function InputEnum({
@@ -24,6 +25,7 @@ export function InputEnum({
   options,
   error,
   required = false,
+  disabled = false,
 }: InputEnumProps) {
   return (
     <div className="space-y-2">
@@ -36,16 +38,17 @@ export function InputEnum({
             key={option.value}
             type="button"
             onClick={() => onChange(option.value)}
+            disabled={disabled}
             className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
               value === option.value
                 ? 'bg-indigo-600 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
+            } ${disabled ? 'cursor-not-allowed opacity-50' : ''}`}
           >
             {option.label}
           </button>
         ))}
-        {value && (
+        {value && !disabled && (
           <button
             type="button"
             onClick={() => onChange('')}

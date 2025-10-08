@@ -3,15 +3,12 @@ import { Label } from '@/components/ui/label';
 import { Sketch } from '@uiw/react-color';
 import React, { useState } from 'react';
 
-interface InputColorProps {
+interface InputColorProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'onClick'> {
   id: string;
   label: string;
   value: string;
   onChange: (value: string) => void;
   error?: string;
-  placeholder?: string;
-  required?: boolean;
-  className?: string;
 }
 
 export function InputColor({
@@ -23,6 +20,7 @@ export function InputColor({
   placeholder = 'Select a color',
   required = false,
   className = '',
+  ...props
 }: InputColorProps) {
   const [showColorPicker, setShowColorPicker] = useState(false);
 
@@ -41,6 +39,7 @@ export function InputColor({
           placeholder={placeholder}
           className={error ? 'border-destructive' : className}
           readOnly
+          {...props}
         />
         <div
           className="h-10 w-10 cursor-pointer rounded border"

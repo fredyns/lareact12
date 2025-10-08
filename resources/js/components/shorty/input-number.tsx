@@ -2,17 +2,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import React from 'react';
 
-interface InputNumberProps {
+interface InputNumberProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'value'> {
   id: string;
   label: string;
   value: string | number;
   onChange: (value: string) => void;
   error?: string;
-  min?: number;
-  max?: number;
-  step?: string | number;
-  required?: boolean;
-  className?: string;
   slider?: boolean;
 }
 
@@ -28,6 +23,7 @@ export function InputNumber({
   required = false,
   className = '',
   slider = true,
+  ...props
 }: InputNumberProps) {
   // Show slider only if slider is true AND both min and max are defined
   const showSlider = slider && min !== undefined && max !== undefined;
@@ -47,6 +43,7 @@ export function InputNumber({
         onChange={(e) => onChange(e.target.value)}
         className={`w-full ${error ? 'border-destructive' : className}`}
         required={required}
+        {...props}
       />
       {showSlider && (
         <div className="mt-2">
