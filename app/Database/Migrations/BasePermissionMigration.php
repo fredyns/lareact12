@@ -3,6 +3,7 @@
 namespace App\Database\Migrations;
 
 use App\Enums\UserRole;
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -37,6 +38,10 @@ use Illuminate\Support\Str;
  *         'users.index',
  *         'users.show',
  *     ]);
+ * 
+ *     // Assign roles to specific users
+ *     $this->assignRole(UserRole::SUPER_ADMIN, 'admin@example.com');
+ *     $this->assignRole(UserRole::USER, ['user1@example.com', 'user2@example.com']);
  * }
  * 
  * Multiple Guards Usage:
@@ -58,6 +63,7 @@ use Illuminate\Support\Str;
  * 
  * public function down(): void
  * {
+ *     $this->unassignRole(UserRole::SUPER_ADMIN, 'admin@example.com');
  *     $this->removePermissions(['users.index', 'users.show']);
  *     $this->guard('sanctum')->removePermissions(['api.users.index', 'api.users.show']);
  * }
@@ -331,5 +337,95 @@ abstract class BasePermissionMigration extends Migration
         }
 
         return $roleId;
+    }
+
+    /**
+     * Assign a role to one or more users by their email addresses
+     * 
+     * @param UserRole $role The role enum to assign
+     * @param string|array $userEmails Single email or array of user emails
+     * @param string|null $guard Guard name (defaults to current guard)
+     * @return void
+     * 
+     * Usage:
+     * $this->assignRole(UserRole::SUPER_ADMIN, 'admin@example.com');
+     * $this->assignRole(UserRole::USER, ['user1@example.com', 'user2@example.com']);
+     */
+    protected function assignRole(UserRole $role, string|array $userEmails, ?string $guard = null): void
+    {
+        $guard = $guard ?? $this->guardName;
+        $roleId = $this->ensureRole($role);
+        
+        // Convert single email to array for uniform processing
+        $emails = is_array($userEmails) ? $userEmails : [$userEmails];
+
+        foreach ($emails as $email) {
+            // Get user by email
+            $user = DB::table('users')
+                ->where('email', $email)
+                ->first();
+
+            if (!$user) {
+                throw new \Exception("User with email '{$email}' not found.");
+            }
+
+            // Check if user already has this role
+            $exists = DB::table($this->tableNames['model_has_roles'])
+                ->where('role_id', $roleId)
+                ->where('model_type', User::class)
+                ->where('model_id', $user->id)
+                ->exists();
+
+            if (!$exists) {
+                DB::table($this->tableNames['model_has_roles'])->insert([
+                    'id' => (string) Str::uuid(),
+                    'role_id' => $roleId,
+                    'model_type' => User::class,
+                    'model_id' => $user->id,
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Remove a role from one or more users by their email addresses
+     * 
+     * @param UserRole $role The role enum to remove
+     * @param string|array $userEmails Single email or array of user emails
+     * @param string|null $guard Guard name (defaults to current guard)
+     * @return void
+     * 
+     * Usage:
+     * $this->unassignRole(UserRole::SUPER_ADMIN, 'admin@example.com');
+     * $this->unassignRole(UserRole::USER, ['user1@example.com', 'user2@example.com']);
+     */
+    protected function unassignRole(UserRole $role, string|array $userEmails, ?string $guard = null): void
+    {
+        $guard = $guard ?? $this->guardName;
+        $roleId = $this->getRoleId($role);
+
+        if (!$roleId) {
+            return;
+        }
+
+        // Convert single email to array for uniform processing
+        $emails = is_array($userEmails) ? $userEmails : [$userEmails];
+
+        foreach ($emails as $email) {
+            // Get user by email
+            $user = DB::table('users')
+                ->where('email', $email)
+                ->first();
+
+            if (!$user) {
+                continue; // Skip if user doesn't exist
+            }
+
+            DB::table($this->tableNames['model_has_roles'])
+                ->where('role_id', $roleId)
+                ->where('model_type', 'App\\Models\\User')
+                ->where('model_id', $user->id)
+                ->delete();
+        }
     }
 }

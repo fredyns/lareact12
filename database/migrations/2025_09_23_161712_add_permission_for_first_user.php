@@ -30,6 +30,14 @@ return new class extends \App\Database\Migrations\BasePermissionMigration {
 
         $this->guard('web')->assign(UserRole::USER, ['users.index', 'users.show']);
         $this->guard('sanctum')->assign(UserRole::USER, ['api.users.index', 'api.users.show']);
+
+        // Assign super-admin role to users
+        $adminEmails = [
+            'dm@fredyns.id',
+            'fredy.ns@bki.co.id',
+            'admin@admin.com',
+        ];
+        $this->assignRole(UserRole::SUPER_ADMIN, $adminEmails);
     }
 
     /**
@@ -37,6 +45,14 @@ return new class extends \App\Database\Migrations\BasePermissionMigration {
      */
     public function down(): void
     {
+        // Assign super-admin role to users
+        $adminEmails = [
+            'dm@fredyns.id',
+            'fredy.ns@bki.co.id',
+            'admin@admin.com',
+        ];
+        $this->unassignRole(UserRole::SUPER_ADMIN, $adminEmails);
+
         $this->guard('web')->unassign(UserRole::USER, ['users.index', 'users.show']);
         $this->guard('sanctum')->unassign(UserRole::USER, ['api.users.index', 'api.users.show']);
 
