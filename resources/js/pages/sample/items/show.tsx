@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, Item } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
+import { ArrowLeft, Check, Edit, Trash2, X } from 'lucide-react';
 import { dashboard } from '@/routes';
 import sample from '@/routes/sample';
 
@@ -105,6 +105,7 @@ export default function Show({ item, enumerateOptions }: Props) {
                   label="Status"
                   value={getEnumerateLabel(item.enumerate)}
                   variant={item.enumerate === 'enable' ? 'default' : 'secondary'}
+                  icon={item.enumerate === 'enable' ? Check : X}
                 />
 
                 <ShowField label="User" value={item.user?.name} />
