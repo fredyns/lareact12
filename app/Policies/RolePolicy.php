@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 
@@ -12,6 +13,10 @@ class RolePolicy
      */
     public function viewAny(User $user): bool
     {
+        if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
+            return true;
+        }
+
         return $user->can('roles.index');
     }
 
@@ -20,6 +25,10 @@ class RolePolicy
      */
     public function view(User $user, Role $role): bool
     {
+        if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
+            return true;
+        }
+
         return $user->can('roles.show');
     }
 
@@ -28,6 +37,10 @@ class RolePolicy
      */
     public function create(User $user): bool
     {
+        if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
+            return true;
+        }
+
         return $user->can('roles.create');
     }
 
@@ -36,6 +49,10 @@ class RolePolicy
      */
     public function update(User $user, Role $role): bool
     {
+        if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
+            return true;
+        }
+
         return $user->can('roles.update');
     }
 
@@ -47,6 +64,10 @@ class RolePolicy
         // Prevent deletion of roles that have users assigned
         if ($role->users()->count() > 0) {
             return false;
+        }
+
+        if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
+            return true;
         }
 
         return $user->can('roles.delete');

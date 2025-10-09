@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\UserRole;
 use App\Models\User;
 
 class UserPolicy
@@ -11,6 +12,10 @@ class UserPolicy
      */
     public function viewAny(User $user): bool
     {
+        if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
+            return true;
+        }
+
         return $user->can('users.index');
     }
 
@@ -19,6 +24,10 @@ class UserPolicy
      */
     public function view(User $user, User $model): bool
     {
+        if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
+            return true;
+        }
+
         return $user->can('users.show');
     }
 
@@ -27,6 +36,10 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
+        if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
+            return true;
+        }
+
         return $user->can('users.create');
     }
 
@@ -35,6 +48,10 @@ class UserPolicy
      */
     public function update(User $user, User $model): bool
     {
+        if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
+            return true;
+        }
+
         return $user->can('users.update');
     }
 
@@ -46,6 +63,10 @@ class UserPolicy
         // Prevent deletion of own account
         if ($user->id === $model->id) {
             return false;
+        }
+
+        if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
+            return true;
         }
 
         return $user->can('users.delete');

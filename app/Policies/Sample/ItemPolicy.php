@@ -2,6 +2,7 @@
 
 namespace App\Policies\Sample;
 
+use App\Enums\UserRole;
 use App\Models\Sample\Item;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
@@ -28,6 +29,10 @@ class ItemPolicy
      */
     public function viewAny(User $user): bool
     {
+        if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
+            return true;
+        }
+
         return $user->can('sample.items.index');
     }
 
@@ -40,6 +45,10 @@ class ItemPolicy
      */
     public function view(User $user, Item $item): bool
     {
+        if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
+            return true;
+        }
+
         return $user->can('sample.items.show');
     }
 
@@ -51,6 +60,10 @@ class ItemPolicy
      */
     public function create(User $user): bool
     {
+        if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
+            return true;
+        }
+
         return $user->can('sample.items.create');
     }
 
@@ -63,6 +76,10 @@ class ItemPolicy
      */
     public function update(User $user, Item $item): bool
     {
+        if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
+            return true;
+        }
+
         return $user->can('sample.items.update');
     }
 
@@ -75,6 +92,10 @@ class ItemPolicy
      */
     public function delete(User $user, Item $item): bool
     {
+        if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
+            return true;
+        }
+
         return $user->can('sample.items.delete');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Spatie\Permission\Models\Permission;
 
@@ -12,6 +13,10 @@ class PermissionPolicy
      */
     public function viewAny(User $user): bool
     {
+        if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
+            return true;
+        }
+
         return $user->can('permissions.index');
     }
 
@@ -20,6 +25,10 @@ class PermissionPolicy
      */
     public function view(User $user, Permission $permission): bool
     {
+        if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
+            return true;
+        }
+
         return $user->can('permissions.show');
     }
 
@@ -28,6 +37,10 @@ class PermissionPolicy
      */
     public function create(User $user): bool
     {
+        if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
+            return true;
+        }
+
         return $user->can('permissions.create');
     }
 
@@ -36,6 +49,10 @@ class PermissionPolicy
      */
     public function update(User $user, Permission $permission): bool
     {
+        if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
+            return true;
+        }
+
         return $user->can('permissions.update');
     }
 
@@ -52,6 +69,10 @@ class PermissionPolicy
         // Prevent deletion of permissions that are directly assigned to users
         if ($permission->users()->count() > 0) {
             return false;
+        }
+
+        if ($user->hasRole(UserRole::SUPER_ADMIN->value)) {
+            return true;
         }
 
         return $user->can('permissions.delete');
