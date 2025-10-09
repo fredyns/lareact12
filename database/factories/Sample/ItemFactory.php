@@ -30,10 +30,10 @@ class ItemFactory extends Factory
         return [
             'id' => Str::uuid(),
             'user_id' => User::factory(),
-            'string' => $this->faker->sentence(),
+            'string' => $this->faker->words(),
             'email' => $this->faker->optional()->safeEmail(),
             'color' => $this->faker->optional()->hexColor(),
-            'integer' => $this->faker->optional()->numberBetween(1, 100),
+            'integer' => $this->faker->optional()->numberBetween(0, 100),
             'decimal' => $this->faker->optional()->randomFloat(2, 1, 1000),
             'npwp' => $this->faker->optional()->regexify('^\d{2}\.\d{3}\.\d{3}\.\d-\d{3}\.\d{3}$'),
             'datetime' => $this->faker->optional()->dateTime(),
