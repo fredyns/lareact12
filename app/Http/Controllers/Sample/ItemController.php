@@ -63,8 +63,7 @@ class ItemController extends Controller
         }
 
         // Paginate results
-        $items = $query->paginate($request->input('per_page', 10))
-            ->appends($request->query());
+        $items = $query->paginate(10)->withQueryString();
 
         // Return API response if requested
         if ($request->wantsJson()) {
@@ -118,25 +117,9 @@ class ItemController extends Controller
         // Move uploaded files from temporary location to final location
         // Temporary: tmp/sample_items/2025/10/01/filename.ext
         // Final: sample_items/2025/10/01/{modelID}/filename.ext
-        if ($item->file && $this->minioService->fileExists($item->file)) {
-            $oldPath = $item->file;
-            $fileName = basename($oldPath);
-            $newPath = $item->upload_path . '/' . $fileName;
-            
-            if ($this->minioService->moveFile($oldPath, $newPath)) {
-                $item->file = $newPath;
-            }
-        }
-
-        if ($item->image && $this->minioService->fileExists($item->image)) {
-            $oldPath = $item->image;
-            $fileName = basename($oldPath);
-            $newPath = $item->upload_path . '/' . $fileName;
-            
-            if ($this->minioService->moveFile($oldPath, $newPath)) {
-                $item->image = $newPath;
-            }
-        }
+        $this->minioService->setFolder($item->upload_path);
+        $this->minioService->moveToFolder($item->file);
+        $this->minioService->moveToFolder($item->image);
 
         // Save updated file paths if any files were moved
         if ($item->isDirty(['file', 'image'])) {
@@ -204,55 +187,23 @@ class ItemController extends Controller
     {
         $this->authorize('update', $item);
 
-        $data = $request->validated();
-
-        // Handle file uploads using MinIO with item's upload_path
-        if ($request->hasFile('file')) {
-            // Delete old file if exists
-            if ($item->file && $this->minioService->fileExists($item->file)) {
-                $this->minioService->deleteFile($item->file);
-            }
-            
-            // Ensure upload_path is set
-            if (empty($item->upload_path)) {
-                $item->upload_path = $item->generateUploadPath();
-                $item->save();
-            }
-            
-            $filePath = $this->minioService->uploadFile(
-                $request->file('file'),
-                $item->upload_path
-            );
-            if ($filePath) {
-                $data['file'] = $filePath;
-            }
-        } elseif ($request->has('file') && is_string($request->input('file'))) {
-            // Handle file path from already-uploaded file (two-step upload process)
-            $data['file'] = $request->input('file');
+        // Ensure upload_path is set
+        if (empty($item->upload_path)) {
+            $item->upload_path = $item->generateUploadPath();
         }
 
-        if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($item->image && $this->minioService->fileExists($item->image)) {
-                $this->minioService->deleteFile($item->image);
-            }
-            
-            // Ensure upload_path is set
-            if (empty($item->upload_path)) {
-                $item->upload_path = $item->generateUploadPath();
-                $item->save();
-            }
-            
-            $imagePath = $this->minioService->uploadFile(
-                $request->file('image'),
-                $item->upload_path
-            );
-            if ($imagePath) {
-                $data['image'] = $imagePath;
-            }
-        } elseif ($request->has('image') && is_string($request->input('image'))) {
-            // Handle image path from already-uploaded image (two-step upload process)
-            $data['image'] = $request->input('image');
+        $data = $request->validated();
+
+        // Set target folder for file operations
+        $this->minioService->setFolder($item->upload_path);
+
+        // Handle file uploads using MinIO (handles both file uploads and already-uploaded paths)
+        if ($this->minioService->updateFile($item->file, $request, 'file')) {
+            $data['file'] = $item->file;
+        }
+
+        if ($this->minioService->updateFile($item->image, $request, 'image')) {
+            $data['image'] = $item->image;
         }
 
         $item->update($data);
@@ -278,13 +229,7 @@ class ItemController extends Controller
         $this->authorize('delete', $item);
 
         // Delete associated files from MinIO
-        if ($item->file && $this->minioService->fileExists($item->file)) {
-            $this->minioService->deleteFile($item->file);
-        }
-
-        if ($item->image && $this->minioService->fileExists($item->image)) {
-            $this->minioService->deleteFile($item->image);
-        }
+        $this->minioService->deleteFiles([$item->file, $item->image]);
 
         $item->delete();
 

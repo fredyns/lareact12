@@ -139,7 +139,7 @@ class Item extends Model
     {
         parent::boot();
 
-        static::creating(function ($model) {
+        static::creating(function (Item $model) {
             if (empty($model->{$model->getKeyName()})) {
                 $model->{$model->getKeyName()} = (string)Str::uuid();
             }
@@ -155,7 +155,7 @@ class Item extends Model
             }
         });
 
-        static::updating(function ($model) {
+        static::updating(function (Item $model) {
             // Generate upload_path if empty (for existing records)
             if (empty($model->upload_path)) {
                 $model->upload_path = $model->generateUploadPath();
