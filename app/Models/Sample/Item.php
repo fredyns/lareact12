@@ -216,15 +216,4 @@ class Item extends Model
             $this->id
         );
     }
-
-    /**
-     * Get the full file path within the upload directory.
-     *
-     * @param string $filename
-     * @return string
-     */
-    public function getFilePath(string $filename): string
-    {
-        return $this->upload_path . '/' . $filename;
-    }
 }
