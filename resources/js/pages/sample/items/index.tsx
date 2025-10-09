@@ -9,8 +9,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, Item } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
+import { type BreadcrumbItem, Item, PageProps } from '@/types';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
   ArrowDown,
   ArrowUp,
@@ -126,8 +126,10 @@ export default function ItemsIndex({ items, filters, enumerateOptions }: Props) 
     return filters.sort_direction === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />;
   };
 
+  const { locale } = usePage<PageProps>().props;
+
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString(locale, {
       year: 'numeric',
       month: 'short',
       day: 'numeric',

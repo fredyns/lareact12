@@ -57,6 +57,7 @@ export interface Auth {
 
 export interface SharedData {
   name: string;
+  locale: string;
   quote: { message: string; author: string };
   auth: Auth;
   sidebarOpen: boolean;
@@ -86,3 +87,7 @@ export interface BreadcrumbItem {
   title: string;
   href: string;
 }
+
+// Page Props
+
+export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & SharedData;
