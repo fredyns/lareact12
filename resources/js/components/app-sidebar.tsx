@@ -16,7 +16,7 @@ import sample from '@/routes/sample';
 import users from '@/routes/users';
 import { type NavItem, type NavGroup } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Users, Shield, Key, Package } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, Users, Shield, Key, Package, Ship, Anchor, Building2 } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -28,6 +28,26 @@ const mainNavItems: NavItem[] = [
 ];
 
 const navGroups: NavGroup[] = [
+    {
+        title: 'Landing Pages',
+        items: [
+            {
+                title: 'Home',
+                href: '/landing/home',
+                icon: Ship,
+            },
+            {
+                title: 'Services',
+                href: '/landing/services',
+                icon: Anchor,
+            },
+            {
+                title: 'About Us',
+                href: '/landing/about',
+                icon: Building2,
+            },
+        ],
+    },
     {
         title: 'System',
         items: [

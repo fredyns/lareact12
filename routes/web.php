@@ -11,8 +11,23 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('welcome');
+    return redirect('/landing/home');
 })->name('home');
+
+// Landing Pages Routes - Public (no auth required)
+Route::prefix('landing')->name('landing.')->group(function () {
+    Route::get('home', function () {
+        return Inertia::render('landing/home');
+    })->name('home');
+
+    Route::get('services', function () {
+        return Inertia::render('landing/services');
+    })->name('services');
+
+    Route::get('about', function () {
+        return Inertia::render('landing/about');
+    })->name('about');
+});
 
 // File Download Routes - Serve files from S3/MinIO through application domain
 Route::get('downloads/{path}', [DownloadController::class, 'serve'])
