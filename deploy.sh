@@ -25,6 +25,7 @@ php artisan cache:clear
 php artisan event:cache
 #php artisan icons:cache
 npm run build
+php artisan wayfinder:generate
 
 # supervisor
 #supervisorctl status
