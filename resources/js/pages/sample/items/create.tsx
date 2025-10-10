@@ -47,8 +47,8 @@ export default function Create({ enumerateOptions }: Props) {
     image: '',
     markdown_text: '',
     wysiwyg: '',
-    latitude: 0,
-    longitude: 0,
+    latitude: null,
+    longitude: null,
     user_id: '',
   });
 

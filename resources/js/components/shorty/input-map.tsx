@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogHeader, DialogOverlay, DialogPortal, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogDescription, DialogHeader, DialogOverlay, DialogPortal, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
@@ -19,6 +19,9 @@ L.Icon.Default.mergeOptions({
 
 // Zoom level 11 is approximately 5km view
 const DEFAULT_ZOOM = 11;
+
+// Default center: Jakarta, Indonesia
+const DEFAULT_CENTER: [number, number] = [-6.2088, 106.8456];
 
 // Component to add scale control to react-leaflet map
 function ScaleControl() {
@@ -59,10 +62,10 @@ const ClickableMarker = ({ position, onPositionChange, disabled = false }: Click
 };
 
 interface InputMapProps {
-  latitude: number;
-  longitude: number;
-  onLatitudeChange: (value: number) => void;
-  onLongitudeChange: (value: number) => void;
+  latitude: number | null;
+  longitude: number | null;
+  onLatitudeChange: (value: number | null) => void;
+  onLongitudeChange: (value: number | null) => void;
   latitudeError?: string;
   longitudeError?: string;
   ratio?: number;
@@ -84,8 +87,8 @@ export function InputMap({
   disabled = false,
 }: InputMapProps) {
   const [showMapModal, setShowMapModal] = useState(false);
-  const [tempLat, setTempLat] = useState(latitude);
-  const [tempLng, setTempLng] = useState(longitude);
+  const [tempLat, setTempLat] = useState(latitude ?? DEFAULT_CENTER[0]);
+  const [tempLng, setTempLng] = useState(longitude ?? DEFAULT_CENTER[1]);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const thumbnailMapRef = useRef<L.Map | null>(null);
   const thumbnailContainerRef = useRef<HTMLDivElement>(null);
@@ -154,36 +157,67 @@ export function InputMap({
   useEffect(() => {
     if (!isValidLocation || !thumbnailContainerRef.current || dimensions.width === 0) return;
 
-    const map = L.map(thumbnailContainerRef.current, {
-      center: [latitude, longitude],
-      zoom: zoom,
-      zoomControl: false,
-      dragging: false,
-      scrollWheelZoom: false,
-      doubleClickZoom: false,
-      boxZoom: false,
-      keyboard: false,
-      attributionControl: false,
-    });
+    // Small delay to ensure the DOM is ready
+    const timeoutId = setTimeout(() => {
+      if (!thumbnailContainerRef.current) return;
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-    L.marker([latitude, longitude]).addTo(map);
-    L.control.scale({ position: 'bottomleft', imperial: false }).addTo(map);
+      // Remove existing map if it exists
+      if (thumbnailMapRef.current) {
+        try {
+          thumbnailMapRef.current.remove();
+        } catch (e) {
+          console.warn('Error removing map:', e);
+        }
+        thumbnailMapRef.current = null;
+      }
 
-    thumbnailMapRef.current = map;
+      // Clear the container
+      thumbnailContainerRef.current.innerHTML = '';
 
-    setTimeout(() => {
-      map.invalidateSize();
-    }, 100);
+      try {
+        const map = L.map(thumbnailContainerRef.current, {
+          center: [latitude, longitude],
+          zoom: zoom,
+          zoomControl: false,
+          dragging: false,
+          scrollWheelZoom: false,
+          doubleClickZoom: false,
+          boxZoom: false,
+          keyboard: false,
+          attributionControl: false,
+        });
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        L.marker([latitude, longitude]).addTo(map);
+        L.control.scale({ position: 'bottomleft', imperial: false }).addTo(map);
+
+        thumbnailMapRef.current = map;
+
+        // Multiple invalidateSize calls to ensure proper rendering
+        setTimeout(() => map.invalidateSize(), 50);
+        setTimeout(() => map.invalidateSize(), 200);
+        setTimeout(() => map.invalidateSize(), 500);
+      } catch (e) {
+        console.error('Error creating map:', e);
+      }
+    }, 10);
 
     return () => {
-      map.remove();
+      clearTimeout(timeoutId);
+      if (thumbnailMapRef.current) {
+        try {
+          thumbnailMapRef.current.remove();
+        } catch (e) {
+          console.warn('Error removing map on cleanup:', e);
+        }
+        thumbnailMapRef.current = null;
+      }
     };
   }, [latitude, longitude, zoom, isValidLocation, dimensions]);
 
   const handleOpenModal = () => {
-    setTempLat(latitude);
-    setTempLng(longitude);
+    setTempLat(latitude ?? DEFAULT_CENTER[0]);
+    setTempLng(longitude ?? DEFAULT_CENTER[1]);
     setShowMapModal(true);
   };
 
@@ -198,6 +232,11 @@ export function InputMap({
     setTempLng(lng);
   };
 
+  const handleClearLocation = () => {
+    onLatitudeChange(null);
+    onLongitudeChange(null);
+  };
+
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
@@ -205,21 +244,34 @@ export function InputMap({
           <Label htmlFor="latitude">
             Latitude {required && <span className="text-destructive">*</span>}
           </Label>
-          <Input
-            id="latitude"
-            type="number"
-            step="0.001"
-            min="-90"
-            max="90"
-            value={latitude}
-            onChange={(e) => {
-              const lat = parseFloat(e.target.value);
-              onLatitudeChange(lat);
-            }}
-            placeholder="Enter latitude"
-            className={latitudeError ? 'border-destructive' : ''}
-            disabled={disabled}
-          />
+          <div className="relative">
+            <Input
+              id="latitude"
+              type="number"
+              step="0.001"
+              min="-90"
+              max="90"
+              value={latitude ?? ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                const lat = value === '' ? null : parseFloat(value);
+                onLatitudeChange(lat);
+              }}
+              placeholder="Enter latitude"
+              className={`${latitudeError ? 'border-destructive' : ''} ${!required && latitude !== null ? 'pr-10' : ''}`}
+              disabled={disabled}
+            />
+            {!required && latitude !== null && (
+              <button
+                type="button"
+                onClick={handleClearLocation}
+                disabled={disabled}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
           {latitudeError && <p className="text-sm text-destructive">{latitudeError}</p>}
         </div>
 
@@ -227,21 +279,34 @@ export function InputMap({
           <Label htmlFor="longitude">
             Longitude {required && <span className="text-destructive">*</span>}
           </Label>
-          <Input
-            id="longitude"
-            type="number"
-            step="0.001"
-            min="-180"
-            max="180"
-            value={longitude}
-            onChange={(e) => {
-              const lng = parseFloat(e.target.value);
-              onLongitudeChange(lng);
-            }}
-            placeholder="Enter longitude"
-            className={longitudeError ? 'border-destructive' : ''}
-            disabled={disabled}
-          />
+          <div className="relative">
+            <Input
+              id="longitude"
+              type="number"
+              step="0.001"
+              min="-180"
+              max="180"
+              value={longitude ?? ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                const lng = value === '' ? null : parseFloat(value);
+                onLongitudeChange(lng);
+              }}
+              placeholder="Enter longitude"
+              className={`${longitudeError ? 'border-destructive' : ''} ${!required && longitude !== null ? 'pr-10' : ''}`}
+              disabled={disabled}
+            />
+            {!required && longitude !== null && (
+              <button
+                type="button"
+                onClick={handleClearLocation}
+                disabled={disabled}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
           {longitudeError && <p className="text-sm text-destructive">{longitudeError}</p>}
         </div>
       </div>
@@ -249,6 +314,7 @@ export function InputMap({
       <div className="mt-2">
         {isValidLocation ? (
           <div
+            key={`map-${latitude}-${longitude}`}
             ref={thumbnailContainerRef}
             className={`w-full rounded-lg border ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer transition-opacity hover:opacity-80'}`}
             style={{
@@ -279,6 +345,9 @@ export function InputMap({
           <DialogPrimitive.Content className="fixed left-[50%] top-[50%] z-[9999] h-[90vh] w-[90vw] max-w-6xl translate-x-[-50%] translate-y-[-50%] overflow-hidden rounded-lg bg-background p-6 shadow-lg">
             <DialogHeader>
               <DialogTitle>Select Location</DialogTitle>
+              <DialogDescription>
+                Click on the map to select a location. The coordinates will be displayed above the map.
+              </DialogDescription>
               <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
                 <X className="h-4 w-4" />
                 <span className="sr-only">Close</span>
@@ -297,7 +366,7 @@ export function InputMap({
               </div>
               <div className="h-[calc(90vh-16rem)]">
                 <MapContainer
-                  center={[tempLat || 0, tempLng || 0]}
+                  center={[tempLat || DEFAULT_CENTER[0], tempLng || DEFAULT_CENTER[1]]}
                   zoom={zoom}
                   style={{
                     height: '100%',
@@ -310,18 +379,35 @@ export function InputMap({
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
-                  <ClickableMarker position={[tempLat || 0, tempLng || 0]} onPositionChange={handleTempPositionChange} disabled={disabled} />
+                  <ClickableMarker position={[tempLat || DEFAULT_CENTER[0], tempLng || DEFAULT_CENTER[1]]} onPositionChange={handleTempPositionChange} disabled={disabled} />
                   <ScaleControl />
                 </MapContainer>
               </div>
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setShowMapModal(false)}>
-                  Cancel
-                </Button>
-                <Button onClick={handleSelectLocation} disabled={disabled}>
-                  <MapPin className="mr-2 h-4 w-4" />
-                  Select This Location
-                </Button>
+              <div className="flex justify-between gap-2">
+                {!required && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      handleClearLocation();
+                      setShowMapModal(false);
+                    }}
+                    disabled={disabled}
+                    className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                  >
+                    <X className="mr-2 h-4 w-4" />
+                    Clear Location
+                  </Button>
+                )}
+                <div className="flex gap-2 ml-auto">
+                  <Button variant="outline" onClick={() => setShowMapModal(false)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleSelectLocation} disabled={disabled}>
+                    <MapPin className="mr-2 h-4 w-4" />
+                    Select This Location
+                  </Button>
+                </div>
               </div>
             </div>
           </DialogPrimitive.Content>

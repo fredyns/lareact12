@@ -48,8 +48,8 @@ export default function Edit({ item, enumerateOptions }: Props) {
     image: item.image || '',
     markdown_text: item.markdown_text || '',
     wysiwyg: item.wysiwyg || '',
-    latitude: item.latitude || 0,
-    longitude: item.longitude || 0,
+    latitude: item.latitude ?? null,
+    longitude: item.longitude ?? null,
     user_id: item.user_id || '',
     _method: 'PUT',
   });

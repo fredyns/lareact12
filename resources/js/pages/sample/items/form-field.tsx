@@ -37,8 +37,8 @@ interface FormData {
   image: string;
   markdown_text: string;
   wysiwyg: string;
-  latitude: number;
-  longitude: number;
+  latitude: number | null;
+  longitude: number | null;
   user_id: string;
 }
 
