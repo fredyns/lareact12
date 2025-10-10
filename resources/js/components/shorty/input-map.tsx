@@ -92,11 +92,20 @@ export function InputMap({
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const thumbnailMapRef = useRef<L.Map | null>(null);
   const thumbnailContainerRef = useRef<HTMLDivElement>(null);
+  const [mapKey, setMapKey] = useState(0);
 
   const isValidLocation = latitude !== null && longitude !== null && !isNaN(latitude) && !isNaN(longitude);
 
   // Clamp ratio between 1/3 and 3/1
   const clampedRatio = Math.max(1 / 3, Math.min(3, ratio));
+
+  // Force map re-creation when coordinates become valid AND dimensions are ready
+  useEffect(() => {
+    if (isValidLocation && dimensions.width > 0 && dimensions.height > 0) {
+      // Increment mapKey to force re-render with proper dimensions
+      setMapKey(prev => prev + 1);
+    }
+  }, [isValidLocation, dimensions.width, dimensions.height]);
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -140,7 +149,12 @@ export function InputMap({
       }
     };
 
+    // Initial calculation
     updateDimensions();
+    
+    // Retry after a short delay to ensure DOM is ready
+    const timer = setTimeout(updateDimensions, 100);
+    
     window.addEventListener('resize', updateDimensions);
 
     const resizeObserver = new ResizeObserver(updateDimensions);
@@ -149,17 +163,22 @@ export function InputMap({
     }
 
     return () => {
+      clearTimeout(timer);
       window.removeEventListener('resize', updateDimensions);
       resizeObserver.disconnect();
     };
-  }, [clampedRatio]);
+  }, [clampedRatio, isValidLocation]);
 
   useEffect(() => {
-    if (!isValidLocation || !thumbnailContainerRef.current || dimensions.width === 0) return;
+    if (!isValidLocation || !thumbnailContainerRef.current || dimensions.width === 0 || dimensions.height === 0) {
+      return;
+    }
 
-    // Small delay to ensure the DOM is ready
+    // Longer delay to ensure the DOM is ready, especially when transitioning from null to valid location
     const timeoutId = setTimeout(() => {
-      if (!thumbnailContainerRef.current) return;
+      if (!thumbnailContainerRef.current) {
+        return;
+      }
 
       // Remove existing map if it exists
       if (thumbnailMapRef.current) {
@@ -185,6 +204,7 @@ export function InputMap({
           boxZoom: false,
           keyboard: false,
           attributionControl: false,
+          preferCanvas: true,
         });
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
@@ -193,6 +213,11 @@ export function InputMap({
 
         thumbnailMapRef.current = map;
 
+        // Force immediate invalidation
+        requestAnimationFrame(() => {
+          map.invalidateSize();
+        });
+        
         // Multiple invalidateSize calls to ensure proper rendering
         setTimeout(() => map.invalidateSize(), 50);
         setTimeout(() => map.invalidateSize(), 200);
@@ -200,7 +225,7 @@ export function InputMap({
       } catch (e) {
         console.error('Error creating map:', e);
       }
-    }, 10);
+    }, 250);
 
     return () => {
       clearTimeout(timeoutId);
@@ -314,7 +339,7 @@ export function InputMap({
       <div className="mt-2">
         {isValidLocation ? (
           <div
-            key={`map-${latitude}-${longitude}`}
+            key={`map-${mapKey}-${latitude}-${longitude}`}
             ref={thumbnailContainerRef}
             className={`w-full rounded-lg border ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer transition-opacity hover:opacity-80'}`}
             style={{
