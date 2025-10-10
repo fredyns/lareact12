@@ -329,32 +329,32 @@ class MinioService
     }
 
     /**
-     * Move a file to a target folder and update the reference
-     * The file path variable is updated directly via reference
+     * Move a file to a target folder and return the new path
+     * This is a cleaner alternative to moveToFolder() that doesn't use references
      *
-     * @param string|null &$filePath Reference to the file path variable to move and update
+     * @param string|null $filePath The file path to move
      * @param string|null $targetFolder The destination folder path (uses setFolder if null)
-     * @return bool True if file was moved successfully, false otherwise
+     * @return string|null The new file path if successful, null otherwise
      */
-    public function moveToFolder(?string &$filePath, ?string $targetFolder = null): bool
+    public function moveToFolder(?string $filePath, ?string $targetFolder = null): ?string
     {
+        // Skip null or empty paths
+        if (empty($filePath)) {
+            return null;
+        }
+
         // Use stored target folder if not provided
         $folder = $targetFolder ?? $this->targetFolder;
 
         if (empty($folder)) {
-            \Log::error("MinIO moveToFolder: No target folder specified");
-            return false;
-        }
-
-        // Skip null or empty paths
-        if (empty($filePath)) {
-            return false;
+            \Log::error("MinIO moveFileToFolder: No target folder specified");
+            return null;
         }
 
         // Check if file exists
         if (!$this->fileExists($filePath)) {
-            \Log::warning("MinIO moveToFolder: File does not exist: {$filePath}");
-            return false;
+            \Log::warning("MinIO moveFileToFolder: File does not exist: {$filePath}");
+            return null;
         }
 
         // Get the filename from the original path
@@ -365,72 +365,70 @@ class MinioService
 
         // Move the file
         if ($this->moveFile($filePath, $newPath)) {
-            // Update the reference with the new path
-            $filePath = $newPath;
-            return true;
+            return $newPath;
         }
 
-        \Log::error("MinIO moveToFolder: Failed to move file from {$filePath} to {$newPath}");
-        return false;
+        \Log::error("MinIO moveFileToFolder: Failed to move file from {$filePath} to {$newPath}");
+        return null;
     }
 
-    /**
-     * Update a file by deleting the old one and uploading a new one
-     * The file path variable is updated directly via reference
-     * Handles both file uploads and already-uploaded file paths (two-step upload)
-     *
-     * @param string|null &$filePath Reference to the current file path variable to update
-     * @param mixed $request The request object (e.g., Illuminate\Http\Request)
-     * @param string $field The field name in the request (e.g., 'file', 'image')
-     * @return bool True if file was updated successfully, false otherwise
-     */
-    public function updateFile(?string &$filePath, $request, string $field): bool
-    {
-        // Case 1: Handle actual file upload
-        if ($request->hasFile($field)) {
-            // Use stored target folder
-            if (empty($this->targetFolder)) {
-                \Log::error("MinIO updateFile: No target folder specified. Call setFolder() first.");
-                return false;
-            }
-
-            // Delete old file if exists
-            if (!empty($filePath) && $this->fileExists($filePath)) {
-                $this->deleteFile($filePath);
-            }
-
-            // Upload new file
-            $newPath = $this->uploadFile(
-                $request->file($field),
-                $this->targetFolder
-            );
-
-            if ($newPath) {
-                // Update the reference with the new path
-                $filePath = $newPath;
-                return true;
-            }
-
-            \Log::error("MinIO updateFile: Failed to upload file for field {$field}");
-            return false;
-        }
-
-        // Case 2: Handle already-uploaded file path (two-step upload process)
-        if ($request->has($field) && is_string($request->input($field))) {
-            $newPath = $request->input($field);
-            
-            // Validate that the file exists in MinIO
-            if (!empty($newPath) && $this->fileExists($newPath)) {
-                // Update the reference with the new path
-                $filePath = $newPath;
-                return true;
-            }
-            
-            \Log::warning("MinIO updateFile: File path provided but file does not exist: {$newPath}");
-            return false;
-        }
-
-        // No file provided
-        return false;
-    }
+//    /**
+//     * Update a file by deleting the old one and uploading a new one
+//     * The file path variable is updated directly via reference
+//     * Handles both file uploads and already-uploaded file paths (two-step upload)
+//     *
+//     * @param string|null &$filePath Reference to the current file path variable to update
+//     * @param mixed $request The request object (e.g., Illuminate\Http\Request)
+//     * @param string $field The field name in the request (e.g., 'file', 'image')
+//     * @return bool True if file was updated successfully, false otherwise
+//     */
+//    public function updateFile(?string &$filePath, $request, string $field): bool
+//    {
+//        // Case 1: Handle actual file upload
+//        if ($request->hasFile($field)) {
+//            // Use stored target folder
+//            if (empty($this->targetFolder)) {
+//                \Log::error("MinIO updateFile: No target folder specified. Call setFolder() first.");
+//                return false;
+//            }
+//
+//            // Delete old file if exists
+//            if (!empty($filePath) && $this->fileExists($filePath)) {
+//                $this->deleteFile($filePath);
+//            }
+//
+//            // Upload new file
+//            $newPath = $this->uploadFile(
+//                $request->file($field),
+//                $this->targetFolder
+//            );
+//
+//            if ($newPath) {
+//                // Update the reference with the new path
+//                $filePath = $newPath;
+//                return true;
+//            }
+//
+//            \Log::error("MinIO updateFile: Failed to upload file for field {$field}");
+//            return false;
+//        }
+//
+//        // Case 2: Handle already-uploaded file path (two-step upload process)
+//        if ($request->has($field) && is_string($request->input($field))) {
+//            $newPath = $request->input($field);
+//            
+//            // Validate that the file exists in MinIO
+//            if (!empty($newPath) && $this->fileExists($newPath)) {
+//                // Update the reference with the new path
+//                $filePath = $newPath;
+//                return true;
+//            }
+//            
+//            \Log::warning("MinIO updateFile: File path provided but file does not exist: {$newPath}");
+//            return false;
+//        }
+//
+//        // No file provided
+//        return false;
+//    }
 }

@@ -117,9 +117,8 @@ class ItemController extends Controller
         // Move uploaded files from temporary location to final location
         // Temporary: tmp/sample_items/2025/10/01/filename.ext
         // Final: sample_items/2025/10/01/{modelID}/filename.ext
-        $this->minioService->setFolder($item->upload_path);
-        $this->minioService->moveToFolder($item->file);
-        $this->minioService->moveToFolder($item->image);
+        $item->file = $this->minioService->moveToFolder($item->file, $item->upload_path) ?? $item->file;
+        $item->image = $this->minioService->moveToFolder($item->image, $item->upload_path) ?? $item->image;
 
         // Save updated file paths if any files were moved
         if ($item->isDirty(['file', 'image'])) {
@@ -194,16 +193,25 @@ class ItemController extends Controller
 
         $data = $request->validated();
 
-        // Set target folder for file operations
-        $this->minioService->setFolder($item->upload_path);
-
-        // Handle file uploads using MinIO (handles both file uploads and already-uploaded paths)
-        if ($this->minioService->updateFile($item->file, $request, 'file')) {
-            $data['file'] = $item->file;
+        // Handle file uploads using MinIO
+        // If new file uploaded, it will be in the request data
+        // If not, keep the existing file path
+        if ($request->hasFile('file')) {
+            // Delete old file if exists
+            if ($item->file) {
+                $this->minioService->deleteFile($item->file);
+            }
+            // Move new file to final location
+            $data['file'] = $this->minioService->moveToFolder($data['file'], $item->upload_path) ?? $data['file'];
         }
 
-        if ($this->minioService->updateFile($item->image, $request, 'image')) {
-            $data['image'] = $item->image;
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($item->image) {
+                $this->minioService->deleteFile($item->image);
+            }
+            // Move new image to final location
+            $data['image'] = $this->minioService->moveToFolder($data['image'], $item->upload_path) ?? $data['image'];
         }
 
         $item->update($data);
