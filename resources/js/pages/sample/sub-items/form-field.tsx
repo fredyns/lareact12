@@ -18,6 +18,7 @@ import { InputTime } from '@/components/shorty/input-time';
 import { InputWysiwyg } from '@/components/shorty/input-wysiwyg';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { SubItem } from '@/types';
+import { ShowField } from '@/components/shorty/show-field';
 
 interface FormData {
   string: string;
@@ -101,15 +102,15 @@ export function FormField({
     <>
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="space-y-6">
-          {/* Basic Information */}
           <Card>
             <CardHeader>
-              <CardTitle>Basic Information</CardTitle>
+              <CardTitle>Parent Item</CardTitle>
             </CardHeader>
             <CardContent>
+              {/* Parent Item Card */}
               <InputSelectFromResource
                 id="item_id"
-                label="Parent Item"
+                label="Name"
                 onChange={(value) => setData('item_id', value)}
                 apiEndpoint="/sample/items"
                 labelField="string"
@@ -117,7 +118,15 @@ export function FormField({
                 error={errors.item_id}
                 required
               />
+            </CardContent>
+          </Card>
 
+          {/* Basic Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Basic Information</CardTitle>
+            </CardHeader>
+            <CardContent>
               <InputString
                 id="string"
                 label="String"

@@ -11,14 +11,14 @@ import { ShowWysiwyg } from '@/components/shorty/show-wysiwyg';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, Item } from '@/types';
+import { type BreadcrumbItem, SubItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, Check, Edit, Trash2, X } from 'lucide-react';
 import { dashboard } from '@/routes';
 import sample from '@/routes/sample';
 
 interface Props {
-  subItem: Item;
+  subItem: SubItem;
   enumerateOptions: { value: string; label: string }[];
 }
 
@@ -59,7 +59,7 @@ export default function Show({ subItem, enumerateOptions }: Props) {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">{subItem.string}</h1>
-            <p className="text-muted-foreground">Item details and information</p>
+            <p className="text-muted-foreground">Sub-item details and information</p>
           </div>
           <div className="flex items-center space-x-2">
             <Link href={sample.subItems.index.url()}>
@@ -83,6 +83,23 @@ export default function Show({ subItem, enumerateOptions }: Props) {
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <div className="space-y-6">
+            {/* Parent Item Card */}
+            {subItem.item && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Parent Item</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <ShowField label="Name" value={subItem.item.string} />
+                      <ShowField label="Email" value={subItem.item.email} />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Basic Information Card */}
             <Card>
               <CardHeader>
@@ -98,7 +115,6 @@ export default function Show({ subItem, enumerateOptions }: Props) {
                 <ShowField label="Integer" value={subItem.integer} />
 
                 <ShowField label="Decimal" value={subItem.decimal} />
-
                 <ShowField label="NPWP" value={subItem.npwp} />
 
                 <ShowBadge
@@ -137,7 +153,9 @@ export default function Show({ subItem, enumerateOptions }: Props) {
                 <ShowField label="Boolean" value={subItem.boolean ? 'True' : 'False'} />
               </CardContent>
             </Card>
+          </div>
 
+          <div className="space-y-6">
             {/* Location */}
             <Card>
               <CardHeader>
@@ -147,9 +165,7 @@ export default function Show({ subItem, enumerateOptions }: Props) {
                 <ShowMap latitude={subItem.latitude} longitude={subItem.longitude} popupText={subItem.string} />
               </CardContent>
             </Card>
-          </div>
 
-          <div className="space-y-6">
             {/* Files */}
             <Card>
               <CardHeader>

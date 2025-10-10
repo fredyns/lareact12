@@ -68,8 +68,8 @@ export default function Edit({ subItem, enumerateOptions }: Props) {
       <div className="mx-auto flex h-full flex-1 flex-col gap-4 p-4 lg:w-7xl">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Edit Item</h1>
-            <p className="text-muted-foreground">Update item information and settings</p>
+            <h1 className="text-2xl font-bold tracking-tight">Edit Sub-Item</h1>
+            <p className="text-muted-foreground">Update sub-item information and settings</p>
           </div>
           <Link href={sample.subItems.index.url()}>
             <Button variant="outline">

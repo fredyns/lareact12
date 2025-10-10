@@ -66,8 +66,8 @@ export default function Create({ enumerateOptions }: Props) {
       <div className="mx-auto flex h-full flex-1 flex-col gap-4 p-4 lg:w-7xl">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Create Item</h1>
-            <p className="text-muted-foreground">Add a new sample sub item to the system</p>
+            <h1 className="text-2xl font-bold tracking-tight">Create Sub-Item</h1>
+            <p className="text-muted-foreground">Add a new sample sub-item to the system</p>
           </div>
           <Link href={sample.subItems.index.url()}>
             <Button variant="outline">
