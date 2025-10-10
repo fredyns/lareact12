@@ -26,11 +26,40 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - eslint (ESLINT) - v9
 - prettier (PRETTIER) - v3
 
+## Code Generator
+
+This will guide future CRUD application development with:
+
+### Database Layer
+- Migration (Create Table): Following database/migrations/2025_09_25_061659_create_sample_items_table.php pattern
+- Migration (Foreign Keys): Separate migration for relationships
+- Migration (Permissions): Following database/migrations/2025_09_25_061844_add_sample_items_permissions.php pattern and extend from 'App\Database\Migrations\BasePermissionMigration'
+- Model: With DocBlock, implementing Searchable trait (app/Models/Sample/Item.php)
+- Factory: Following database/factories/Sample/ItemFactory.php pattern
+- Seeder: Following database/seeders/Sample/ItemSeeder.php pattern, registered in DatabaseSeeder.php
+
+- ### Backend Layer
+- Policy: app/Policies/Sample/ItemPolicy.php
+- Request: app/Http/Requests/Sample/ItemRequest.php
+- Resource: app/Http/Resources/Sample/ItemResource.php
+- Resource Collection: app/Http/Resources/Sample/ItemCollection.php
+- Controller: app/Http/Controllers/Sample/ItemController.php
+- Test: tests/Feature/Sample/ItemTest.php
+
+### Frontend Layer
+- index: resources/js/pages/sample/items/index.tsx
+- form-field Component: resources/js/pages/sample/items/form.tsx (reusable, with shorty components, adjusted card layouts)
+- create: resources/js/pages/sample/items/create.tsx (includes form component)
+- show: resources/js/pages/sample/items/show.tsx (shorty components, adjusted card layouts)
+- edit: resources/js/pages/sample/items/edit.tsx (includes form component)
 
 ## Conventions
 - You must follow all existing code conventions used in this application. When creating or editing a file, check sibling files for the correct structure, approach, naming.
 - Use descriptive names for variables and methods. For example, `isRegisteredForDiscounts`, not `discount()`.
 - Check for existing components to reuse before writing a new one.
+- Frontend layer files should be named in kebab-case
+- all files and folders under 'resources/js' are named in kebab-case
+- for common interfaces, use or create in 'resources/js/types/index.ts'.
 
 ## Verification Scripts
 - Do not create verification scripts or tinker when tests cover that functionality and prove it works. Unit and feature tests are more important.
