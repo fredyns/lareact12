@@ -16,7 +16,7 @@ import sample from '@/routes/sample';
 import users from '@/routes/users';
 import { type NavItem, type NavGroup } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Users, Shield, Key, Package, Ship, Anchor, Building2 } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, Users, Shield, Key, Package, Ship, Anchor, Building2, Layers } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -65,6 +65,11 @@ const navGroups: NavGroup[] = [
                 title: 'Items',
                 href: sample.items.index.url(),
                 icon: Package,
+            },
+            {
+                title: 'Sub Items',
+                href: '/sample/sub-items',
+                icon: Layers,
             },
         ],
     },

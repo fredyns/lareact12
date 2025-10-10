@@ -49,6 +49,42 @@ export interface Item {
   updater?: User;
 }
 
+export interface SubItem {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  created_by: string | null;
+  updated_by: string | null;
+  item_id: string;
+  user_id: string | null;
+  string: string;
+  email: string | null;
+  color: string | null;
+  integer: number | null;
+  decimal: number | null;
+  npwp: string | null;
+  datetime: string | null;
+  date: string | null;
+  time: string | null;
+  ip_address: string | null;
+  boolean: boolean | null;
+  enumerate: string | null;
+  text: string | null;
+  file: string | null;
+  file_url: string | null;
+  image: string | null;
+  image_url: string | null;
+  markdown_text: string | null;
+  wysiwyg: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  upload_path: string | null;
+  item?: Item;
+  user?: User;
+  creator?: User;
+  updater?: User;
+}
+
 // Data Structures
 
 export interface Auth {

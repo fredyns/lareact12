@@ -4,6 +4,7 @@ use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\RBAC\PermissionController;
 use App\Http\Controllers\RBAC\RoleController;
 use App\Http\Controllers\Sample\ItemController;
+use App\Http\Controllers\Sample\SubItemController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -43,7 +44,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
-    // RBAC Routes with prefix and namespace
+    // Select Options Routes with prefix and namespace
     Route::prefix('select-options')->name('select-options.')->group(function () {
         // API endpoint for users dropdown
         Route::get('users', function (Request $request) {
@@ -85,6 +86,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Sample Routes with prefix and namespace
     Route::prefix('sample')->name('sample.')->group(function () {
         Route::resource('items', ItemController::class);
+        Route::resource('sub-items', SubItemController::class);
     });
 });
 

@@ -8,17 +8,17 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 /**
- * App\Models\Sample\Item
+ * App\Models\Sample\SubItem
  *
  * @property string $id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $created_by
  * @property string|null $updated_by
+ * @property string $item_id
  * @property string|null $user_id
  * @property string $string
  * @property string|null $email
@@ -40,12 +40,12 @@ use Illuminate\Support\Str;
  * @property float|null $latitude
  * @property float|null $longitude
  * @property string|null $upload_path
+ * @property-read Item $item
  * @property-read User|null $user
  * @property-read User|null $creator
  * @property-read User|null $updater
- * @property-read \Illuminate\Database\Eloquent\Collection<int, SubItem> $subItems
  */
-class Item extends Model
+class SubItem extends Model
 {
     use HasFactory;
     use Searchable;
@@ -55,7 +55,7 @@ class Item extends Model
      *
      * @var string
      */
-    protected $table = 'sample_items';
+    protected $table = 'sample_sub_items';
 
     /**
      * The "type" of the primary key ID.
@@ -77,6 +77,7 @@ class Item extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'item_id',
         'user_id',
         'string',
         'email',
@@ -141,7 +142,7 @@ class Item extends Model
     {
         parent::boot();
 
-        static::creating(function (Item $model) {
+        static::creating(function (SubItem $model) {
             if (empty($model->{$model->getKeyName()})) {
                 $model->{$model->getKeyName()} = (string)Str::uuid();
             }
@@ -157,7 +158,7 @@ class Item extends Model
             }
         });
 
-        static::updating(function (Item $model) {
+        static::updating(function (SubItem $model) {
             // Generate upload_path if empty (for existing records)
             if (empty($model->upload_path)) {
                 $model->upload_path = $model->generateUploadPath();
@@ -170,7 +171,17 @@ class Item extends Model
     }
 
     /**
-     * Get the user that owns the item.
+     * Get the parent item that owns the sub-item.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function item(): BelongsTo
+    {
+        return $this->belongsTo(Item::class, 'item_id');
+    }
+
+    /**
+     * Get the user that owns the sub-item.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -180,7 +191,7 @@ class Item extends Model
     }
 
     /**
-     * Get the user that created the item.
+     * Get the user that created the sub-item.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -190,7 +201,7 @@ class Item extends Model
     }
 
     /**
-     * Get the user that last updated the item.
+     * Get the user that last updated the sub-item.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -200,17 +211,7 @@ class Item extends Model
     }
 
     /**
-     * Get the sub-items for this item.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function subItems(): HasMany
-    {
-        return $this->hasMany(SubItem::class, 'item_id');
-    }
-
-    /**
-     * Generate the upload path for this item.
+     * Generate the upload path for this sub-item.
      * Format: {tableName}/{year}/{month}/{day}/{modelID}
      *
      * @return string
