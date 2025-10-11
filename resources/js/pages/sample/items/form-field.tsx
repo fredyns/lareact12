@@ -11,7 +11,7 @@ import { InputMap } from '@/components/shorty/input-map';
 import { InputMarkdown } from '@/components/shorty/input-markdown';
 import { InputNpwp } from '@/components/shorty/input-npwp';
 import { InputNumber } from '@/components/shorty/input-number';
-import { InputSelectFromTable } from '@/components/shorty/input-select-from-table';
+import { InputSelectUser } from '@/components/select-from-table/input-select-user';
 import { InputString } from '@/components/shorty/input-string';
 import { InputTextarea } from '@/components/shorty/input-textarea';
 import { InputTime } from '@/components/shorty/input-time';
@@ -169,11 +169,10 @@ export function FormField({
                 error={errors.enumerate}
               />
 
-              <InputSelectFromTable
+              <InputSelectUser
                 id="user_id"
                 label="User"
                 onChange={(value) => setData('user_id', value)}
-                apiEndpoint="/select-options/users"
                 defaultValue={userDefaultValue}
                 error={errors.user_id}
               />
