@@ -48,26 +48,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Enum API Routes
     Route::get('enums/{enumClass}', [EnumController::class, 'show'])->name('enums.show');
 
-    // Select Options Routes with prefix and namespace
-    Route::prefix('select-options')->name('select-options.')->group(function () {
-        // API endpoint for users dropdown
-        Route::get('users', function (Request $request) {
-            $search = (string)$request->input('search', '');
-            $users = \App\Models\User::search($search)
-                ->select('id', 'name', 'email')
-                ->limit(10)
-                ->get()
-                ->map(function ($user) {
-                    return [
-                        'value' => $user->id,
-                        'label' => $user->name . ' (' . $user->email . ')',
-                    ];
-                });
-
-            return response()->json($users);
-        });
-    });
-
     // Generic Upload Routes for MinIO
     Route::prefix('upload')->name('upload.')->group(function () {
         Route::post('file', [UploadController::class, 'uploadFile'])->name('file');
