@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DownloadController;
+use App\Http\Controllers\EnumController;
 use App\Http\Controllers\RBAC\PermissionController;
 use App\Http\Controllers\RBAC\RoleController;
 use App\Http\Controllers\Sample\ItemController;
@@ -43,6 +44,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
+
+    // Enum API Routes
+    Route::get('enums/{enumClass}', [EnumController::class, 'show'])->name('enums.show');
 
     // Select Options Routes with prefix and namespace
     Route::prefix('select-options')->name('select-options.')->group(function () {
