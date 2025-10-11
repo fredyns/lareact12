@@ -92,8 +92,8 @@ export default function Show({ subItem, enumerateOptions }: Props) {
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="space-y-2">
-                      <ShowField label="Name" value={subItem.item.string} />
-                      <ShowField label="Email" value={subItem.item.email} />
+                      <ShowField label="Name" value={subItem.item?.string} />
+                      <ShowField label="Email" value={subItem.item?.email} />
                     </div>
                   </div>
                 </CardContent>

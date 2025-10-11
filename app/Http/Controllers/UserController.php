@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResourceCollection;
 use App\Models\RBAC\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -32,6 +33,11 @@ class UserController extends Controller
         }
 
         $users = $query->paginate(10)->withQueryString();
+
+        // Return API response if requested
+        if ($request->wantsJson()) {
+            return new UserResourceCollection($users);
+        }
 
         return Inertia::render('users/index', [
             'users' => $users,
@@ -71,6 +77,14 @@ class UserController extends Controller
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
         ]);
+
+        // Return JSON for AJAX requests (e.g., from InputSelectUser component)
+        if ($request->wantsJson()) {
+            return response()->json([
+                'data' => $user->only(['id', 'name', 'email']),
+                'message' => 'User created successfully.',
+            ], 201);
+        }
 
         return redirect()->route('users.index')
             ->with('success', 'User created successfully.');
