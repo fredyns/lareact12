@@ -12,13 +12,13 @@ import { InputMarkdown } from '@/components/shorty/input-markdown';
 import { InputNpwp } from '@/components/shorty/input-npwp';
 import { InputNumber } from '@/components/shorty/input-number';
 import { InputSelectFromResource } from '@/components/shorty/input-select-from-resource';
+import { InputSelectSampleItem } from '@/components/select-from-table/input-select-sample-item';
 import { InputString } from '@/components/shorty/input-string';
 import { InputTextarea } from '@/components/shorty/input-textarea';
 import { InputTime } from '@/components/shorty/input-time';
 import { InputWysiwyg } from '@/components/shorty/input-wysiwyg';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { SubItem } from '@/types';
-import { ShowField } from '@/components/shorty/show-field';
+import type { SelectOption, SubItem } from '@/types';
 
 interface FormData {
   string: string;
@@ -72,7 +72,7 @@ interface FormFieldProps {
   data: FormData;
   setData: <K extends keyof FormData>(key: K, value: FormData[K]) => void;
   errors: FormErrors;
-  enumerateOptions: { value: string; label: string }[];
+  enumerateOptions: SelectOption[];
   // Optional: Pass subItem for edit mode to auto-populate optional props
   subItem?: SubItem;
   // Optional: Pass uploadPath directly for create mode
@@ -108,12 +108,10 @@ export function FormField({
             </CardHeader>
             <CardContent>
               {/* Parent Item Card */}
-              <InputSelectFromResource
+              <InputSelectSampleItem
                 id="item_id"
                 label="Name"
                 onChange={(value) => setData('item_id', value)}
-                apiEndpoint="/sample/items"
-                labelField="string"
                 defaultValue={itemDefaultValue}
                 error={errors.item_id}
                 required
