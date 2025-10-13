@@ -24,6 +24,7 @@ interface InputSelectUserProps {
   required?: boolean;
   placeholder?: string;
   disabled?: boolean;
+  allowCreate?: boolean;
 }
 
 export function InputSelectUser({
@@ -35,6 +36,7 @@ export function InputSelectUser({
   required = false,
   placeholder = 'Select user...',
   disabled = false,
+  allowCreate = true,
 }: InputSelectUserProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -76,8 +78,8 @@ export function InputSelectUser({
         label: `${user.name} (${user.email})`,
       }));
 
-      // Add "Create new" option if search has value and no results
-      if (inputValue && options.length === 0) {
+      // Add "Create new" option if search has value and no results (only if allowCreate is true)
+      if (allowCreate && inputValue && options.length === 0) {
         return [
           {
             value: '__create_new__',
@@ -261,19 +263,21 @@ export function InputSelectUser({
             />
           </div>
           
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={() => {
-              setNewUserData({ name: '', email: '', password: '', password_confirmation: '' });
-              setIsDialogOpen(true);
-            }}
-            disabled={disabled}
-            title="Add new user"
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
+          {allowCreate && (
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() => {
+                setNewUserData({ name: '', email: '', password: '', password_confirmation: '' });
+                setIsDialogOpen(true);
+              }}
+              disabled={disabled}
+              title="Add new user"
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          )}
         </div>
         
         {error && <p className="text-sm text-destructive">{error}</p>}

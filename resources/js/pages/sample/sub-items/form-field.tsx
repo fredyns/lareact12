@@ -197,6 +197,7 @@ export function FormField({
                 onChange={(value) => setData('user_id', value)}
                 defaultValue={userDefaultValue}
                 error={errors.user_id}
+                // allowCreate={false}
               />
             </CardContent>
           </Card>
