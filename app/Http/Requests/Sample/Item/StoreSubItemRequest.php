@@ -6,11 +6,11 @@ use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * Embedded SubItem Form Request for Item Show Page
- * 
+ *
  * Handles validation for SubItem creation and updates within parent item context
  * This is separate from the standalone SubItem request
  */
-class SubItemRequest extends FormRequest
+class StoreSubItemRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,12 +27,10 @@ class SubItemRequest extends FormRequest
      */
     public function rules(): array
     {
-        $isUpdate = $this->route('subItem') !== null;
-        
         return [
-            // item_id is required for create, optional for update
-            'item_id' => [$isUpdate ? 'sometimes' : 'required', 'uuid', 'exists:sample_items,id'],
-            
+            // item_id is required for create
+            'item_id' => ['required', 'uuid', 'exists:sample_items,id'],
+
             // Basic fields
             'string' => ['required', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],

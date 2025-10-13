@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Sample\Item;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Sample\Item\SubItemRequest;
+use App\Http\Requests\Sample\Item\StoreSubItemRequest;
+use App\Http\Requests\Sample\Item\UpdateSubItemRequest;
 use App\Http\Resources\Sample\SubItemResource;
 use App\Models\Sample\Item;
 use App\Models\Sample\SubItem;
@@ -53,10 +54,10 @@ class SubItemController extends Controller
     /**
      * Store a newly created sub-item.
      *
-     * @param  \App\Http\Requests\Sample\Item\SubItemRequest  $request
+     * @param  \App\Http\Requests\Sample\Item\StoreSubItemRequest  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(SubItemRequest $request)
+    public function store(StoreSubItemRequest $request)
     {
         $item = Item::findOrFail($request->item_id);
         $this->authorize('view', $item);
@@ -98,12 +99,12 @@ class SubItemController extends Controller
     /**
      * Update the specified sub-item.
      *
-     * @param  \App\Http\Requests\Sample\Item\SubItemRequest  $request
+     * @param  \App\Http\Requests\Sample\Item\UpdateSubItemRequest  $request
      * @param  string  $itemId
      * @param  string  $subItemId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(SubItemRequest $request, string $itemId, string $subItemId)
+    public function update(UpdateSubItemRequest $request, string $itemId, string $subItemId)
     {
         $item = Item::findOrFail($itemId);
         $this->authorize('view', $item);
