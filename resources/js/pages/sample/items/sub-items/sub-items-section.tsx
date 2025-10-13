@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/table';
 import { SubItem } from '@/types';
 
-import { router } from '@inertiajs/react';
 import { Edit, Eye, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { SubItemViewModal } from './view-modal';
@@ -132,7 +131,7 @@ export function SubItemsSection({ itemId }: SubItemsSectionProps) {
     const pages: (number | string)[] = [1]; // Always show first page
     const maxVisible = 7;
     let start = Math.max(2, currentPage - Math.floor(maxVisible / 2));
-    let end = Math.min(totalPages - 1, start + maxVisible - 1);
+    const end = Math.min(totalPages - 1, start + maxVisible - 1);
 
     // Adjust start if we're near the end
     if (end === totalPages - 1) {
