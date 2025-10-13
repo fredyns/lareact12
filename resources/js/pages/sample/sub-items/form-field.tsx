@@ -114,6 +114,7 @@ export function FormField({
                 onChange={(value) => setData('item_id', value)}
                 defaultValue={itemDefaultValue}
                 error={errors.item_id}
+                // allowCreate={false}  // Hides + button and "Create new" option
                 required
               />
             </CardContent>

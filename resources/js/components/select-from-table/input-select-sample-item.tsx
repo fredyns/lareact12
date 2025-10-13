@@ -26,6 +26,7 @@ interface InputSelectSampleItemProps {
   required?: boolean;
   placeholder?: string;
   disabled?: boolean;
+  allowCreate?: boolean;
 }
 
 export function InputSelectSampleItem({
@@ -37,6 +38,7 @@ export function InputSelectSampleItem({
   required = false,
   placeholder = 'Select item...',
   disabled = false,
+  allowCreate = true,
 }: InputSelectSampleItemProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -110,8 +112,8 @@ export function InputSelectSampleItem({
         label: item.string,
       }));
 
-      // Add "Create new" option if search has value and no results
-      if (inputValue && options.length === 0) {
+      // Add "Create new" option if search has value and no results (only if allowCreate is true)
+      if (allowCreate && inputValue && options.length === 0) {
         return [
           {
             value: '__create_new__',
@@ -297,19 +299,21 @@ export function InputSelectSampleItem({
             />
           </div>
           
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={() => {
-              setNewItemData({ string: '', email: '', enumerate: '' });
-              setIsDialogOpen(true);
-            }}
-            disabled={disabled || isLoadingEnum}
-            title={isLoadingEnum ? 'Loading options...' : 'Add new item'}
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
+          {allowCreate && (
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() => {
+                setNewItemData({ string: '', email: '', enumerate: '' });
+                setIsDialogOpen(true);
+              }}
+              disabled={disabled || isLoadingEnum}
+              title={isLoadingEnum ? 'Loading options...' : 'Add new item'}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          )}
         </div>
         
         {error && <p className="text-sm text-destructive">{error}</p>}
@@ -373,18 +377,14 @@ export function InputSelectSampleItem({
             <Button
               type="button"
               variant="outline"
-              onClick={() => {
-                setIsDialogOpen(false);
-                setFormErrors({});
-              }}
-              disabled={isCreating}
+              onClick={() => setIsDialogOpen(false)}
             >
               Cancel
             </Button>
             <Button
               type="button"
               onClick={handleCreateItem}
-              disabled={isCreating || !newItemData.string || isLoadingEnum}
+              disabled={isCreating}
             >
               {isCreating ? 'Creating...' : 'Create Item'}
             </Button>
