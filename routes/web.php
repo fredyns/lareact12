@@ -5,6 +5,7 @@ use App\Http\Controllers\EnumController;
 use App\Http\Controllers\RBAC\PermissionController;
 use App\Http\Controllers\RBAC\RoleController;
 use App\Http\Controllers\Sample\ItemController;
+use App\Http\Controllers\Sample\Item\SubItemController as ItemSubItemController;
 use App\Http\Controllers\Sample\SubItemController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\UserController;
@@ -70,6 +71,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Sample Routes with prefix and namespace
     Route::prefix('sample')->name('sample.')->group(function () {
         Route::resource('items', ItemController::class);
+        
+        // Embedded sub-items routes (for item show page)
+        Route::prefix('items/{item}/sub-items')->name('items.sub-items.')->group(function () {
+            Route::get('/', [ItemSubItemController::class, 'index'])->name('index');
+            Route::post('/', [ItemSubItemController::class, 'store'])->name('store');
+            Route::get('/{subItem}', [ItemSubItemController::class, 'show'])->name('show');
+            Route::put('/{subItem}', [ItemSubItemController::class, 'update'])->name('update');
+            Route::delete('/{subItem}', [ItemSubItemController::class, 'destroy'])->name('destroy');
+        });
+        
+        // Standalone sub-items resource (for dedicated pages)
         Route::resource('sub-items', SubItemController::class);
     });
 });

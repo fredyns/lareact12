@@ -16,6 +16,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, Check, Edit, Trash2, X } from 'lucide-react';
 import { dashboard } from '@/routes';
 import sample from '@/routes/sample';
+import { SubItemsSection } from './sub-items/sub-items-section';
 
 interface Props {
   item: Item;
@@ -176,6 +177,11 @@ export default function Show({ item, enumerateOptions }: Props) {
               </CardContent>
             </Card>
           </div>
+        </div>
+
+        {/* Sub Items Section */}
+        <div className="mt-6">
+          <SubItemsSection itemId={item.id} />
         </div>
       </div>
     </AppLayout>
