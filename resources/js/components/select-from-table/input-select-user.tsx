@@ -56,7 +56,7 @@ export function InputSelectUser({
     setSearchInput(inputValue);
     
     try {
-      const response = await fetch(`/users?search=${inputValue}`, {
+      const response = await fetch(users.index.url({ query: { search: inputValue } }), {
         method: 'GET',
         headers: {
           Accept: 'application/json',

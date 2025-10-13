@@ -16,6 +16,7 @@ import { InputString } from '@/components/shorty/input-string';
 import { InputEmail } from '@/components/shorty/input-email';
 import { InputEnum } from '@/components/shorty/input-enum';
 import sample from '@/routes/sample';
+import enums from '@/routes/enums';
 
 interface InputSelectSampleItemProps {
   id: string;
@@ -59,7 +60,7 @@ export function InputSelectSampleItem({
   useEffect(() => {
     const fetchEnumOptions = async () => {
       try {
-        const response = await fetch('/enums/ItemEnumerate', {
+        const response = await fetch(enums.show.url('ItemEnumerate'), {
           method: 'GET',
           headers: {
             Accept: 'application/json',
@@ -90,7 +91,7 @@ export function InputSelectSampleItem({
     setSearchInput(inputValue);
     
     try {
-      const response = await fetch(`/sample/items?search=${inputValue}`, {
+      const response = await fetch(sample.items.index.url({ query: { search: inputValue } }), {
         method: 'GET',
         headers: {
           Accept: 'application/json',
