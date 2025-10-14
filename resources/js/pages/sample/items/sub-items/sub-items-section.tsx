@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -9,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { SubItem } from '@/types';
+import { SubItem, SelectOption } from '@/types';
 
 import { Edit, Eye, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -19,11 +20,14 @@ import { SubItemEditModal } from './edit-modal';
 
 interface SubItemsSectionProps {
   itemId: string;
+  enumerateOptions?: SelectOption[];
 }
 
-export function SubItemsSection({ itemId }: SubItemsSectionProps) {
+export function SubItemsSection({ itemId, enumerateOptions: enumerateOptionsProp }: SubItemsSectionProps) {
   const [subItems, setSubItems] = useState<SubItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [enumerateOptions, setEnumerateOptions] = useState<SelectOption[]>([]);
+  const [enumLoading, setEnumLoading] = useState(true);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -34,6 +38,39 @@ export function SubItemsSection({ itemId }: SubItemsSectionProps) {
   const [fromItem, setFromItem] = useState(0);
   const [toItem, setToItem] = useState(0);
   const pageSize = 10;
+
+  // Fetch enumerate options from API
+  useEffect(() => {
+    const fetchEnumerateOptions = async () => {
+      if (enumerateOptionsProp) {
+        setEnumerateOptions(enumerateOptionsProp);
+        setEnumLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/enums/sample-sub-item-status', {
+          headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+          credentials: 'same-origin',
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setEnumerateOptions(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch enumerate options:', error);
+      } finally {
+        setEnumLoading(false);
+      }
+    };
+
+    fetchEnumerateOptions();
+  }, [enumerateOptionsProp]);
+
 
   // Fetch sub-items asynchronously
   useEffect(() => {
@@ -162,7 +199,7 @@ export function SubItemsSection({ itemId }: SubItemsSectionProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Sub Items</CardTitle>
-          <Button size="sm" onClick={() => setCreateModalOpen(true)}>
+          <Button size="sm" onClick={() => setCreateModalOpen(true)} disabled={enumLoading}>
             <Plus className="mr-2 h-4 w-4" />
             Add Sub Item
           </Button>
@@ -218,7 +255,11 @@ export function SubItemsSection({ itemId }: SubItemsSectionProps) {
                       <TableCell className="font-medium">{subItem.string}</TableCell>
                       <TableCell>{subItem.email || '-'}</TableCell>
                       <TableCell>{subItem.integer || '-'}</TableCell>
-                      <TableCell>{subItem.enumerate || '-'}</TableCell>
+                      <TableCell>
+                        <Badge variant={subItem.enumerate === 'enable' ? 'default' : 'secondary'}>
+                          {subItem.enumerate ? subItem.enumerate.charAt(0).toUpperCase() + subItem.enumerate.slice(1) : 'N/A'}
+                        </Badge>
+                      </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
                           <Button
@@ -232,6 +273,7 @@ export function SubItemsSection({ itemId }: SubItemsSectionProps) {
                             size="sm"
                             variant="ghost"
                             onClick={() => handleEdit(subItem)}
+                            disabled={enumLoading}
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -302,25 +344,28 @@ export function SubItemsSection({ itemId }: SubItemsSectionProps) {
       {/* Modals */}
       {viewModalOpen && selectedSubItem && (
         <SubItemViewModal
+          itemId={itemId}
           subItemId={selectedSubItem.id}
           open={viewModalOpen}
           onOpenChange={setViewModalOpen}
         />
       )}
 
-      {createModalOpen && (
+      {createModalOpen && !enumLoading && (
         <SubItemCreateModal
           itemId={itemId}
+          enumerateOptions={enumerateOptions}
           open={createModalOpen}
           onOpenChange={setCreateModalOpen}
           onSuccess={handleCreateSuccess}
         />
       )}
 
-      {editModalOpen && selectedSubItem && (
+      {editModalOpen && selectedSubItem && !enumLoading && (
         <SubItemEditModal
           itemId={itemId}
           subItemId={selectedSubItem.id}
+          enumerateOptions={enumerateOptions}
           open={editModalOpen}
           onOpenChange={setEditModalOpen}
           onSuccess={handleUpdateSuccess}
