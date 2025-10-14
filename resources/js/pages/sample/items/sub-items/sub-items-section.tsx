@@ -150,7 +150,13 @@ export function SubItemsSection({ itemId, enumerateOptions: enumerateOptionsProp
 
   const handleCreateSuccess = () => {
     // Reset to page 1 and refresh the table after successful create
-    setCurrentPage(1);
+    if (currentPage === 1) {
+      // If already on page 1, manually refresh
+      fetchSubItems();
+    } else {
+      // If on another page, setting to page 1 will trigger useEffect to fetch
+      setCurrentPage(1);
+    }
   };
 
   const handleUpdateSuccess = () => {

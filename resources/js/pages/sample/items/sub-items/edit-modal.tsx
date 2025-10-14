@@ -10,13 +10,14 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SubItem } from '@/types';
+import { SubItem, SelectOption } from '@/types';
 import { FormEvent, useEffect, useState } from 'react';
 import sample from '@/routes/sample';
 
 interface SubItemEditModalProps {
   itemId: string;
   subItemId: string;
+  enumerateOptions: SelectOption[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
@@ -31,6 +32,7 @@ interface FormData {
 export function SubItemEditModal({
   itemId,
   subItemId,
+  enumerateOptions,
   open,
   onOpenChange,
   onSuccess,

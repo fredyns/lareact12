@@ -9,11 +9,13 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { SelectOption } from '@/types';
 import { FormEvent, useState } from 'react';
 import sample from '@/routes/sample';
 
 interface SubItemCreateModalProps {
   itemId: string;
+  enumerateOptions: SelectOption[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
@@ -28,6 +30,7 @@ interface FormData {
 
 export function SubItemCreateModal({
   itemId,
+  enumerateOptions,
   open,
   onOpenChange,
   onSuccess,
