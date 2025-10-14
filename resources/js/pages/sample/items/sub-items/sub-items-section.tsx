@@ -49,7 +49,7 @@ export function SubItemsSection({ itemId, enumerateOptions: enumerateOptionsProp
       }
 
       try {
-        const response = await fetch('/api/enums/sample-sub-item-status', {
+        const response = await fetch('/enums/ItemEnumerate', {
           headers: {
             'Accept': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
