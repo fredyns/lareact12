@@ -11,6 +11,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { SubItem, SelectOption } from '@/types';
+import { Link } from '@inertiajs/react';
+import subItemsRoutes from '@/routes/sample/sub-items';
 
 import { Edit, Eye, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -226,7 +228,7 @@ export function SubItemsSection({ itemId, enumerateOptions: enumerateOptionsProp
               <TableBody>
                 {loading ? (
                   // Loading skeleton
-                  Array.from({ length: 3 }).map((_, index) => (
+                  Array.from({ length: 1 }).map((_, index) => (
                     <TableRow key={index}>
                       <TableCell>
                         <Skeleton className="h-4 w-8" />
@@ -258,7 +260,15 @@ export function SubItemsSection({ itemId, enumerateOptions: enumerateOptionsProp
                   subItems.map((subItem, index) => (
                     <TableRow key={subItem.id}>
                       <TableCell className="text-muted-foreground">{fromItem + index}</TableCell>
-                      <TableCell className="font-medium">{subItem.string}</TableCell>
+                      <TableCell className="font-medium">
+                        <Link
+                          href={subItemsRoutes.show.url(subItem.id)}
+                          className="text-primary hover:underline"
+                          target="_blank"
+                        >
+                          {subItem.string}
+                        </Link>
+                      </TableCell>
                       <TableCell>{subItem.email || '-'}</TableCell>
                       <TableCell>{subItem.integer || '-'}</TableCell>
                       <TableCell>
