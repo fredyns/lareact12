@@ -10,13 +10,13 @@ A fully async-optimistic CRUD system for managing sub-items that belong to a par
 
 ### Components
 
-1. **sub-items-section.tsx** - Main container component
+1. **index-section.tsx** - Main container component
    - Manages sub-items table display
    - Handles async data fetching
    - Coordinates modal operations
    - Implements optimistic updates for all operations
 
-2. **view-modal.tsx** - View sub-item details
+2. **show-modal.tsx** - View sub-item details
    - Async field loading with shimmer effects
    - Displays all sub-item fields progressively
    - Shows skeleton loaders while data is being fetched
@@ -108,10 +108,10 @@ Deletes a sub-item (uses Inertia for routing).
 ### In Items Show Page
 
 ```tsx
-import { SubItemsSection } from './sub-items/sub-items-section';
+import { IndexSection } from './sub-items/sub-items-section';
 
 // In component
-<SubItemsSection itemId={item.id} />
+<IndexSection itemId={item.id} />
 ```
 
 ### Backend Routes
@@ -129,7 +129,7 @@ Route::middleware('auth:sanctum')->prefix('sample')->group(function () {
 ## Data Flow
 
 1. **Initial Load**
-   - SubItemsSection mounts
+   - IndexSection mounts
    - Fetches sub-items via API
    - Displays skeleton while loading
    - Renders table when data arrives

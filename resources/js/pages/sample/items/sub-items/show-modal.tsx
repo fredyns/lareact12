@@ -24,14 +24,14 @@ import { Check, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import sample from '@/routes/sample';
 
-interface SubItemViewModalProps {
+interface SubItemShowModalProps {
   itemId: string;
   subItemId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function SubItemViewModal({ itemId, subItemId, open, onOpenChange }: SubItemViewModalProps) {
+export function SubItemShowModal({ itemId, subItemId, open, onOpenChange }: SubItemShowModalProps) {
   const [subItem, setSubItem] = useState<SubItem | null>(null);
   const [loading, setLoading] = useState(true);
 

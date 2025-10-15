@@ -16,7 +16,7 @@ import subItemsRoutes from '@/routes/sample/sub-items';
 
 import { Edit, Eye, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { SubItemViewModal } from './view-modal';
+import { SubItemShowModal } from './show-modal';
 import { SubItemCreateModal } from './create-modal';
 import { SubItemEditModal } from './edit-modal';
 
@@ -25,7 +25,7 @@ interface SubItemsSectionProps {
   enumerateOptions?: SelectOption[];
 }
 
-export function SubItemsSection({ itemId, enumerateOptions: enumerateOptionsProp }: SubItemsSectionProps) {
+export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }: SubItemsSectionProps) {
   const [subItems, setSubItems] = useState<SubItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [enumerateOptions, setEnumerateOptions] = useState<SelectOption[]>([]);
@@ -359,7 +359,7 @@ export function SubItemsSection({ itemId, enumerateOptions: enumerateOptionsProp
 
       {/* Modals */}
       {viewModalOpen && selectedSubItem && (
-        <SubItemViewModal
+        <SubItemShowModal
           itemId={itemId}
           subItemId={selectedSubItem.id}
           open={viewModalOpen}
