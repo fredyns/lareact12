@@ -58,8 +58,8 @@ export function SubItemsSection({ itemId, enumerateOptions: enumerateOptionsProp
         });
 
         if (response.ok) {
-          const data = await response.json();
-          setEnumerateOptions(data);
+          const result = await response.json();
+          setEnumerateOptions(result.data || []);
         }
       } catch (error) {
         console.error('Failed to fetch enumerate options:', error);

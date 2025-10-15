@@ -7,11 +7,10 @@ import {
   DialogPortal,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { SelectOption } from '@/types';
 import { FormEvent, useState } from 'react';
 import sample from '@/routes/sample';
+import { FormField } from './form-field';
 
 interface SubItemCreateModalProps {
   itemId: string;
@@ -25,7 +24,24 @@ interface FormData {
   item_id: string;
   string: string;
   email: string;
+  color: string;
   integer: string;
+  decimal: string;
+  npwp: string;
+  datetime: string;
+  date: string;
+  time: string;
+  ip_address: string;
+  boolean: boolean;
+  enumerate: string;
+  text: string;
+  file: string;
+  image: string;
+  markdown_text: string;
+  wysiwyg: string;
+  latitude: number | null;
+  longitude: number | null;
+  user_id: string;
 }
 
 export function SubItemCreateModal({
@@ -39,7 +55,24 @@ export function SubItemCreateModal({
     item_id: itemId,
     string: '',
     email: '',
+    color: '#000000',
     integer: '',
+    decimal: '',
+    npwp: '',
+    datetime: '',
+    date: '',
+    time: '',
+    ip_address: '',
+    boolean: false,
+    enumerate: '',
+    text: '',
+    file: '',
+    image: '',
+    markdown_text: '',
+    wysiwyg: '',
+    latitude: null,
+    longitude: null,
+    user_id: '',
   });
   const [processing, setProcessing] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
@@ -58,12 +91,7 @@ export function SubItemCreateModal({
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
       },
       credentials: 'same-origin',
-      body: JSON.stringify({
-        item_id: data.item_id,
-        string: data.string,
-        email: data.email || null,
-        integer: data.integer ? parseInt(data.integer) : null,
-      }),
+      body: JSON.stringify(data),
     })
       .then(async (response) => {
         if (!response.ok) {
@@ -84,7 +112,24 @@ export function SubItemCreateModal({
           item_id: itemId,
           string: '',
           email: '',
+          color: '#000000',
           integer: '',
+          decimal: '',
+          npwp: '',
+          datetime: '',
+          date: '',
+          time: '',
+          ip_address: '',
+          boolean: false,
+          enumerate: '',
+          text: '',
+          file: '',
+          image: '',
+          markdown_text: '',
+          wysiwyg: '',
+          latitude: null,
+          longitude: null,
+          user_id: '',
         });
         setProcessing(false);
       })
@@ -104,55 +149,19 @@ export function SubItemCreateModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPortal>
         <DialogOverlay className="z-[9999]" />
-        <DialogContent className="z-[10000] max-w-md" aria-describedby={undefined}>
+        <DialogContent className="z-[10000] max-h-[90vh] w-[95vw] lg:w-[85vw] xl:w-[80vw] 2xl:w-[1400px] !max-w-none overflow-y-auto" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Create Sub Item</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="string">
-              String <span className="text-destructive">*</span>
-            </Label>
-            <Input
-              id="string"
-              value={data.string}
-              onChange={(e) => setData({ ...data, string: e.target.value })}
-              placeholder="Enter string"
-              required
-            />
-            {errors.string && (
-              <p className="text-sm text-destructive">{errors.string}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={data.email}
-              onChange={(e) => setData({ ...data, email: e.target.value })}
-              placeholder="Enter email"
-            />
-            {errors.email && (
-              <p className="text-sm text-destructive">{errors.email}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="integer">Integer</Label>
-            <Input
-              id="integer"
-              type="number"
-              value={data.integer}
-              onChange={(e) => setData({ ...data, integer: e.target.value })}
-              placeholder="Enter integer"
-            />
-            {errors.integer && (
-              <p className="text-sm text-destructive">{errors.integer}</p>
-            )}
-          </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <FormField
+            data={data}
+            setData={(key, value) => setData({ ...data, [key]: value })}
+            errors={errors}
+            enumerateOptions={enumerateOptions}
+            uploadPath={`tmp/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, '0')}/${String(new Date().getDate()).padStart(2, '0')}/sample_sub_items`}
+          />
 
           <div className="flex justify-end gap-2">
             <Button
