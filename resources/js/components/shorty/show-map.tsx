@@ -190,8 +190,8 @@ export function ShowMap({ latitude, longitude, popupText = 'Location', zoom = DE
       {/* Interactive Map Modal */}
       <Dialog open={showMapModal} onOpenChange={setShowMapModal}>
         <DialogPortal>
-          <DialogOverlay className="z-[9998] bg-black/80" />
-          <DialogPrimitive.Content className="fixed top-[50%] left-[50%] z-[9999] h-[90vh] w-[90vw] max-w-6xl translate-x-[-50%] translate-y-[-50%] overflow-hidden rounded-lg bg-background p-6 shadow-lg">
+          <DialogOverlay className="z-[10001] bg-black/80" />
+          <DialogPrimitive.Content className="fixed top-[50%] left-[50%] z-[10002] h-[90vh] w-[90vw] max-w-6xl translate-x-[-50%] translate-y-[-50%] overflow-hidden rounded-lg bg-background p-6 shadow-lg">
             <DialogHeader>
               <DialogTitle>Map Location</DialogTitle>
               <DialogPrimitive.Close className="absolute top-4 right-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none disabled:pointer-events-none">
