@@ -98,7 +98,7 @@ export function TimePicker({
           {displayTime || placeholder}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-4 z-[10001]" align="start">
+      <PopoverContent className="w-auto p-4 z-[6020]" align="start">
         <div className="flex items-center space-x-2">
           <div className="flex flex-col space-y-2">
             <label className="text-sm font-medium">Hour</label>

@@ -366,8 +366,8 @@ export function InputMap({
       {/* Interactive Map Modal */}
       <Dialog open={showMapModal} onOpenChange={setShowMapModal}>
         <DialogPortal>
-          <DialogOverlay className="z-[9998] bg-black/80" />
-          <DialogPrimitive.Content className="fixed left-[50%] top-[50%] z-[9999] h-[90vh] w-[90vw] max-w-6xl translate-x-[-50%] translate-y-[-50%] overflow-hidden rounded-lg bg-background p-6 shadow-lg">
+          <DialogOverlay className="z-[6029] bg-black/80" />
+          <DialogPrimitive.Content className="fixed left-[50%] top-[50%] z-[6030] h-[90vh] w-[90vw] max-w-6xl translate-x-[-50%] translate-y-[-50%] overflow-hidden rounded-lg bg-background p-6 shadow-lg">
             <DialogHeader>
               <DialogTitle>Select Location</DialogTitle>
               <DialogDescription>

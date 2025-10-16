@@ -16,9 +16,9 @@
 - **[ui/popover.tsx](resources/js/components/ui/popover.tsx)**
     - Content: `z-50` (L20)
 - **[ui/date-picker.tsx](resources/js/components/ui/date-picker.tsx)**
-    - PopoverContent: `z-[10001]` (L93)
+    - PopoverContent: `z-[6010]` (L93)
 - **[ui/time-picker.tsx](resources/js/components/ui/time-picker.tsx)**
-    - PopoverContent: `z-[10001]` (L101)
+    - PopoverContent: `z-[6020]` (L101)
 - **[ui/select.tsx](resources/js/components/ui/select.tsx)**
     - Content: `z-50` (L58)
 - **[ui/sheet.tsx](resources/js/components/ui/sheet.tsx)**
@@ -27,13 +27,13 @@
 - **[ui/input-otp.tsx](resources/js/components/ui/input-otp.tsx)**
     - Active slot: `z-10` (L43)
 - **[shorty/image-preview.tsx](resources/js/components/shorty/image-preview.tsx)**
-    - Overlay: `z-[10001]` (L17)
-    - Content: `z-[10002]` (L18)
+    - Overlay: `z-[5009]` (L17)
+    - Content: `z-[5010]` (L18)
 - **[shorty/input-color.tsx](resources/js/components/shorty/input-color.tsx)**
     - Color picker: `z-10` (L51)
 - **[shorty/input-map.tsx](resources/js/components/shorty/input-map.tsx)**
-    - Map modal overlay: `z-[9998]` (L369)
-    - Map modal content: `z-[9999]` (L370)
+    - Map modal overlay: `z-[6029]` (L369)
+    - Map modal content: `z-[6030]` (L370)
 - **[two-factor-setup-modal.tsx](resources/js/components/two-factor-setup-modal.tsx)**
     - QR scan line: `z-20` (L44)
     - QR container: `z-10` (L74)
