@@ -1,24 +1,17 @@
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { SubItem, SelectOption } from '@/types';
-import { Link } from '@inertiajs/react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import subItemsRoutes from '@/routes/sample/sub-items';
+import { SelectOption, SubItem } from '@/types';
+import { Link } from '@inertiajs/react';
 
 import { Edit, Eye, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { SubItemShowModal } from './show-modal';
 import { SubItemCreateModal } from './create-modal';
 import { SubItemEditModal } from './edit-modal';
+import { SubItemShowModal } from './show-modal';
 
 interface SubItemsSectionProps {
   itemId: string;
@@ -27,6 +20,7 @@ interface SubItemsSectionProps {
 
 export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }: SubItemsSectionProps) {
   const [subItems, setSubItems] = useState<SubItem[]>([]);
+  const [visibleRows, setVisibleRows] = useState<Set<number>>(new Set());
   const [loading, setLoading] = useState(true);
   const [enumerateOptions, setEnumerateOptions] = useState<SelectOption[]>([]);
   const [enumLoading, setEnumLoading] = useState(true);
@@ -53,7 +47,7 @@ export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }:
       try {
         const response = await fetch('/enums/ItemEnumerate', {
           headers: {
-            'Accept': 'application/json',
+            Accept: 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
           },
           credentials: 'same-origin',
@@ -73,11 +67,32 @@ export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }:
     fetchEnumerateOptions();
   }, [enumerateOptionsProp]);
 
-
   // Fetch sub-items asynchronously
   useEffect(() => {
     fetchSubItems();
   }, [itemId, currentPage]);
+
+  // Staggered row reveal animation
+  useEffect(() => {
+    if (!loading && subItems.length > 0) {
+      // Reset visible rows
+      setVisibleRows(new Set());
+
+      const timers: NodeJS.Timeout[] = [];
+
+      subItems.forEach((_, index) => {
+        const timer = setTimeout(() => {
+          setVisibleRows((prev) => new Set([...prev, index]));
+        }, index * 100); // 150ms delay between each row
+
+        timers.push(timer);
+      });
+
+      return () => {
+        timers.forEach((timer) => clearTimeout(timer));
+      };
+    }
+  }, [loading, subItems]);
 
   const fetchSubItems = async () => {
     setLoading(true);
@@ -88,7 +103,7 @@ export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }:
 
       const response = await fetch(url.toString(), {
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
         },
         credentials: 'same-origin',
@@ -97,7 +112,7 @@ export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }:
       if (response.ok) {
         const result = await response.json();
         setSubItems(result.data || []);
-        
+
         // Set pagination metadata from backend
         if (result.meta) {
           setTotalPages(result.meta.last_page);
@@ -129,7 +144,7 @@ export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }:
         const response = await fetch(`/sample/items/${itemId}/sub-items/${subItem.id}`, {
           method: 'DELETE',
           headers: {
-            'Accept': 'application/json',
+            Accept: 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
           },
@@ -258,7 +273,14 @@ export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }:
                   </TableRow>
                 ) : (
                   subItems.map((subItem, index) => (
-                    <TableRow key={subItem.id}>
+                    <TableRow
+                      key={subItem.id}
+                      className={`transition-all duration-300 ${
+                        visibleRows.has(index)
+                          ? 'translate-y-0 opacity-100'
+                          : 'pointer-events-none hidden -translate-y-2 opacity-0'
+                      }`}
+                    >
                       <TableCell className="text-muted-foreground">{fromItem + index}</TableCell>
                       <TableCell className="font-medium">
                         <Link
@@ -273,31 +295,20 @@ export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }:
                       <TableCell>{subItem.integer || '-'}</TableCell>
                       <TableCell>
                         <Badge variant={subItem.enumerate === 'enable' ? 'default' : 'secondary'}>
-                          {subItem.enumerate ? subItem.enumerate.charAt(0).toUpperCase() + subItem.enumerate.slice(1) : 'N/A'}
+                          {subItem.enumerate
+                            ? subItem.enumerate.charAt(0).toUpperCase() + subItem.enumerate.slice(1)
+                            : 'N/A'}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleView(subItem)}
-                          >
+                          <Button size="sm" variant="ghost" onClick={() => handleView(subItem)}>
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleEdit(subItem)}
-                            disabled={enumLoading}
-                          >
+                          <Button size="sm" variant="ghost" onClick={() => handleEdit(subItem)} disabled={enumLoading}>
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleDelete(subItem)}
-                          >
+                          <Button size="sm" variant="ghost" onClick={() => handleDelete(subItem)}>
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
@@ -324,8 +335,8 @@ export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }:
                 >
                   Previous
                 </Button>
-                
-                {getPageNumbers().map((page, index) => (
+
+                {getPageNumbers().map((page, index) =>
                   page === '...' ? (
                     <span key={`ellipsis-${index}`} className="px-2 text-muted-foreground">
                       ...
@@ -340,8 +351,8 @@ export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }:
                     >
                       {page}
                     </Button>
-                  )
-                ))}
+                  ),
+                )}
 
                 <Button
                   size="sm"
