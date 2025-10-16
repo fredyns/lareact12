@@ -27,19 +27,25 @@ import sample from '@/routes/sample';
 interface SubItemShowModalProps {
   itemId: string;
   subItemId: string;
+  subItem?: SubItem | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function SubItemShowModal({ itemId, subItemId, open, onOpenChange }: SubItemShowModalProps) {
-  const [subItem, setSubItem] = useState<SubItem | null>(null);
-  const [loading, setLoading] = useState(true);
+export function SubItemShowModal({ itemId, subItemId, subItem: subItemProp, open, onOpenChange }: SubItemShowModalProps) {
+  const [subItem, setSubItem] = useState<SubItem | null>(subItemProp || null);
+  const [loading, setLoading] = useState(!subItemProp);
 
   useEffect(() => {
     if (open && subItemId) {
-      fetchSubItem();
+      if (subItemProp) {
+        setSubItem(subItemProp);
+        setLoading(false);
+      } else {
+        fetchSubItem();
+      }
     }
-  }, [open, subItemId]);
+  }, [open, subItemId, subItemProp]);
 
   const fetchSubItem = async () => {
     setLoading(true);

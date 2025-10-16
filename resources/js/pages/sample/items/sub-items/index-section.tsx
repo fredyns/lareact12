@@ -362,6 +362,7 @@ export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }:
         <SubItemShowModal
           itemId={itemId}
           subItemId={selectedSubItem.id}
+          subItem={selectedSubItem}
           open={viewModalOpen}
           onOpenChange={setViewModalOpen}
         />
