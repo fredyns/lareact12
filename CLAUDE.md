@@ -61,6 +61,29 @@ This will guide future CRUD application development with:
 - all files and folders under 'resources/js' are named in kebab-case
 - for common interfaces, use or create in 'resources/js/types/index.ts'.
 
+## Z-Index Reservation
+
+### Reserved Z-Index Ranges
+- **10000+**: Top-level modals and overlays (highest priority)
+- **9000-9999**: Secondary modals and map dialogs
+- **50-99**: UI component overlays (dropdowns, popovers, dialogs, sheets)
+- **10-49**: Interactive elements (color pickers, filters)
+- **1-9**: Minor layering (indicators, active states)
+
+### Current Z-Index Usage above 10000
+- **[shorty/image-preview.tsx](resources/js/components/shorty/image-preview.tsx)**
+    - Overlay: `z-[10001]` (L17)
+    - Content: `z-[10002]` (L18)
+
+### Guidelines
+1. **Never use z-index above 10000** without documenting it here
+2. **Standard UI components** should use `z-50` (shadcn/ui default)
+3. **Modal dialogs** for forms/data should use `z-[9999]` (overlay) and `z-[10000]` (content)
+4. **Image/media previews** should use `z-[10001]` (overlay) and `z-[10002]` (content)
+5. **Interactive maps** should use `z-[9998]` (overlay) and `z-[9999]` (content)
+6. **Small interactive elements** (color pickers, filters) should use `z-10`
+7. **Always use relative positioning** (`relative`) on parent when applying z-index to children
+
 ## Verification Scripts
 - Do not create verification scripts or tinker when tests cover that functionality and prove it works. Unit and feature tests are more important.
 
