@@ -90,7 +90,7 @@ export function DatePicker({
           {date ? formatDisplayDate(date) : <span>{placeholder}</span>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent className="w-auto p-0 z-[10001]" align="start">
         <Calendar
           selected={date}
           onSelect={handleDateSelect}

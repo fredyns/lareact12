@@ -15,6 +15,10 @@
     - Indicator: `z-[1]` (L148)
 - **[ui/popover.tsx](resources/js/components/ui/popover.tsx)**
     - Content: `z-50` (L20)
+- **[ui/date-picker.tsx](resources/js/components/ui/date-picker.tsx)**
+    - PopoverContent: `z-[10001]` (L93)
+- **[ui/time-picker.tsx](resources/js/components/ui/time-picker.tsx)**
+    - PopoverContent: `z-[10001]` (L101)
 - **[ui/select.tsx](resources/js/components/ui/select.tsx)**
     - Content: `z-50` (L58)
 - **[ui/sheet.tsx](resources/js/components/ui/sheet.tsx)**
