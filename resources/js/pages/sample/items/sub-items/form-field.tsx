@@ -11,7 +11,6 @@ import { InputMap } from '@/components/shorty/input-map';
 import { InputMarkdown } from '@/components/shorty/input-markdown';
 import { InputNpwp } from '@/components/shorty/input-npwp';
 import { InputNumber } from '@/components/shorty/input-number';
-import { InputSelectSampleItem } from '@/components/select-from-table/input-select-sample-item';
 import { InputSelectUser } from '@/components/select-from-table/input-select-user';
 import { InputString } from '@/components/shorty/input-string';
 import { InputTextarea } from '@/components/shorty/input-textarea';
@@ -96,30 +95,11 @@ export function FormField({
   // Use uploadPath from prop (create mode) or from subItem (edit mode)
   const uploadPath = uploadPathProp;
   const userDefaultValue = subItem?.user ? { value: subItem.user.id, label: subItem.user.name } : null;
-  const itemDefaultValue = subItem?.item ? { value: subItem.item.id, label: subItem.item.string } : null;
   const wysiwygInitialValue = subItem?.wysiwyg || '';
   return (
     <>
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Parent Item</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {/* Parent Item Card */}
-              <InputSelectSampleItem
-                id="item_id"
-                label="Name"
-                onChange={(value) => setData('item_id', value)}
-                defaultValue={itemDefaultValue}
-                error={errors.item_id}
-                // allowCreate={false}  // Hides + button and "Create new" option
-                required
-              />
-            </CardContent>
-          </Card>
-
           {/* Basic Information */}
           <Card>
             <CardHeader>
