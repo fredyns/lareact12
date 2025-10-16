@@ -80,8 +80,8 @@ export function SubItemShowModal({ itemId, subItemId, subItem: subItemProp, open
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPortal>
-        <DialogOverlay className="z-[9999]" />
-        <DialogContent className="z-[10000] max-h-[90vh] w-[95vw] lg:w-[85vw] xl:w-[80vw] 2xl:w-[1400px] !max-w-none flex flex-col" aria-describedby={undefined}>
+        <DialogOverlay className="z-[4999]" />
+        <DialogContent className="z-[5000] max-h-[90vh] w-[95vw] lg:w-[85vw] xl:w-[80vw] 2xl:w-[1400px] !max-w-none flex flex-col" aria-describedby={undefined}>
         <DialogHeader className="flex-shrink-0">
           <DialogTitle>
             {loading ? <Skeleton className="h-6 w-48" /> : `Sub Item: ${subItem?.string}`}

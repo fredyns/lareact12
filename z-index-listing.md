@@ -44,11 +44,11 @@
 - **[sub-items/index.tsx](resources/js/pages/sample/sub-items/index.tsx)**
     - Filter icon: `z-10` (L201)
 - **[items/sub-items/create-modal.tsx](resources/js/pages/sample/items/sub-items/create-modal.tsx)**
-    - Overlay: `z-[9999]` (L151)
-    - Content: `z-[10000]` (L152)
+    - Overlay: `z-[4999]` (L151)
+    - Content: `z-[5000]` (L152)
 - **[items/sub-items/edit-modal.tsx](resources/js/pages/sample/items/sub-items/edit-modal.tsx)**
-    - Overlay: `z-[9999]` (L248)
-    - Content: `z-[10000]` (L249)
+    - Overlay: `z-[4999]` (L248)
+    - Content: `z-[5000]` (L249)
 - **[items/sub-items/show-modal.tsx](resources/js/pages/sample/items/sub-items/show-modal.tsx)**
-    - Overlay: `z-[9999]` (L83)
-    - Content: `z-[10000]` (L84)
+    - Overlay: `z-[4999]` (L83)
+    - Content: `z-[5000]` (L84)
