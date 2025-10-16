@@ -81,152 +81,154 @@ export function SubItemShowModal({ itemId, subItemId, subItem: subItemProp, open
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPortal>
         <DialogOverlay className="z-[9999]" />
-        <DialogContent className="z-[10000] max-h-[90vh] w-[95vw] lg:w-[85vw] xl:w-[80vw] 2xl:w-[1400px] !max-w-none overflow-y-auto" aria-describedby={undefined}>
-        <DialogHeader>
+        <DialogContent className="z-[10000] max-h-[90vh] w-[95vw] lg:w-[85vw] xl:w-[80vw] 2xl:w-[1400px] !max-w-none flex flex-col" aria-describedby={undefined}>
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>
             {loading ? <Skeleton className="h-6 w-48" /> : `Sub Item: ${subItem?.string}`}
           </DialogTitle>
         </DialogHeader>
 
-        {loading ? (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <Skeleton className="h-6 w-32" />
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <FieldSkeleton />
-                  <FieldSkeleton />
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <div className="space-y-6">
-              {/* Parent Item Card */}
-              {subItem?.item && (
+        <div className="flex-1 overflow-y-auto pr-2">
+          {loading ? (
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              <div className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Parent Item</CardTitle>
+                    <Skeleton className="h-6 w-32" />
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <ShowField label="Name" value={subItem.item.string} />
-                    <ShowField label="Email" value={subItem.item.email} />
+                    <FieldSkeleton />
+                    <FieldSkeleton />
                   </CardContent>
                 </Card>
-              )}
-
-              {/* Basic Information Card */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Basic Information</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <ShowField label="String" value={subItem?.string} />
-
-                  <ShowField label="Email" value={subItem?.email} />
-
-                  <ShowColor color={subItem?.color ?? null} />
-
-                  <ShowField label="Integer" value={subItem?.integer} />
-
-                  <ShowField label="Decimal" value={subItem?.decimal} />
-
-                  <ShowField label="NPWP" value={subItem?.npwp} />
-
-                  <ShowBadge
-                    label="Status"
-                    value={subItem?.enumerate || 'N/A'}
-                    variant={subItem?.enumerate === 'enable' ? 'default' : 'secondary'}
-                    icon={subItem?.enumerate === 'enable' ? Check : X}
-                  />
-
-                  <ShowField label="User" value={subItem?.user?.name} />
-                </CardContent>
-              </Card>
-
-              {/* Date & Time */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Date & Time</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <ShowDatetime label="Date" value={subItem?.date} format="ddd, MMM dd, yyyy" />
-
-                  <ShowDatetime label="Time" value={subItem?.time} format="HH:mm" />
-
-                  <ShowDatetime label="Datetime" value={subItem?.datetime} format="ddd, MMM dd, yyyy HH:mm" />
-                </CardContent>
-              </Card>
-
-              {/* Other Information */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Other Information</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <ShowField label="IP Address" value={subItem?.ip_address} />
-
-                  <ShowField label="Boolean" value={subItem?.boolean ? 'True' : 'False'} />
-                </CardContent>
-              </Card>
+              </div>
             </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              <div className="space-y-6">
+                {/* Parent Item Card */}
+                {subItem?.item && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Parent Item</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <ShowField label="Name" value={subItem.item.string} />
+                      <ShowField label="Email" value={subItem.item.email} />
+                    </CardContent>
+                  </Card>
+                )}
 
-            <div className="space-y-6">
-              {/* Location */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Location</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <ShowMap
-                    latitude={subItem?.latitude ?? null}
-                    longitude={subItem?.longitude ?? null}
-                    popupText={subItem?.string}
-                  />
-                </CardContent>
-              </Card>
+                {/* Basic Information Card */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Basic Information</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <ShowField label="String" value={subItem?.string} />
 
-              {/* Files */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Files</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <ShowFile
-                    label="File (PDF, DOCX, PPTX, XLSX, ZIP, RAR)"
-                    url={subItem?.file_url ?? null}
-                    path={subItem?.file ?? null}
-                  />
+                    <ShowField label="Email" value={subItem?.email} />
 
-                  <ShowImage
-                    label="Image (JPG, JPEG, PNG)"
-                    url={subItem?.image_url ?? null}
-                    alt={subItem?.string ?? 'Sub Item Image'}
-                  />
-                </CardContent>
-              </Card>
+                    <ShowColor color={subItem?.color ?? null} />
 
-              {/* Text Content */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Text Content</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <ShowText label="Text" value={subItem?.text} />
+                    <ShowField label="Integer" value={subItem?.integer} />
 
-                  <ShowMarkdown label="Markdown Content" value={subItem?.markdown_text} />
+                    <ShowField label="Decimal" value={subItem?.decimal} />
 
-                  <ShowWysiwyg label="WYSIWYG Content" value={subItem?.wysiwyg} />
-                </CardContent>
-              </Card>
+                    <ShowField label="NPWP" value={subItem?.npwp} />
+
+                    <ShowBadge
+                      label="Status"
+                      value={subItem?.enumerate || 'N/A'}
+                      variant={subItem?.enumerate === 'enable' ? 'default' : 'secondary'}
+                      icon={subItem?.enumerate === 'enable' ? Check : X}
+                    />
+
+                    <ShowField label="User" value={subItem?.user?.name} />
+                  </CardContent>
+                </Card>
+
+                {/* Date & Time */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Date & Time</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <ShowDatetime label="Date" value={subItem?.date} format="ddd, MMM dd, yyyy" />
+
+                    <ShowDatetime label="Time" value={subItem?.time} format="HH:mm" />
+
+                    <ShowDatetime label="Datetime" value={subItem?.datetime} format="ddd, MMM dd, yyyy HH:mm" />
+                  </CardContent>
+                </Card>
+
+                {/* Other Information */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Other Information</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <ShowField label="IP Address" value={subItem?.ip_address} />
+
+                    <ShowField label="Boolean" value={subItem?.boolean ? 'True' : 'False'} />
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="space-y-6">
+                {/* Location */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Location</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <ShowMap
+                      latitude={subItem?.latitude ?? null}
+                      longitude={subItem?.longitude ?? null}
+                      popupText={subItem?.string}
+                    />
+                  </CardContent>
+                </Card>
+
+                {/* Files */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Files</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <ShowFile
+                      label="File (PDF, DOCX, PPTX, XLSX, ZIP, RAR)"
+                      url={subItem?.file_url ?? null}
+                      path={subItem?.file ?? null}
+                    />
+
+                    <ShowImage
+                      label="Image (JPG, JPEG, PNG)"
+                      url={subItem?.image_url ?? null}
+                      alt={subItem?.string ?? 'Sub Item Image'}
+                    />
+                  </CardContent>
+                </Card>
+
+                {/* Text Content */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Text Content</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <ShowText label="Text" value={subItem?.text} />
+
+                    <ShowMarkdown label="Markdown Content" value={subItem?.markdown_text} />
+
+                    <ShowWysiwyg label="WYSIWYG Content" value={subItem?.wysiwyg} />
+                  </CardContent>
+                </Card>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        <div className="flex justify-end">
+        <div className="flex justify-end flex-shrink-0 pt-4 border-t">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Close
           </Button>
