@@ -177,10 +177,10 @@ export function SubItemEditModal({
       <DialogPortal>
         <DialogOverlay className="z-[4999]" />
         <DialogContent
-          className="z-[5000] max-h-[90vh] w-[95vw] !max-w-none overflow-y-auto lg:w-[85vw] xl:w-[80vw] 2xl:w-[1400px]"
+          className="z-[5000] flex max-h-[90vh] w-[95vw] !max-w-none flex-col overflow-hidden lg:w-[85vw] xl:w-[80vw] 2xl:w-[1400px]"
           aria-describedby={undefined}
         >
-          <DialogHeader>
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle>
               {loading ? <Skeleton className="h-6 w-48" /> : `Edit Sub Item: ${subItem?.string}`}
             </DialogTitle>
@@ -194,17 +194,19 @@ export function SubItemEditModal({
               <Skeleton className="h-32 w-full" />
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <FormField
-                data={data}
-                setData={(key, value) => setData({ ...data, [key]: value })}
-                errors={errors}
-                enumerateOptions={enumerateOptions}
-                subItem={subItem || undefined}
-                uploadPath={subItem ? getSubItemUploadPath(subItem) : getTempUploadPath()}
-              />
+            <form onSubmit={handleSubmit} className="flex flex-1 flex-col overflow-hidden">
+              <div className="flex-1 overflow-y-auto pr-2">
+                <FormField
+                  data={data}
+                  setData={(key, value) => setData({ ...data, [key]: value })}
+                  errors={errors}
+                  enumerateOptions={enumerateOptions}
+                  subItem={subItem || undefined}
+                  uploadPath={subItem ? getSubItemUploadPath(subItem) : getTempUploadPath()}
+                />
+              </div>
 
-              <div className="flex justify-end gap-2">
+              <div className="flex flex-shrink-0 justify-end gap-2 border-t pt-4">
                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={processing}>
                   Cancel
                 </Button>
