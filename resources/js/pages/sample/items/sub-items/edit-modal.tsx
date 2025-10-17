@@ -1,18 +1,11 @@
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogOverlay,
-  DialogPortal,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogOverlay, DialogPortal, DialogTitle } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SubItem, SelectOption } from '@/types';
-import { FormEvent, useEffect, useState } from 'react';
 import sample from '@/routes/sample';
+import { SelectOption, SubItem } from '@/types';
+import { getSubItemUploadPath, getTempUploadPath } from '@/utils/upload';
+import { FormEvent, useEffect, useState } from 'react';
+import { FormField } from './form-field';
 
 interface SubItemEditModalProps {
   itemId: string;
@@ -24,9 +17,27 @@ interface SubItemEditModalProps {
 }
 
 interface FormData {
+  item_id: string;
   string: string;
   email: string;
+  color: string;
   integer: string;
+  decimal: string;
+  npwp: string;
+  datetime: string;
+  date: string;
+  time: string;
+  ip_address: string;
+  boolean: boolean;
+  enumerate: string;
+  text: string;
+  file: string;
+  image: string;
+  markdown_text: string;
+  wysiwyg: string;
+  latitude: number | null;
+  longitude: number | null;
+  user_id: string;
 }
 
 export function SubItemEditModal({
@@ -40,82 +51,93 @@ export function SubItemEditModal({
   const [subItem, setSubItem] = useState<SubItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<FormData>({
+    item_id: itemId,
     string: '',
     email: '',
+    color: '',
     integer: '',
+    decimal: '',
+    npwp: '',
+    datetime: '',
+    date: '',
+    time: '',
+    ip_address: '',
+    boolean: false,
+    enumerate: '',
+    text: '',
+    file: '',
+    image: '',
+    markdown_text: '',
+    wysiwyg: '',
+    latitude: null,
+    longitude: null,
+    user_id: '',
   });
   const [processing, setProcessing] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
 
+  // Fetch sub-item data when modal opens
   useEffect(() => {
     if (open && subItemId) {
-      fetchSubItem();
-    } else if (!open) {
-      // Reset form when modal closes
-      setData({
-        string: '',
-        email: '',
-        integer: '',
-      });
-      setSubItem(null);
-      setErrors({});
-    }
-  }, [open, subItemId]);
-
-
-  const fetchSubItem = async () => {
-    setLoading(true);
-    try {
-      const url = sample.items.subItems.show.url({ item: itemId, subItem: subItemId });
-      const response = await fetch(url, {
+      setLoading(true);
+      fetch(sample.items.subItems.show.url([itemId, subItemId]), {
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
         },
         credentials: 'same-origin',
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        const item = result.data;
-        setSubItem(item);
-        setData({
-          string: item.string || '',
-          email: item.email || '',
-          integer: item.integer?.toString() || '',
+      })
+        .then((response) => response.json())
+        .then((result) => {
+          setSubItem(result.data);
+          // Populate form with existing data
+          setData({
+            item_id: itemId,
+            string: result.data.string || '',
+            email: result.data.email || '',
+            color: result.data.color || '#000000',
+            integer: result.data.integer?.toString() || '',
+            decimal: result.data.decimal?.toString() || '',
+            npwp: result.data.npwp || '',
+            datetime: result.data.datetime || '',
+            date: result.data.date || '',
+            time: result.data.time || '',
+            ip_address: result.data.ip_address || '',
+            boolean: result.data.boolean || false,
+            enumerate: result.data.enumerate || '',
+            text: result.data.text || '',
+            file: result.data.file || '',
+            image: result.data.image || '',
+            markdown_text: result.data.markdown_text || '',
+            wysiwyg: result.data.wysiwyg || '',
+            latitude: result.data.latitude || null,
+            longitude: result.data.longitude || null,
+            user_id: result.data.user_id || '',
+          });
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error('Failed to fetch sub-item:', error);
+          setLoading(false);
         });
-      } else {
-        console.error('Failed to fetch sub-item:', response.status, response.statusText);
-      }
-    } catch (error) {
-      console.error('Failed to fetch sub-item:', error);
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [open, itemId, subItemId]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-
-    if (!subItem) return;
-
     setProcessing(true);
     setErrors({});
 
-    fetch(sample.items.subItems.update.url({ item: itemId, subItem: subItemId }), {
+    fetch(sample.items.subItems.update.url([itemId, subItemId]), {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
       },
       credentials: 'same-origin',
-      body: JSON.stringify({
-        string: data.string,
-        email: data.email || null,
-        integer: data.integer ? parseInt(data.integer) : null,
-      }),
+      body: JSON.stringify(data),
     })
       .then(async (response) => {
         if (!response.ok) {
@@ -127,19 +149,25 @@ export function SubItemEditModal({
       .then(() => {
         // Success - refresh table
         onSuccess();
-        
+
         // Close modal
         onOpenChange(false);
+
         setProcessing(false);
       })
       .catch((error) => {
         setProcessing(false);
-        
+
+        // Log the full error for debugging
+        console.error('Update sub-item error:', error);
+
         // Handle validation errors
         if (error.errors) {
           setErrors(error.errors);
         } else {
-          alert('Failed to update sub-item. Please try again.');
+          // Show more detailed error message
+          const errorMessage = error.message || 'Failed to update sub-item. Please try again.';
+          alert(`Error: ${errorMessage}\n\nCheck the browser console for more details.`);
         }
       });
   };
@@ -147,91 +175,46 @@ export function SubItemEditModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPortal>
-        <DialogOverlay className="z-[9999]" />
-        <DialogContent className="z-[10000] max-w-md" aria-describedby={undefined}>
-        <DialogHeader>
-          <DialogTitle>
-            {loading ? <Skeleton className="h-6 w-48" /> : `Edit Sub Item: ${subItem?.string}`}
-          </DialogTitle>
-        </DialogHeader>
+        <DialogOverlay className="z-[4999]" />
+        <DialogContent
+          className="z-[5000] max-h-[90vh] w-[95vw] !max-w-none overflow-y-auto lg:w-[85vw] xl:w-[80vw] 2xl:w-[1400px]"
+          aria-describedby={undefined}
+        >
+          <DialogHeader>
+            <DialogTitle>
+              {loading ? <Skeleton className="h-6 w-48" /> : `Edit Sub Item: ${subItem?.string}`}
+            </DialogTitle>
+          </DialogHeader>
 
-        {loading ? (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-16" />
+          {loading ? (
+            <div className="space-y-4">
               <Skeleton className="h-10 w-full" />
-            </div>
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-16" />
               <Skeleton className="h-10 w-full" />
-            </div>
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-16" />
               <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-32 w-full" />
             </div>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="string">
-                String <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="string"
-                value={data.string}
-                onChange={(e) => setData({ ...data, string: e.target.value })}
-                placeholder="Enter string"
-                required
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <FormField
+                data={data}
+                setData={(key, value) => setData({ ...data, [key]: value })}
+                errors={errors}
+                enumerateOptions={enumerateOptions}
+                subItem={subItem || undefined}
+                uploadPath={subItem ? getSubItemUploadPath(subItem) : getTempUploadPath()}
               />
-              {errors.string && (
-                <p className="text-sm text-destructive">{errors.string}</p>
-              )}
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={data.email}
-                onChange={(e) => setData({ ...data, email: e.target.value })}
-                placeholder="Enter email"
-              />
-              {errors.email && (
-                <p className="text-sm text-destructive">{errors.email}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="integer">Integer</Label>
-              <Input
-                id="integer"
-                type="number"
-                value={data.integer}
-                onChange={(e) => setData({ ...data, integer: e.target.value })}
-                placeholder="Enter integer"
-              />
-              {errors.integer && (
-                <p className="text-sm text-destructive">{errors.integer}</p>
-              )}
-            </div>
-
-            <div className="flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={processing}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={processing}>
-                {processing ? 'Updating...' : 'Update Sub Item'}
-              </Button>
-            </div>
-          </form>
-        )}
-      </DialogContent>
+              <div className="flex justify-end gap-2">
+                <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={processing}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={processing}>
+                  {processing ? 'Updating...' : 'Update Sub Item'}
+                </Button>
+              </div>
+            </form>
+          )}
+        </DialogContent>
       </DialogPortal>
     </Dialog>
   );
