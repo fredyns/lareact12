@@ -1,4 +1,4 @@
-import { Item } from '@/types/index';
+import { Item,SubItem } from '@/types/index';
 
 /**
  * Generate temporary upload path based on current date
@@ -42,4 +42,25 @@ export function getItemUploadPath(item: Item): string {
   const day = String(createdAt.getDate()).padStart(2, '0');
 
   return `sample_items/${year}/${month}/${day}/${item.id}`;
+}
+
+/**
+ * Generate an upload path for an item based on its creation date
+ * Format: sample_items/{YYYY}/{MM}/{DD}/{id}
+ */
+export function getSubItemUploadPath(subItem: SubItem): string {
+  if (subItem.upload_path) {
+    return subItem.upload_path;
+  }
+
+  if (!subItem.id) {
+    return getTempUploadPath();
+  }
+
+  const createdAt = new Date(subItem.created_at);
+  const year = createdAt.getFullYear();
+  const month = String(createdAt.getMonth() + 1).padStart(2, '0');
+  const day = String(createdAt.getDate()).padStart(2, '0');
+
+  return `sample_sub_items/${year}/${month}/${day}/${subItem.id}`;
 }
