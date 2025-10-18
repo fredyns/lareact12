@@ -1,13 +1,14 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import subItemsRoutes from '@/routes/sample/sub-items';
+import sample from '@/routes/sample';
 import { SelectOption, SubItem } from '@/types';
 import { Link } from '@inertiajs/react';
 
-import { Edit, Eye, Plus, Trash2 } from 'lucide-react';
+import { Edit, Eye, Plus, Search, Trash2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { SubItemCreateModal } from './create-modal';
 import { SubItemEditModal } from './edit-modal';
@@ -33,6 +34,7 @@ export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }:
   const [totalItems, setTotalItems] = useState(0);
   const [fromItem, setFromItem] = useState(0);
   const [toItem, setToItem] = useState(0);
+  const [search, setSearch] = useState('');
   const pageSize = 10;
 
   // Fetch enumerate options from API
@@ -70,7 +72,7 @@ export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }:
   // Fetch sub-items asynchronously
   useEffect(() => {
     fetchSubItems();
-  }, [itemId, currentPage]);
+  }, [itemId, currentPage, search]);
 
   // Staggered row reveal animation
   useEffect(() => {
@@ -100,6 +102,10 @@ export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }:
       const url = new URL(`/sample/items/${itemId}/sub-items`, window.location.origin);
       url.searchParams.append('page', currentPage.toString());
       url.searchParams.append('per_page', pageSize.toString());
+      // Only apply search if at least 2 characters
+      if (search && search.length >= 2) {
+        url.searchParams.append('search', search);
+      }
 
       const response = await fetch(url.toString(), {
         headers: {
@@ -165,6 +171,29 @@ export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }:
     }
   };
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Only search if at least 3 characters or empty (to show all)
+    if (search.length === 0 || search.length >= 3) {
+      // Reset to page 1 when searching
+      if (currentPage === 1) {
+        fetchSubItems();
+      } else {
+        setCurrentPage(1);
+      }
+    }
+  };
+
+  const handleClearSearch = () => {
+    setSearch('');
+    // Reset to page 1 when clearing search
+    if (currentPage === 1) {
+      fetchSubItems();
+    } else {
+      setCurrentPage(1);
+    }
+  };
+
   const handleCreateSuccess = () => {
     // Reset to page 1 and refresh the table after successful create
     if (currentPage === 1) {
@@ -220,12 +249,37 @@ export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }:
   return (
     <>
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Sub Items</CardTitle>
-          <Button size="sm" onClick={() => setCreateModalOpen(true)} disabled={enumLoading}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Sub Item
-          </Button>
+        <CardHeader>
+          <div className="flex flex-row items-center justify-between">
+            <CardTitle>Sub Items</CardTitle>
+            <Button size="sm" onClick={() => setCreateModalOpen(true)} disabled={enumLoading}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Sub Item
+            </Button>
+          </div>
+          <form onSubmit={handleSearch} className="flex items-center space-x-2">
+            <div className="relative w-64">
+              <Search className="absolute top-2.5 left-2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search sub-items... (min 2 characters)"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pr-8 pl-8"
+              />
+              {search && (
+                <button
+                  type="button"
+                  onClick={handleClearSearch}
+                  className="absolute top-2.5 right-2 h-4 w-4 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+            {/*<Button type="submit" variant="outline" size="sm" disabled={search.length > 0 && search.length < 2}>*/}
+            {/*  Search*/}
+            {/*</Button>*/}
+          </form>
         </CardHeader>
         <CardContent>
           <div className="rounded-md border">
@@ -284,7 +338,7 @@ export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }:
                       <TableCell className="text-muted-foreground">{fromItem + index}</TableCell>
                       <TableCell className="font-medium">
                         <Link
-                          href={subItemsRoutes.show.url(subItem.id)}
+                          href={sample.subItems.show.url(subItem.id)}
                           className="text-primary hover:underline"
                           target="_blank"
                         >

@@ -32,8 +32,17 @@ class SubItemController extends Controller
 
         $perPage = $request->input('per_page', 10);
         $page = $request->input('page', 1);
+        $search = $request->input('search');
 
-        $subItems = SubItem::where('item_id', $itemId)
+        // $query = SubItem::where('item_id', $itemId);
+        $query = $item->subItems();
+
+        // Apply search if provided
+        if ($search) {
+            $query->search($search);
+        }
+
+        $subItems = $query
             ->with(['user', 'creator', 'updater'])
             ->orderBy('created_at', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);
