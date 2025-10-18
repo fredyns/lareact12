@@ -116,6 +116,9 @@ class SubItemController extends Controller
         
         // Update the sub-item
         $subItem->update($data);
+        
+        // Reload relationships for consistent data structure
+        $subItem->load(['user', 'creator', 'updater']);
 
         return (new SubItemResource($subItem))
             ->response()

@@ -12,15 +12,10 @@ class UpdateSubItemRequest extends StoreSubItemRequest
      */
     public function rules(): array
     {
-        return [
-            // item_id is optional for update
-            'item_id' => ['sometimes', 'uuid', 'exists:sample_items,id'],
-
-            // Basic fields
-            'string' => ['required', 'string', 'max:255'],
-            'email' => ['nullable', 'email', 'max:255'],
-            'integer' => ['nullable', 'integer', 'between:1,100'],
-        ];
+        $storeRules = parent::rules();
+        // item_id is optional for update
+        $storeRules['item_id'] = ['sometimes', 'uuid', 'exists:sample_items,id'];
+        return $storeRules;
     }
 
 }
