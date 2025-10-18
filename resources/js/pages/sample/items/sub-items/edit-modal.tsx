@@ -198,7 +198,7 @@ export function SubItemEditModal({
               <div className="flex-1 overflow-y-auto pr-2">
                 <FormField
                   data={data}
-                  setData={(key, value) => setData({ ...data, [key]: value })}
+                  setData={(key, value) => setData((prev) => ({ ...prev, [key]: value }))}
                   errors={errors}
                   enumerateOptions={enumerateOptions}
                   subItem={subItem || undefined}
