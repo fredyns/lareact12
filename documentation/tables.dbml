@@ -1,0 +1,362 @@
+// Database Documentation for Lareact12 Application
+// Generated: 2025-10-19
+// DBML Specification: https://dbml.dbdiagram.io/docs
+
+Project lareact12 {
+  database_type: 'MySQL'
+  Note: '''
+    # Lareact12 Database Schema
+    
+    Laravel 12 + React + Inertia.js application with:
+    - User authentication and authorization
+    - Role-Based Access Control (RBAC) using Spatie Laravel Permission
+    - Sample Items and Sub-Items management
+    - File upload integration with MinIO
+    - Two-Factor Authentication support
+  '''
+}
+
+// ============================================
+// CORE TABLES - User Management & Authentication
+// ============================================
+
+Table users {
+  id uuid [pk, note: 'Primary key']
+  name varchar(255) [not null, note: 'User full name']
+  email varchar(255) [unique, not null, note: 'User email address']
+  email_verified_at timestamp [null, note: 'Email verification timestamp']
+  password varchar(255) [not null, note: 'Hashed password']
+  remember_token varchar(100) [null, note: 'Remember me token']
+  two_factor_secret text [null, note: 'Two-factor authentication secret']
+  two_factor_recovery_codes text [null, note: 'Two-factor recovery codes']
+  two_factor_confirmed_at timestamp [null, note: 'Two-factor confirmation timestamp']
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  
+  Indexes {
+    email [unique, name: 'users_email_unique']
+  }
+  
+  Note: 'Core users table with authentication and 2FA support'
+}
+
+Table password_reset_tokens {
+  email varchar(255) [pk, note: 'User email address']
+  token varchar(255) [not null, note: 'Password reset token']
+  created_at timestamp [null, note: 'Token creation timestamp']
+  
+  Note: 'Password reset tokens for forgot password functionality'
+}
+
+Table sessions {
+  id varchar(255) [pk, note: 'Session ID']
+  user_id uuid [null, ref: > users.id, note: 'Associated user']
+  ip_address varchar(45) [null, note: 'Client IP address']
+  user_agent text [null, note: 'Client user agent']
+  payload longtext [not null, note: 'Session data payload']
+  last_activity int [not null, note: 'Last activity timestamp']
+  
+  Indexes {
+    user_id [name: 'sessions_user_id_index']
+    last_activity [name: 'sessions_last_activity_index']
+  }
+  
+  Note: 'Active user sessions'
+}
+
+// ============================================
+// RBAC TABLES - Spatie Laravel Permission
+// ============================================
+
+Table permissions {
+  id uuid [pk, note: 'Permission ID']
+  name varchar(255) [not null, note: 'Permission name (e.g., sample.items.create)']
+  guard_name varchar(255) [not null, note: 'Guard name (usually "web")']
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  
+  Indexes {
+    (name, guard_name) [unique, name: 'permissions_name_guard_name_unique']
+  }
+  
+  Note: 'System permissions for RBAC'
+}
+
+Table roles {
+  id uuid [pk, note: 'Role ID']
+  name varchar(255) [not null, note: 'Role name (e.g., admin, user)']
+  guard_name varchar(255) [not null, note: 'Guard name (usually "web")']
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  
+  Indexes {
+    (name, guard_name) [unique, name: 'roles_name_guard_name_unique']
+  }
+  
+  Note: 'User roles for RBAC'
+}
+
+Table model_has_permissions {
+  id uuid [pk, note: 'Primary key']
+  permission_id uuid [not null, ref: > permissions.id, note: 'Permission reference']
+  model_type varchar(255) [not null, note: 'Model class name (polymorphic)']
+  model_id uuid [not null, note: 'Model ID (polymorphic)']
+  
+  Indexes {
+    (model_id, model_type) [name: 'model_has_permissions_model_id_model_type_index']
+    (permission_id, model_id, model_type) [unique, name: 'model_has_permissions_permission_model_type_primary']
+  }
+  
+  Note: 'Direct permissions assigned to models (polymorphic many-to-many)'
+}
+
+Table model_has_roles {
+  id uuid [pk, note: 'Primary key']
+  role_id uuid [not null, ref: > roles.id, note: 'Role reference']
+  model_type varchar(255) [not null, note: 'Model class name (polymorphic)']
+  model_id uuid [not null, note: 'Model ID (polymorphic)']
+  
+  Indexes {
+    (model_id, model_type) [name: 'model_has_roles_model_id_model_type_index']
+    (role_id, model_id, model_type) [unique, name: 'model_has_roles_role_model_type_primary']
+  }
+  
+  Note: 'Roles assigned to models (polymorphic many-to-many)'
+}
+
+Table role_has_permissions {
+  permission_id uuid [pk, ref: > permissions.id, note: 'Permission reference']
+  role_id uuid [pk, ref: > roles.id, note: 'Role reference']
+  
+  Indexes {
+    (permission_id, role_id) [pk, name: 'role_has_permissions_permission_id_role_id_primary']
+  }
+  
+  Note: 'Permissions assigned to roles (many-to-many pivot)'
+}
+
+// ============================================
+// SAMPLE TABLES - Demo/Example Data
+// ============================================
+
+Table sample_items {
+  id uuid [pk, note: 'Primary key']
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  created_by uuid [null, ref: > users.id, note: 'User who created this item']
+  updated_by uuid [null, ref: > users.id, note: 'User who last updated this item']
+  user_id uuid [null, ref: > users.id, note: 'Associated user']
+  string varchar(255) [not null, note: 'Sample string field']
+  email varchar(255) [null, note: 'Sample email field']
+  color varchar(20) [null, note: 'Sample color field (hex code)']
+  integer int [null, note: 'Sample integer field']
+  decimal decimal(10,2) [null, note: 'Sample decimal field']
+  npwp varchar(20) [null, note: 'Sample NPWP (Indonesian tax ID) field']
+  datetime datetime [null, note: 'Sample datetime field']
+  date date [null, note: 'Sample date field']
+  time time [null, note: 'Sample time field']
+  ip_address varchar(255) [null, note: 'Sample IP address field']
+  boolean boolean [null, note: 'Sample boolean field']
+  enumerate enum('enable','disable') [null, note: 'Sample enum field']
+  text text [null, note: 'Sample text field']
+  file text [null, note: 'File path in MinIO storage']
+  image text [null, note: 'Image path in MinIO storage']
+  markdown_text text [null, note: 'Markdown content with mermaid diagram support']
+  wysiwyg text [null, note: 'WYSIWYG HTML content']
+  latitude decimal(10,8) [null, note: 'GPS latitude coordinate']
+  longitude decimal(11,8) [null, note: 'GPS longitude coordinate']
+  upload_path varchar(500) [null, note: 'Base upload path for files (date-based structure)']
+  
+  Indexes {
+    user_id [name: 'sample_items_user_id_index']
+  }
+  
+  Note: '''
+    Sample items table demonstrating various field types and features:
+    - Multiple data types (string, integer, decimal, date, time, etc.)
+    - File upload integration with MinIO
+    - Markdown and WYSIWYG editors
+    - GPS coordinates
+    - Audit fields (created_by, updated_by)
+  '''
+}
+
+Table sample_sub_items {
+  id uuid [pk, note: 'Primary key']
+  created_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  updated_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
+  created_by uuid [null, ref: > users.id, note: 'User who created this sub-item']
+  updated_by uuid [null, ref: > users.id, note: 'User who last updated this sub-item']
+  item_id uuid [not null, ref: > sample_items.id, note: 'Parent item reference']
+  user_id uuid [null, ref: > users.id, note: 'Associated user']
+  string varchar(255) [not null, note: 'Sample string field']
+  email varchar(255) [null, note: 'Sample email field']
+  color varchar(20) [null, note: 'Sample color field (hex code)']
+  integer int [null, note: 'Sample integer field']
+  decimal decimal(10,2) [null, note: 'Sample decimal field']
+  npwp varchar(20) [null, note: 'Sample NPWP (Indonesian tax ID) field']
+  datetime datetime [null, note: 'Sample datetime field']
+  date date [null, note: 'Sample date field']
+  time time [null, note: 'Sample time field']
+  ip_address varchar(255) [null, note: 'Sample IP address field']
+  boolean boolean [null, note: 'Sample boolean field']
+  enumerate enum('enable','disable') [null, note: 'Sample enum field']
+  text text [null, note: 'Sample text field']
+  file text [null, note: 'File path in MinIO storage']
+  image text [null, note: 'Image path in MinIO storage']
+  markdown_text text [null, note: 'Markdown content with mermaid diagram support']
+  wysiwyg text [null, note: 'WYSIWYG HTML content']
+  latitude decimal(10,8) [null, note: 'GPS latitude coordinate']
+  longitude decimal(11,8) [null, note: 'GPS longitude coordinate']
+  upload_path varchar(500) [null, note: 'Base upload path for files (date-based structure)']
+  
+  Indexes {
+    item_id [name: 'sample_sub_items_item_id_index']
+    user_id [name: 'sample_sub_items_user_id_index']
+  }
+  
+  Note: '''
+    Sample sub-items table demonstrating parent-child relationships.
+    Cascades on delete when parent item is deleted.
+    Same field structure as sample_items for consistency.
+  '''
+}
+
+// ============================================
+// SYSTEM TABLES - Cache, Jobs, etc.
+// ============================================
+
+Table cache {
+  key varchar(255) [pk, note: 'Cache key']
+  value mediumtext [not null, note: 'Cached value']
+  expiration int [not null, note: 'Expiration timestamp']
+  
+  Note: 'Laravel cache storage'
+}
+
+Table cache_locks {
+  key varchar(255) [pk, note: 'Lock key']
+  owner varchar(255) [not null, note: 'Lock owner']
+  expiration int [not null, note: 'Lock expiration timestamp']
+  
+  Note: 'Laravel cache locks for atomic operations'
+}
+
+Table jobs {
+  id bigint [pk, increment, note: 'Job ID']
+  queue varchar(255) [not null, note: 'Queue name']
+  payload longtext [not null, note: 'Job payload']
+  attempts tinyint [not null, note: 'Number of attempts']
+  reserved_at int [null, note: 'Reserved timestamp']
+  available_at int [not null, note: 'Available timestamp']
+  created_at int [not null, note: 'Creation timestamp']
+  
+  Indexes {
+    queue [name: 'jobs_queue_index']
+  }
+  
+  Note: 'Laravel queue jobs'
+}
+
+Table job_batches {
+  id varchar(255) [pk, note: 'Batch ID']
+  name varchar(255) [not null, note: 'Batch name']
+  total_jobs int [not null, note: 'Total jobs in batch']
+  pending_jobs int [not null, note: 'Pending jobs count']
+  failed_jobs int [not null, note: 'Failed jobs count']
+  failed_job_ids longtext [not null, note: 'Failed job IDs']
+  options mediumtext [null, note: 'Batch options']
+  cancelled_at int [null, note: 'Cancellation timestamp']
+  created_at int [not null, note: 'Creation timestamp']
+  finished_at int [null, note: 'Finish timestamp']
+  
+  Note: 'Laravel job batches'
+}
+
+Table failed_jobs {
+  id bigint [pk, increment, note: 'Failed job ID']
+  uuid varchar(255) [unique, not null, note: 'Job UUID']
+  connection text [not null, note: 'Connection name']
+  queue text [not null, note: 'Queue name']
+  payload longtext [not null, note: 'Job payload']
+  exception longtext [not null, note: 'Exception details']
+  failed_at timestamp [not null, default: `CURRENT_TIMESTAMP`, note: 'Failure timestamp']
+  
+  Indexes {
+    uuid [unique, name: 'failed_jobs_uuid_unique']
+  }
+  
+  Note: 'Failed queue jobs for debugging'
+}
+
+// ============================================
+// RELATIONSHIPS SUMMARY
+// ============================================
+
+// User Relationships
+Ref: sessions.user_id > users.id [delete: cascade]
+
+// Sample Items Relationships
+Ref: sample_items.created_by > users.id [delete: set null]
+Ref: sample_items.updated_by > users.id [delete: set null]
+Ref: sample_items.user_id > users.id [delete: set null]
+
+// Sample Sub-Items Relationships
+Ref: sample_sub_items.item_id > sample_items.id [delete: cascade]
+Ref: sample_sub_items.created_by > users.id [delete: set null]
+Ref: sample_sub_items.updated_by > users.id [delete: set null]
+Ref: sample_sub_items.user_id > users.id [delete: set null]
+
+// RBAC Relationships (Spatie Permission)
+Ref: model_has_permissions.permission_id > permissions.id [delete: cascade]
+Ref: model_has_roles.role_id > roles.id [delete: cascade]
+Ref: role_has_permissions.permission_id > permissions.id [delete: cascade]
+Ref: role_has_permissions.role_id > roles.id [delete: cascade]
+
+// ============================================
+// TABLE GROUPS FOR VISUALIZATION
+// ============================================
+
+TableGroup authentication {
+  users
+  password_reset_tokens
+  sessions
+  
+  Note: 'User authentication and session management'
+}
+
+TableGroup rbac {
+  permissions
+  roles
+  model_has_permissions
+  model_has_roles
+  role_has_permissions
+  
+  Note: 'Role-Based Access Control (Spatie Laravel Permission)'
+}
+
+TableGroup sample_data {
+  sample_items
+  sample_sub_items
+  
+  Note: 'Sample/Demo data tables'
+}
+
+TableGroup system {
+  cache
+  cache_locks
+  jobs
+  job_batches
+  failed_jobs
+  
+  Note: 'Laravel system tables'
+}
+
+// ============================================
+// ENUMS DOCUMENTATION
+// ============================================
+
+Enum enumerate_values {
+  enable [note: 'Enabled state']
+  disable [note: 'Disabled state']
+}
