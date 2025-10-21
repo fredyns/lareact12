@@ -9,7 +9,7 @@ import { SelectOption, SubItem } from '@/types';
 import { Link } from '@inertiajs/react';
 
 import { Edit, Eye, Plus, Search, Trash2, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useEffectEvent, useState } from 'react';
 import { SubItemCreateModal } from './create-modal';
 import { SubItemEditModal } from './edit-modal';
 import { SubItemShowModal } from './show-modal';
@@ -38,36 +38,36 @@ export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }:
   const pageSize = 10;
 
   // Fetch enumerate options from API
+  const fetchEnumerateOptions = useEffectEvent(async () => {
+    if (enumerateOptionsProp) {
+      setEnumerateOptions(enumerateOptionsProp);
+      setEnumLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch('/enums/ItemEnumerate', {
+        headers: {
+          Accept: 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        credentials: 'same-origin',
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setEnumerateOptions(result.data || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch enumerate options:', error);
+    } finally {
+      setEnumLoading(false);
+    }
+  });
+
   useEffect(() => {
-    const fetchEnumerateOptions = async () => {
-      if (enumerateOptionsProp) {
-        setEnumerateOptions(enumerateOptionsProp);
-        setEnumLoading(false);
-        return;
-      }
-
-      try {
-        const response = await fetch('/enums/ItemEnumerate', {
-          headers: {
-            Accept: 'application/json',
-            'X-Requested-With': 'XMLHttpRequest',
-          },
-          credentials: 'same-origin',
-        });
-
-        if (response.ok) {
-          const result = await response.json();
-          setEnumerateOptions(result.data || []);
-        }
-      } catch (error) {
-        console.error('Failed to fetch enumerate options:', error);
-      } finally {
-        setEnumLoading(false);
-      }
-    };
-
     fetchEnumerateOptions();
-  }, [enumerateOptionsProp]);
+  }, []);
 
   // Fetch sub-items asynchronously
   useEffect(() => {
@@ -96,7 +96,7 @@ export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }:
     }
   }, [loading, subItems]);
 
-  const fetchSubItems = async () => {
+  const fetchSubItems = useEffectEvent(async () => {
     setLoading(true);
     try {
       const url = new URL(`/sample/items/${itemId}/sub-items`, window.location.origin);
@@ -132,7 +132,7 @@ export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }:
     } finally {
       setLoading(false);
     }
-  };
+  });
 
   const handleView = (subItem: SubItem) => {
     setSelectedSubItem(subItem);

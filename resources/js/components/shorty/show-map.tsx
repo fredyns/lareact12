@@ -3,7 +3,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { X } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
 
 // Fix for Leaflet marker icons
@@ -29,13 +29,16 @@ const DEFAULT_ZOOM = 11;
 function ScaleControl() {
   const map = useMap();
 
-  useEffect(() => {
+  const addScaleControl = useEffectEvent((mapInstance: L.Map) => {
     const scale = L.control.scale({ position: 'bottomleft', imperial: false });
-    scale.addTo(map);
-
+    scale.addTo(mapInstance);
     return () => {
       scale.remove();
     };
+  });
+
+  useEffect(() => {
+    return addScaleControl(map);
   }, [map]);
 
   return null;
@@ -56,54 +59,54 @@ export function ShowMap({ latitude, longitude, popupText = 'Location', zoom = DE
   // Clamp ratio between 1/3 and 3/1
   const clampedRatio = Math.max(1 / 3, Math.min(3, ratio));
 
-  useEffect(() => {
-    const updateDimensions = () => {
-      if (thumbnailContainerRef.current) {
-        const parent = thumbnailContainerRef.current.parentElement;
-        if (!parent) return;
+  const updateDimensions = useEffectEvent(() => {
+    if (thumbnailContainerRef.current) {
+      const parent = thumbnailContainerRef.current.parentElement;
+      if (!parent) return;
 
-        // Get the actual available width (accounting for padding)
-        const parentStyle = window.getComputedStyle(parent);
-        const parentPaddingLeft = parseFloat(parentStyle.paddingLeft) || 0;
-        const parentPaddingRight = parseFloat(parentStyle.paddingRight) || 0;
-        const availableWidth = parent.clientWidth - parentPaddingLeft - parentPaddingRight;
+      // Get the actual available width (accounting for padding)
+      const parentStyle = window.getComputedStyle(parent);
+      const parentPaddingLeft = parseFloat(parentStyle.paddingLeft) || 0;
+      const parentPaddingRight = parseFloat(parentStyle.paddingRight) || 0;
+      const availableWidth = parent.clientWidth - parentPaddingLeft - parentPaddingRight;
 
-        // Calculate dimensions based on ratio
-        let width = Math.min(availableWidth, parent.clientWidth);
-        let height = width / clampedRatio;
+      // Calculate dimensions based on ratio
+      let width = Math.min(availableWidth, parent.clientWidth);
+      let height = width / clampedRatio;
 
-        // Apply minimum constraints
-        if (width < 360) {
-          width = 360;
-          height = width / clampedRatio;
-        }
+      // Apply minimum constraints
+      if (width < 360) {
+        width = 360;
+        height = width / clampedRatio;
+      }
 
+      if (height < 360) {
+        height = 360;
+        width = height * clampedRatio;
+      }
+
+      // Ensure width doesn't exceed available space after height adjustment
+      if (width > availableWidth) {
+        width = availableWidth;
+        height = width / clampedRatio;
+
+        // Re-check minimum height constraint
         if (height < 360) {
           height = 360;
           width = height * clampedRatio;
-        }
-
-        // Ensure width doesn't exceed available space after height adjustment
-        if (width > availableWidth) {
-          width = availableWidth;
-          height = width / clampedRatio;
-
-          // Re-check minimum height constraint
-          if (height < 360) {
-            height = 360;
-            width = height * clampedRatio;
-            // If width still exceeds, use available width and adjust ratio
-            if (width > availableWidth) {
-              width = availableWidth;
-              height = width / clampedRatio;
-            }
+          // If width still exceeds, use available width and adjust ratio
+          if (width > availableWidth) {
+            width = availableWidth;
+            height = width / clampedRatio;
           }
         }
-
-        setDimensions({ width, height });
       }
-    };
 
+      setDimensions({ width, height });
+    }
+  });
+
+  useEffect(() => {
     updateDimensions();
     window.addEventListener('resize', updateDimensions);
 
@@ -117,7 +120,7 @@ export function ShowMap({ latitude, longitude, popupText = 'Location', zoom = DE
       window.removeEventListener('resize', updateDimensions);
       resizeObserver.disconnect();
     };
-  }, [clampedRatio]);
+  }, []);
 
   useEffect(() => {
     if (!isValidLocation || !thumbnailContainerRef.current || dimensions.width === 0) return;

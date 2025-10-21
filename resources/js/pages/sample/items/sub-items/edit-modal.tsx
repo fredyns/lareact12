@@ -4,7 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import sample from '@/routes/sample';
 import { SelectOption, SubItem } from '@/types';
 import { getSubItemUploadPath, getTempUploadPath } from '@/utils/upload';
-import { FormEvent, useEffect, useState } from 'react';
+import { Activity, FormEvent, useEffect, useState } from 'react';
 import { FormField } from './form-field';
 
 interface SubItemEditModalProps {
@@ -186,14 +186,15 @@ export function SubItemEditModal({
             </DialogTitle>
           </DialogHeader>
 
-          {loading ? (
+          <Activity mode={loading ? 'visible' : 'hidden'}>
             <div className="space-y-4">
               <Skeleton className="h-10 w-full" />
               <Skeleton className="h-10 w-full" />
               <Skeleton className="h-10 w-full" />
               <Skeleton className="h-32 w-full" />
             </div>
-          ) : (
+          </Activity>
+          <Activity mode={!loading ? 'visible' : 'hidden'}>
             <form onSubmit={handleSubmit} className="flex flex-1 flex-col overflow-hidden">
               <div className="flex-1 overflow-y-auto pr-2">
                 <FormField
@@ -215,7 +216,7 @@ export function SubItemEditModal({
                 </Button>
               </div>
             </form>
-          )}
+          </Activity>
         </DialogContent>
       </DialogPortal>
     </Dialog>

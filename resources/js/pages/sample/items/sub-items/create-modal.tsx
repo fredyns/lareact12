@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { SelectOption } from '@/types';
-import { FormEvent, useState } from 'react';
+import { Activity, FormEvent, useState } from 'react';
 import sample from '@/routes/sample';
 import { FormField } from './form-field';
 
@@ -154,29 +154,31 @@ export function SubItemCreateModal({
           <DialogTitle>Create Sub Item</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <FormField
-            data={data}
-            setData={(key, value) => setData({ ...data, [key]: value })}
-            errors={errors}
-            enumerateOptions={enumerateOptions}
-            uploadPath={`tmp/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, '0')}/${String(new Date().getDate()).padStart(2, '0')}/sample_sub_items`}
-          />
+        <Activity mode="visible">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <FormField
+              data={data}
+              setData={(key, value) => setData({ ...data, [key]: value })}
+              errors={errors}
+              enumerateOptions={enumerateOptions}
+              uploadPath={`tmp/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, '0')}/${String(new Date().getDate()).padStart(2, '0')}/sample_sub_items`}
+            />
 
-          <div className="flex justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={processing}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={processing}>
-              {processing ? 'Creating...' : 'Create Sub Item'}
-            </Button>
-          </div>
-        </form>
+            <div className="flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                disabled={processing}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={processing}>
+                {processing ? 'Creating...' : 'Create Sub Item'}
+              </Button>
+            </div>
+          </form>
+        </Activity>
       </DialogContent>
       </DialogPortal>
     </Dialog>

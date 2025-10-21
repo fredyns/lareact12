@@ -6,7 +6,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MapPin, X } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 
 // Fix for Leaflet marker icons
@@ -30,7 +30,7 @@ function ScaleControl() {
   useEffect(() => {
     const scale = L.control.scale({ position: 'bottomleft', imperial: false });
     scale.addTo(map);
-
+    
     return () => {
       scale.remove();
     };
@@ -107,48 +107,48 @@ export function InputMap({
     }
   }, [isValidLocation, dimensions.width, dimensions.height]);
 
-  useEffect(() => {
-    const updateDimensions = () => {
-      if (thumbnailContainerRef.current) {
-        const parent = thumbnailContainerRef.current.parentElement;
-        if (!parent) return;
+  const updateDimensions = useEffectEvent(() => {
+    if (thumbnailContainerRef.current) {
+      const parent = thumbnailContainerRef.current.parentElement;
+      if (!parent) return;
 
-        const parentStyle = window.getComputedStyle(parent);
-        const parentPaddingLeft = parseFloat(parentStyle.paddingLeft) || 0;
-        const parentPaddingRight = parseFloat(parentStyle.paddingRight) || 0;
-        const availableWidth = parent.clientWidth - parentPaddingLeft - parentPaddingRight;
+      const parentStyle = window.getComputedStyle(parent);
+      const parentPaddingLeft = parseFloat(parentStyle.paddingLeft) || 0;
+      const parentPaddingRight = parseFloat(parentStyle.paddingRight) || 0;
+      const availableWidth = parent.clientWidth - parentPaddingLeft - parentPaddingRight;
 
-        let width = Math.min(availableWidth, parent.clientWidth);
-        let height = width / clampedRatio;
+      let width = Math.min(availableWidth, parent.clientWidth);
+      let height = width / clampedRatio;
 
-        if (width < 360) {
-          width = 360;
-          height = width / clampedRatio;
-        }
+      if (width < 360) {
+        width = 360;
+        height = width / clampedRatio;
+      }
+
+      if (height < 360) {
+        height = 360;
+        width = height * clampedRatio;
+      }
+
+      if (width > availableWidth) {
+        width = availableWidth;
+        height = width / clampedRatio;
 
         if (height < 360) {
           height = 360;
           width = height * clampedRatio;
-        }
-
-        if (width > availableWidth) {
-          width = availableWidth;
-          height = width / clampedRatio;
-
-          if (height < 360) {
-            height = 360;
-            width = height * clampedRatio;
-            if (width > availableWidth) {
-              width = availableWidth;
-              height = width / clampedRatio;
-            }
+          if (width > availableWidth) {
+            width = availableWidth;
+            height = width / clampedRatio;
           }
         }
-
-        setDimensions({ width, height });
       }
-    };
 
+      setDimensions({ width, height });
+    }
+  });
+
+  useEffect(() => {
     // Initial calculation
     updateDimensions();
     
@@ -167,7 +167,7 @@ export function InputMap({
       window.removeEventListener('resize', updateDimensions);
       resizeObserver.disconnect();
     };
-  }, [clampedRatio, isValidLocation]);
+  }, [isValidLocation]);
 
   useEffect(() => {
     if (!isValidLocation || !thumbnailContainerRef.current || dimensions.width === 0 || dimensions.height === 0) {

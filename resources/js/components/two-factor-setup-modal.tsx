@@ -18,7 +18,7 @@ import { confirm } from '@/routes/two-factor';
 import { Form } from '@inertiajs/react';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { Check, Copy, Loader2, ScanLine } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Activity, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import AlertError from './alert-error';
 
 function GridScanIcon() {
@@ -317,12 +317,7 @@ export default function TwoFactorSetupModal({
                 </DialogHeader>
 
                 <div className="flex flex-col items-center space-y-5">
-                    {showVerificationStep ? (
-                        <TwoFactorVerificationStep
-                            onClose={onClose}
-                            onBack={() => setShowVerificationStep(false)}
-                        />
-                    ) : (
+                    <Activity mode={showVerificationStep ? 'hidden' : 'visible'}>
                         <TwoFactorSetupStep
                             qrCodeSvg={qrCodeSvg}
                             manualSetupKey={manualSetupKey}
@@ -330,7 +325,13 @@ export default function TwoFactorSetupModal({
                             onNextStep={handleModalNextStep}
                             errors={errors}
                         />
-                    )}
+                    </Activity>
+                    <Activity mode={!showVerificationStep ? 'hidden' : 'visible'}>
+                        <TwoFactorVerificationStep
+                            onClose={onClose}
+                            onBack={() => setShowVerificationStep(false)}
+                        />
+                    </Activity>
                 </div>
             </DialogContent>
         </Dialog>
