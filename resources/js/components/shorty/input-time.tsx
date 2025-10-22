@@ -13,6 +13,7 @@ interface InputTimeProps {
   required?: boolean;
   className?: string;
   disabled?: boolean;
+  loading?: boolean;
 }
 
 export function InputTime({
@@ -25,6 +26,7 @@ export function InputTime({
   required = false,
   className = '',
   disabled = false,
+  loading = false,
 }: InputTimeProps) {
   return (
     <div className="space-y-2">
@@ -38,9 +40,9 @@ export function InputTime({
           onChange={(value) => onChange(value)}
           className={error ? 'border-destructive' : className}
           placeholder={placeholder}
-          disabled={disabled}
+          disabled={disabled || loading}
         />
-        {value && value.trim() !== '' && !disabled && (
+        {value && value.trim() !== '' && !disabled && !loading && (
           <button
             type="button"
             onClick={() => onChange('')}

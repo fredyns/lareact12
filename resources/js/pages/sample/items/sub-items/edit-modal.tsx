@@ -9,7 +9,7 @@ import { FormField } from './form-field';
 
 interface SubItemEditModalProps {
   itemId: string;
-  subItemId: string;
+  subItem: SubItem;
   enumerateOptions: SelectOption[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -42,93 +42,126 @@ interface FormData {
 
 export function SubItemEditModal({
   itemId,
-  subItemId,
+  subItem: subItemProp,
   enumerateOptions,
   open,
   onOpenChange,
   onSuccess,
 }: SubItemEditModalProps) {
-  const [subItem, setSubItem] = useState<SubItem | null>(null);
+  // Initialize with prop data for optimistic UI
+  const [subItem, setSubItem] = useState<SubItem | null>(subItemProp);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<FormData>({
     item_id: itemId,
-    string: '',
-    email: '',
-    color: '',
-    integer: '',
-    decimal: '',
-    npwp: '',
-    datetime: '',
-    date: '',
-    time: '',
-    ip_address: '',
-    boolean: false,
-    enumerate: '',
-    text: '',
-    file: '',
-    image: '',
-    markdown_text: '',
-    wysiwyg: '',
-    latitude: null,
-    longitude: null,
-    user_id: '',
+    string: subItemProp.string || '',
+    email: subItemProp.email || '',
+    color: subItemProp.color || '#000000',
+    integer: subItemProp.integer?.toString() || '',
+    decimal: subItemProp.decimal?.toString() || '',
+    npwp: subItemProp.npwp || '',
+    datetime: subItemProp.datetime || '',
+    date: subItemProp.date || '',
+    time: subItemProp.time || '',
+    ip_address: subItemProp.ip_address || '',
+    boolean: subItemProp.boolean || false,
+    enumerate: subItemProp.enumerate || '',
+    text: subItemProp.text || '',
+    file: subItemProp.file || '',
+    image: subItemProp.image || '',
+    markdown_text: subItemProp.markdown_text || '',
+    wysiwyg: subItemProp.wysiwyg || '',
+    latitude: subItemProp.latitude || null,
+    longitude: subItemProp.longitude || null,
+    user_id: subItemProp.user_id || '',
   });
   const [processing, setProcessing] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
 
-  // Fetch sub-item data when modal opens
+  // Fetch full sub-item data when modal opens
   useEffect(() => {
-    if (open && subItemId) {
-      setLoading(true);
-      fetch(sample.items.subItems.show.url([itemId, subItemId]), {
+    if (open && subItemProp?.id) {
+      // Set initial data immediately (optimistic UI)
+      setSubItem(subItemProp);
+      setData({
+        item_id: itemId,
+        string: subItemProp.string || '',
+        email: subItemProp.email || '',
+        color: subItemProp.color || '#000000',
+        integer: subItemProp.integer?.toString() || '',
+        decimal: subItemProp.decimal?.toString() || '',
+        npwp: subItemProp.npwp || '',
+        datetime: subItemProp.datetime || '',
+        date: subItemProp.date || '',
+        time: subItemProp.time || '',
+        ip_address: subItemProp.ip_address || '',
+        boolean: subItemProp.boolean || false,
+        enumerate: subItemProp.enumerate || '',
+        text: subItemProp.text || '',
+        file: subItemProp.file || '',
+        image: subItemProp.image || '',
+        markdown_text: subItemProp.markdown_text || '',
+        wysiwyg: subItemProp.wysiwyg || '',
+        latitude: subItemProp.latitude || null,
+        longitude: subItemProp.longitude || null,
+        user_id: subItemProp.user_id || '',
+      });
+      
+      fetchSubItem();
+    }
+  }, [open, subItemProp?.id]);
+
+  const fetchSubItem = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(sample.items.subItems.show.url([itemId, subItemProp.id]), {
         headers: {
           Accept: 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
         },
         credentials: 'same-origin',
-      })
-        .then((response) => response.json())
-        .then((result) => {
-          setSubItem(result.data);
-          // Populate form with existing data
-          setData({
-            item_id: itemId,
-            string: result.data.string || '',
-            email: result.data.email || '',
-            color: result.data.color || '#000000',
-            integer: result.data.integer?.toString() || '',
-            decimal: result.data.decimal?.toString() || '',
-            npwp: result.data.npwp || '',
-            datetime: result.data.datetime || '',
-            date: result.data.date || '',
-            time: result.data.time || '',
-            ip_address: result.data.ip_address || '',
-            boolean: result.data.boolean || false,
-            enumerate: result.data.enumerate || '',
-            text: result.data.text || '',
-            file: result.data.file || '',
-            image: result.data.image || '',
-            markdown_text: result.data.markdown_text || '',
-            wysiwyg: result.data.wysiwyg || '',
-            latitude: result.data.latitude || null,
-            longitude: result.data.longitude || null,
-            user_id: result.data.user_id || '',
-          });
-          setLoading(false);
-        })
-        .catch((error) => {
-          console.error('Failed to fetch sub-item:', error);
-          setLoading(false);
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setSubItem(result.data);
+        // Update form with full data
+        setData({
+          item_id: itemId,
+          string: result.data.string || '',
+          email: result.data.email || '',
+          color: result.data.color || '#000000',
+          integer: result.data.integer?.toString() || '',
+          decimal: result.data.decimal?.toString() || '',
+          npwp: result.data.npwp || '',
+          datetime: result.data.datetime || '',
+          date: result.data.date || '',
+          time: result.data.time || '',
+          ip_address: result.data.ip_address || '',
+          boolean: result.data.boolean || false,
+          enumerate: result.data.enumerate || '',
+          text: result.data.text || '',
+          file: result.data.file || '',
+          image: result.data.image || '',
+          markdown_text: result.data.markdown_text || '',
+          wysiwyg: result.data.wysiwyg || '',
+          latitude: result.data.latitude || null,
+          longitude: result.data.longitude || null,
+          user_id: result.data.user_id || '',
         });
+      }
+    } catch (error) {
+      console.error('Failed to fetch sub-item:', error);
+    } finally {
+      setLoading(false);
     }
-  }, [open, itemId, subItemId]);
+  };
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     setProcessing(true);
     setErrors({});
 
-    fetch(sample.items.subItems.update.url([itemId, subItemId]), {
+    fetch(sample.items.subItems.update.url([itemId, subItemProp.id]), {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -182,19 +215,11 @@ export function SubItemEditModal({
         >
           <DialogHeader className="flex-shrink-0">
             <DialogTitle>
-              {loading ? <Skeleton className="h-6 w-48" /> : `Edit Sub Item: ${subItem?.string}`}
+              {`Edit Sub Item`}
             </DialogTitle>
           </DialogHeader>
 
-          <Activity mode={loading ? 'visible' : 'hidden'}>
-            <div className="space-y-4">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-32 w-full" />
-            </div>
-          </Activity>
-          <Activity mode={!loading ? 'visible' : 'hidden'}>
+          <Activity mode={'visible'}>
             <form onSubmit={handleSubmit} className="flex flex-1 flex-col overflow-hidden">
               <div className="flex-1 overflow-y-auto pr-2">
                 <FormField
@@ -204,6 +229,7 @@ export function SubItemEditModal({
                   enumerateOptions={enumerateOptions}
                   subItem={subItem || undefined}
                   uploadPath={subItem ? getSubItemUploadPath(subItem) : getTempUploadPath()}
+                  loading={loading}
                 />
               </div>
 

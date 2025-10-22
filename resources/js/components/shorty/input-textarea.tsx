@@ -1,4 +1,5 @@
 import { Label } from '@/components/ui/label';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import React from 'react';
 
@@ -8,6 +9,7 @@ interface InputTextareaProps extends Omit<React.TextareaHTMLAttributes<HTMLTextA
   value: string;
   onChange: (value: string) => void;
   error?: string;
+  loading?: boolean;
 }
 
 export function InputTextarea({
@@ -18,6 +20,7 @@ export function InputTextarea({
   error,
   required = false,
   className = '',
+  loading = false,
   ...props
 }: InputTextareaProps) {
   return (
@@ -25,14 +28,18 @@ export function InputTextarea({
       <Label htmlFor={id}>
         {label} {required && <span className="text-destructive">*</span>}
       </Label>
-      <Textarea
-        id={id}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className={error ? 'border-destructive' : className}
-        required={required}
-        {...props}
-      />
+      {loading ? (
+        <Skeleton className="h-24 w-full" />
+      ) : (
+        <Textarea
+          id={id}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className={error ? 'border-destructive' : className}
+          required={required}
+          {...props}
+        />
+      )}
       {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   );

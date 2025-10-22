@@ -10,6 +10,7 @@ interface InputCheckboxProps extends Omit<CheckboxProps, 'checked' | 'onCheckedC
   onChange: (checked: boolean) => void;
   error?: string;
   required?: boolean;
+  loading?: boolean;
 }
 
 export function InputCheckbox({
@@ -19,6 +20,7 @@ export function InputCheckbox({
   onChange,
   error,
   required = false,
+  loading = false,
   ...props
 }: InputCheckboxProps) {
   return (
@@ -27,6 +29,7 @@ export function InputCheckbox({
         id={id}
         checked={checked}
         onCheckedChange={(checked) => onChange(!!checked)}
+        disabled={loading || props.disabled}
         {...props}
       />
       <Label htmlFor={id}>

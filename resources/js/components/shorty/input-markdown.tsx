@@ -14,6 +14,7 @@ interface InputMarkdownProps {
   error?: string;
   required?: boolean;
   disabled?: boolean;
+  loading?: boolean;
 }
 
 export function InputMarkdown({
@@ -26,6 +27,7 @@ export function InputMarkdown({
   error,
   required = false,
   disabled = false,
+  loading = false,
 }: InputMarkdownProps) {
   return (
     <div className="space-y-2">
@@ -42,7 +44,7 @@ export function InputMarkdown({
             onChange={(e) => onChange(e.target.value)}
             rows={rows}
             placeholder={placeholder}
-            disabled={disabled}
+            disabled={disabled || loading}
             className={`flex min-h-[300px] w-full rounded-md border border-input bg-background px-3 py-2 font-mono text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${error ? 'border-destructive' : ''}`}
           />
         </div>

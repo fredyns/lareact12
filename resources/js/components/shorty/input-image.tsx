@@ -16,6 +16,7 @@ interface InputImageProps {
   maxSize: number;
   required?: boolean;
   disabled?: boolean;
+  loading?: boolean;
 }
 
 export function InputImage({
@@ -30,6 +31,7 @@ export function InputImage({
   maxSize,
   required = false,
   disabled = false,
+  loading = false,
 }: InputImageProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -119,13 +121,13 @@ export function InputImage({
           <p className="mt-1 text-sm text-muted-foreground">Current image: {currentImageName || 'View image'}</p>
         </div>
       ) : null}
-      {!disabled && (
+      {!disabled && !loading && (
         <>
           <FileDropzone
             accept={accept}
             maxSize={maxSize}
             onFileDrop={handleFileDrop}
-            disabled={disabled}
+            disabled={disabled || loading}
             isUploading={isUploading}
             isSuccess={isSuccess}
             currentFileName={currentImageName}

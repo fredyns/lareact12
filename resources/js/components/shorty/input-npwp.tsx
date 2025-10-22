@@ -1,5 +1,6 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Skeleton } from '@/components/ui/skeleton';
 import React from 'react';
 
 interface InputNPWPProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
@@ -8,6 +9,7 @@ interface InputNPWPProps extends Omit<React.InputHTMLAttributes<HTMLInputElement
   value: string;
   onChange: (value: string) => void;
   error?: string;
+  loading?: boolean;
 }
 
 export function InputNpwp({
@@ -19,6 +21,7 @@ export function InputNpwp({
   placeholder = '99.999.999.9-999.999',
   required = false,
   className = '',
+  loading = false,
   ...props
 }: InputNPWPProps) {
   const formatNPWP = (input: string): string => {
@@ -60,19 +63,23 @@ export function InputNpwp({
       <Label htmlFor={id}>
         {label} {required && <span className="text-destructive">*</span>}
       </Label>
-      <Input
-        id={id}
-        type="text"
-        value={value || ''}
-        onChange={handleChange}
-        placeholder={placeholder}
-        maxLength={20} // 15 digits + 4 dots + 1 dash = 20 characters
-        pattern="[0-9]{2}\.[0-9]{3}\.[0-9]{3}\.[0-9]{1}-[0-9]{3}\.[0-9]{3}"
-        title="Please enter NPWP in format: 99.999.999.9-999.999"
-        className={error ? 'border-destructive' : className}
-        required={required}
-        {...props}
-      />
+      {loading ? (
+        <Skeleton className="h-10 w-full" />
+      ) : (
+        <Input
+          id={id}
+          type="text"
+          value={value || ''}
+          onChange={handleChange}
+          placeholder={placeholder}
+          maxLength={20} // 15 digits + 4 dots + 1 dash = 20 characters
+          pattern="[0-9]{2}\.[0-9]{3}\.[0-9]{3}\.[0-9]{1}-[0-9]{3}\.[0-9]{3}"
+          title="Please enter NPWP in format: 99.999.999.9-999.999"
+          className={error ? 'border-destructive' : className}
+          required={required}
+          {...props}
+        />
+      )}
       {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   );

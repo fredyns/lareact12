@@ -1,5 +1,6 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Skeleton } from '@/components/ui/skeleton';
 import React from 'react';
 
 interface InputStringProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
@@ -8,6 +9,7 @@ interface InputStringProps extends Omit<React.InputHTMLAttributes<HTMLInputEleme
   value: string;
   onChange: (value: string) => void;
   error?: string;
+  loading?: boolean;
 }
 
 export function InputString({
@@ -18,6 +20,7 @@ export function InputString({
   error,
   required = false,
   className = '',
+  loading = false,
   ...props
 }: InputStringProps) {
   return (
@@ -25,15 +28,19 @@ export function InputString({
       <Label htmlFor={id}>
         {label} {required && <span className="text-destructive">*</span>}
       </Label>
-      <Input
-        id={id}
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className={error ? 'border-destructive' : className}
-        required={required}
-        {...props}
-      />
+      {loading ? (
+        <Skeleton className="h-10 w-full" />
+      ) : (
+        <Input
+          id={id}
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className={error ? 'border-destructive' : className}
+          required={required}
+          {...props}
+        />
+      )}
       {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   );

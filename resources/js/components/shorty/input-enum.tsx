@@ -1,4 +1,5 @@
 import { Label } from '@/components/ui/label';
+import { Skeleton } from '@/components/ui/skeleton';
 import React from 'react';
 
 interface EnumOption {
@@ -15,6 +16,7 @@ interface InputEnumProps {
   error?: string;
   required?: boolean;
   disabled?: boolean;
+  loading?: boolean;
 }
 
 export function InputEnum({
@@ -26,39 +28,44 @@ export function InputEnum({
   error,
   required = false,
   disabled = false,
+  loading = false,
 }: InputEnumProps) {
   return (
     <div className="space-y-2">
       <Label htmlFor={id}>
         {label} {required && <span className="text-destructive">*</span>}
       </Label>
-      <div className="flex flex-wrap gap-2">
-        {options.map((option) => (
-          <button
-            key={option.value}
-            type="button"
-            onClick={() => onChange(option.value)}
-            disabled={disabled}
-            className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-              value === option.value
-                ? 'bg-indigo-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            } ${disabled ? 'cursor-not-allowed opacity-50' : ''}`}
-          >
-            {option.label}
-          </button>
-        ))}
-        {value && !disabled && (
-          <button
-            type="button"
-            onClick={() => onChange('')}
-            className="rounded-full bg-gray-100 px-3 py-2 text-sm font-medium text-gray-500 transition-colors hover:bg-gray-200"
-            title="Clear selection"
-          >
-            ×
-          </button>
-        )}
-      </div>
+      {loading ? (
+        <Skeleton className="h-10 w-full" />
+      ) : (
+        <div className="flex flex-wrap gap-2">
+          {options.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => onChange(option.value)}
+              disabled={disabled}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                value === option.value
+                  ? 'bg-indigo-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              } ${disabled ? 'cursor-not-allowed opacity-50' : ''}`}
+            >
+              {option.label}
+            </button>
+          ))}
+          {value && !disabled && (
+            <button
+              type="button"
+              onClick={() => onChange('')}
+              className="rounded-full bg-gray-100 px-3 py-2 text-sm font-medium text-gray-500 transition-colors hover:bg-gray-200"
+              title="Clear selection"
+            >
+              ×
+            </button>
+          )}
+        </div>
+      )}
       {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   );

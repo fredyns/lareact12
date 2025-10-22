@@ -1,5 +1,6 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Sketch } from '@uiw/react-color';
 import React, { useState } from 'react';
 
@@ -9,6 +10,7 @@ interface InputColorProps extends Omit<React.InputHTMLAttributes<HTMLInputElemen
   value: string;
   onChange: (value: string) => void;
   error?: string;
+  loading?: boolean;
 }
 
 export function InputColor({
@@ -20,6 +22,7 @@ export function InputColor({
   placeholder = 'Select a color',
   required = false,
   className = '',
+  loading = false,
   ...props
 }: InputColorProps) {
   const [showColorPicker, setShowColorPicker] = useState(false);
@@ -29,31 +32,40 @@ export function InputColor({
       <Label htmlFor={id}>
         {label} {required && <span className="text-destructive">*</span>}
       </Label>
-      <div className="flex items-center space-x-2">
-        <Input
-          id={id}
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          onClick={() => setShowColorPicker(!showColorPicker)}
-          placeholder={placeholder}
-          className={error ? 'border-destructive' : className}
-          readOnly
-          {...props}
-        />
-        <div
-          className="h-10 w-10 cursor-pointer rounded border"
-          style={{ backgroundColor: value || '#fff' }}
-          onClick={() => setShowColorPicker(!showColorPicker)}
-        />
-      </div>
-      {showColorPicker && (
-        <div className="absolute z-10 mt-2">
-          <div className="fixed inset-0" onClick={() => setShowColorPicker(false)} />
-          <div className="relative">
-            <Sketch color={value || '#fff'} onChange={(color) => onChange(color.hex)} />
-          </div>
+      {loading ? (
+        <div className="flex items-center space-x-2">
+          <Skeleton className="h-10 flex-1" />
+          <Skeleton className="h-10 w-10" />
         </div>
+      ) : (
+        <>
+          <div className="flex items-center space-x-2">
+            <Input
+              id={id}
+              type="text"
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+              onClick={() => setShowColorPicker(!showColorPicker)}
+              placeholder={placeholder}
+              className={error ? 'border-destructive' : className}
+              readOnly
+              {...props}
+            />
+            <div
+              className="h-10 w-10 cursor-pointer rounded border"
+              style={{ backgroundColor: value || '#fff' }}
+              onClick={() => setShowColorPicker(!showColorPicker)}
+            />
+          </div>
+          {showColorPicker && (
+            <div className="absolute z-10 mt-2">
+              <div className="fixed inset-0" onClick={() => setShowColorPicker(false)} />
+              <div className="relative">
+                <Sketch color={value || '#fff'} onChange={(color) => onChange(color.hex)} />
+              </div>
+            </div>
+          )}
+        </>
       )}
       {error && <p className="text-sm text-destructive">{error}</p>}
     </div>

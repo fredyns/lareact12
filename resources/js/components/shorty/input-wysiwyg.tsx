@@ -13,6 +13,7 @@ interface InputWysiwygProps {
   error?: string;
   required?: boolean;
   disabled?: boolean;
+  loading?: boolean;
 }
 
 export function InputWysiwyg({
@@ -25,6 +26,7 @@ export function InputWysiwyg({
   error,
   required = false,
   disabled = false,
+  loading = false,
 }: InputWysiwygProps) {
   return (
     <div className="space-y-2">
@@ -36,7 +38,7 @@ export function InputWysiwyg({
         apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
         licenseKey="gpl"
         initialValue={initialValue}
-        disabled={disabled}
+        disabled={disabled || loading}
         init={{
           height: height,
           menubar: false,

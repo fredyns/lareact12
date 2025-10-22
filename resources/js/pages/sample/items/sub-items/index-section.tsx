@@ -444,7 +444,7 @@ export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }:
       {editModalOpen && selectedSubItem && !enumLoading && (
         <SubItemEditModal
           itemId={itemId}
-          subItemId={selectedSubItem.id}
+          subItem={selectedSubItem}
           enumerateOptions={enumerateOptions}
           open={editModalOpen}
           onOpenChange={setEditModalOpen}

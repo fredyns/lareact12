@@ -14,6 +14,7 @@ interface InputFileProps {
   maxSize: number;
   required?: boolean;
   disabled?: boolean;
+  loading?: boolean;
 }
 
 export function InputFile({
@@ -27,6 +28,7 @@ export function InputFile({
   maxSize,
   required = false,
   disabled = false,
+  loading = false,
 }: InputFileProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -130,13 +132,13 @@ export function InputFile({
           </a>
         </div>
       ) : null}
-      {!disabled && (
+      {!disabled && !loading && (
         <>
           <FileDropzone
             accept={accept}
             maxSize={maxSize}
             onFileDrop={handleFileDrop}
-            disabled={disabled}
+            disabled={disabled || loading}
             isUploading={isUploading}
             isSuccess={isSuccess}
             currentFileName={currentFileName}

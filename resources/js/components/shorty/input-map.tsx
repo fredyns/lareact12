@@ -43,14 +43,15 @@ interface ClickableMarkerProps {
   position: [number, number];
   onPositionChange: (lat: number, lng: number) => void;
   disabled?: boolean;
+  loading?: boolean;
 }
 
-const ClickableMarker = ({ position, onPositionChange, disabled = false }: ClickableMarkerProps) => {
+const ClickableMarker = ({ position, onPositionChange, disabled = false, loading = false }: ClickableMarkerProps) => {
   const [markerPosition, setMarkerPosition] = useState<[number, number]>(position);
 
   useMapEvents({
     click(e) {
-      if (!disabled) {
+      if (!disabled && !loading) {
         const { lat, lng } = e.latlng;
         setMarkerPosition([lat, lng]);
         onPositionChange(lat, lng);
@@ -72,6 +73,7 @@ interface InputMapProps {
   zoom?: number;
   required?: boolean;
   disabled?: boolean;
+  loading?: boolean;
 }
 
 export function InputMap({
@@ -85,6 +87,7 @@ export function InputMap({
   zoom = DEFAULT_ZOOM,
   required = false,
   disabled = false,
+  loading = false,
 }: InputMapProps) {
   const [showMapModal, setShowMapModal] = useState(false);
   const [tempLat, setTempLat] = useState(latitude ?? DEFAULT_CENTER[0]);
@@ -284,13 +287,13 @@ export function InputMap({
               }}
               placeholder="Enter latitude"
               className={`${latitudeError ? 'border-destructive' : ''} ${!required && latitude !== null ? 'pr-10' : ''}`}
-              disabled={disabled}
+              disabled={disabled || loading}
             />
             {!required && latitude !== null && (
               <button
                 type="button"
                 onClick={handleClearLocation}
-                disabled={disabled}
+                disabled={disabled || loading}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
               >
                 <X className="h-4 w-4" />
@@ -319,13 +322,13 @@ export function InputMap({
               }}
               placeholder="Enter longitude"
               className={`${longitudeError ? 'border-destructive' : ''} ${!required && longitude !== null ? 'pr-10' : ''}`}
-              disabled={disabled}
+              disabled={disabled || loading}
             />
             {!required && longitude !== null && (
               <button
                 type="button"
                 onClick={handleClearLocation}
-                disabled={disabled}
+                disabled={disabled || loading}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
               >
                 <X className="h-4 w-4" />
@@ -341,19 +344,19 @@ export function InputMap({
           <div
             key={`map-${mapKey}-${latitude}-${longitude}`}
             ref={thumbnailContainerRef}
-            className={`w-full rounded-lg border ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer transition-opacity hover:opacity-80'}`}
+            className={`w-full rounded-lg border ${disabled || loading ? 'cursor-not-allowed opacity-50' : 'cursor-pointer transition-opacity hover:opacity-80'}`}
             style={{
               width: dimensions.width > 0 ? `${dimensions.width}px` : '100%',
               height: dimensions.height > 0 ? `${dimensions.height}px` : '360px',
               minWidth: '360px',
               minHeight: '360px',
             }}
-            onClick={disabled ? undefined : handleOpenModal}
+            onClick={disabled || loading ? undefined : handleOpenModal}
           />
         ) : (
           <div
-            className={`flex h-64 w-full items-center justify-center rounded-lg border bg-muted/50 ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer transition-opacity hover:opacity-80'}`}
-            onClick={disabled ? undefined : handleOpenModal}
+            className={`flex h-64 w-full items-center justify-center rounded-lg border bg-muted/50 ${disabled || loading ? 'cursor-not-allowed opacity-50' : 'cursor-pointer transition-opacity hover:opacity-80'}`}
+            onClick={disabled || loading ? undefined : handleOpenModal}
           >
             <div className="text-center">
               <MapPin className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
@@ -404,7 +407,7 @@ export function InputMap({
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
-                  <ClickableMarker position={[tempLat || DEFAULT_CENTER[0], tempLng || DEFAULT_CENTER[1]]} onPositionChange={handleTempPositionChange} disabled={disabled} />
+                  <ClickableMarker position={[tempLat || DEFAULT_CENTER[0], tempLng || DEFAULT_CENTER[1]]} onPositionChange={handleTempPositionChange} disabled={disabled} loading={loading} />
                   <ScaleControl />
                 </MapContainer>
               </div>
@@ -417,7 +420,7 @@ export function InputMap({
                       handleClearLocation();
                       setShowMapModal(false);
                     }}
-                    disabled={disabled}
+                    disabled={disabled || loading}
                     className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
                   >
                     <X className="mr-2 h-4 w-4" />
@@ -428,7 +431,7 @@ export function InputMap({
                   <Button variant="outline" onClick={() => setShowMapModal(false)}>
                     Cancel
                   </Button>
-                  <Button onClick={handleSelectLocation} disabled={disabled}>
+                  <Button onClick={handleSelectLocation} disabled={disabled || loading}>
                     <MapPin className="mr-2 h-4 w-4" />
                     Select This Location
                   </Button>

@@ -78,6 +78,8 @@ interface FormFieldProps {
   subItem?: SubItem;
   // Optional: Pass uploadPath directly for create mode
   uploadPath: string;
+  // Loading state for shimmer effect
+  loading?: boolean;
 }
 
 export function FormField({
@@ -87,6 +89,7 @@ export function FormField({
   enumerateOptions,
   subItem,
   uploadPath: uploadPathProp,
+  loading = false,
 }: FormFieldProps) {
   // Tab height management
   const [minTabHeight, setMinTabHeight] = useState<number>(0);
@@ -136,6 +139,7 @@ export function FormField({
                   placeholder="Enter string value"
                   error={errors.string}
                   required
+                  loading={false}
                 />
               </div>
 
@@ -147,6 +151,7 @@ export function FormField({
                   onChange={(value) => setData('email', value)}
                   error={errors.email}
                   placeholder="Enter email address"
+                  loading={false}
                 />
               </div>
 
@@ -158,6 +163,7 @@ export function FormField({
                   onChange={(value) => setData('enumerate', value)}
                   options={enumerateOptions}
                   error={errors.enumerate}
+                  loading={false}
                 />
               </div>
             </div>
@@ -171,6 +177,7 @@ export function FormField({
                 rows={3}
                 placeholder="Enter text content"
                 error={errors.text}
+                loading={loading}
               />
             </div>
           </CardContent>
@@ -206,6 +213,7 @@ export function FormField({
                 onChange={(value) => setData('color', value)}
                 placeholder="Select a color"
                 error={errors.color}
+                loading={loading}
               />
 
               <InputNumber
@@ -216,6 +224,7 @@ export function FormField({
                 min={0}
                 max={100}
                 error={errors.integer}
+                loading={false}
               />
 
               <InputNumber
@@ -226,6 +235,7 @@ export function FormField({
                 step="0.01"
                 slider={false}
                 error={errors.decimal}
+                loading={loading}
               />
 
               <InputNpwp
@@ -234,6 +244,7 @@ export function FormField({
                 value={data.npwp}
                 onChange={(value) => setData('npwp', value)}
                 error={errors.npwp}
+                loading={loading}
               />
 
               <InputSelectUser
@@ -242,6 +253,7 @@ export function FormField({
                 onChange={(value) => setData('user_id', value)}
                 defaultValue={userDefaultValue}
                 error={errors.user_id}
+                loading={loading}
                 // allowCreate={false}
               />
             </CardContent>
@@ -268,6 +280,7 @@ export function FormField({
                 onChange={(value) => setData('date', value)}
                 placeholder="Select a date"
                 error={errors.date}
+                loading={loading}
               />
 
               <InputTime
@@ -277,6 +290,7 @@ export function FormField({
                 onChange={(value) => setData('time', value)}
                 placeholder="Select time"
                 error={errors.time}
+                loading={loading}
               />
 
               <InputDatetime
@@ -286,6 +300,7 @@ export function FormField({
                 onChange={(value) => setData('datetime', value)}
                 placeholder="Select date and time"
                 error={errors.datetime}
+                loading={loading}
               />
             </CardContent>
           </Card>
@@ -311,6 +326,7 @@ export function FormField({
                 onChange={(value) => setData('ip_address', value)}
                 placeholder="192.168.1.1"
                 error={errors.ip_address}
+                loading={loading}
               />
 
               <InputCheckbox
@@ -319,6 +335,7 @@ export function FormField({
                 checked={!!data.boolean}
                 onChange={(checked) => setData('boolean', checked)}
                 error={errors.boolean}
+                loading={loading}
               />
             </CardContent>
           </Card>
@@ -346,6 +363,7 @@ export function FormField({
                   latitudeError={errors.latitude}
                   longitudeError={errors.longitude}
                   ratio={4 / 3}
+                  loading={loading}
                 />
               </div>
             </CardContent>
@@ -374,6 +392,7 @@ export function FormField({
                 uploadPath={uploadPath}
                 accept=".pdf,.docx,.pptx,.xlsx,.zip,.rar"
                 maxSize={10 * 1024 * 1024} // 10MB
+                loading={loading}
               />
 
               <InputImage
@@ -386,6 +405,7 @@ export function FormField({
                 uploadPath={uploadPath}
                 accept=".jpg,.jpeg,.png,.heic"
                 maxSize={5 * 1024 * 1024} // 5MB
+                loading={loading}
               />
             </CardContent>
           </Card>
@@ -411,6 +431,7 @@ export function FormField({
                 onChange={(value) => setData('markdown_text', value)}
                 rows={12}
                 error={errors.markdown_text}
+                loading={loading}
               />
 
               <InputWysiwyg
@@ -421,6 +442,7 @@ export function FormField({
                 initialValue={wysiwygInitialValue}
                 height={300}
                 error={errors.wysiwyg}
+                loading={loading}
               />
             </CardContent>
           </Card>

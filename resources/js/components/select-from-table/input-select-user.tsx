@@ -13,7 +13,7 @@ import AsyncSelect from 'react-select/async';
 import { User, SelectOption } from '@/types';
 import { Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import users from '@/routes/users';
+import users from '@/routes/users/index';
 
 interface InputSelectUserProps {
   id: string;
@@ -25,6 +25,7 @@ interface InputSelectUserProps {
   placeholder?: string;
   disabled?: boolean;
   allowCreate?: boolean;
+  loading?: boolean;
 }
 
 export function InputSelectUser({
@@ -37,6 +38,7 @@ export function InputSelectUser({
   placeholder = 'Select user...',
   disabled = false,
   allowCreate = true,
+  loading = false,
 }: InputSelectUserProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -205,7 +207,8 @@ export function InputSelectUser({
               classNamePrefix="react-select"
               isClearable
               placeholder={placeholder}
-              isDisabled={disabled}
+              isDisabled={disabled || loading}
+              isLoading={loading}
               theme={(theme) => ({
                 ...theme,
                 colors: {
@@ -272,7 +275,7 @@ export function InputSelectUser({
                 setNewUserData({ name: '', email: '', password: '', password_confirmation: '' });
                 setIsDialogOpen(true);
               }}
-              disabled={disabled}
+              disabled={disabled || loading}
               title="Add new user"
             >
               <Plus className="h-4 w-4" />

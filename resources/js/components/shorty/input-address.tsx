@@ -8,6 +8,7 @@ interface InputIpAddressProps extends Omit<React.InputHTMLAttributes<HTMLInputEl
   value: string;
   onChange: (value: string) => void;
   error?: string;
+  loading?: boolean;
 }
 
 export function InputAddress({
@@ -19,6 +20,7 @@ export function InputAddress({
   placeholder = '192.168.1.1',
   required = false,
   className = '',
+  loading = false,
   ...props
 }: InputIpAddressProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,6 +82,7 @@ export function InputAddress({
         maxLength={15}
         className={error ? 'border-destructive' : className}
         required={required}
+        disabled={loading || props.disabled}
         {...props}
       />
       {error && <p className="text-sm text-destructive">{error}</p>}
