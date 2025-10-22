@@ -19,6 +19,7 @@ import { InputWysiwyg } from '@/components/shorty/input-wysiwyg';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { SelectOption, SubItem } from '@/types';
+import { useEffect, useRef, useState } from 'react';
 
 interface FormData {
   string: string;
@@ -87,6 +88,10 @@ export function FormField({
   subItem,
   uploadPath: uploadPathProp,
 }: FormFieldProps) {
+  // Tab height management
+  const [minTabHeight, setMinTabHeight] = useState<number>(0);
+  const tabRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+
   // Extract optional props from subItem if provided (edit mode)
   const currentFileUrl = subItem?.file_url ?? undefined;
   const currentFileName = (subItem?.file ?? '').split('/').pop() || 'Download file';
@@ -97,6 +102,21 @@ export function FormField({
   const uploadPath = uploadPathProp;
   const userDefaultValue = subItem?.user ? { value: subItem.user.id, label: subItem.user.name } : null;
   const wysiwygInitialValue = subItem?.wysiwyg || '';
+
+  // Calculate max height across all tabs after component mounts
+  useEffect(() => {
+    // Wait for next tick to ensure DOM is updated
+    setTimeout(() => {
+      const heights = Object.values(tabRefs.current)
+        .filter((ref): ref is HTMLDivElement => ref !== null)
+        .map((ref) => ref.scrollHeight);
+
+      if (heights.length > 0) {
+        const maxHeight = Math.max(...heights);
+        setMinTabHeight(maxHeight);
+      }
+    }, 100);
+  }, [data, subItem]);
   return (
     <>
       <div className="grid grid-cols-1 gap-6">
@@ -166,7 +186,14 @@ export function FormField({
           <TabsTrigger value="content">Content</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="basic" className="mt-6">
+        <TabsContent
+          value="basic"
+          className="mt-6"
+          ref={(el) => {
+            tabRefs.current['basic'] = el;
+          }}
+          style={{ minHeight: minTabHeight > 0 ? `${minTabHeight}px` : undefined }}
+        >
           <Card>
             <CardHeader>
               <CardTitle>Basic Information</CardTitle>
@@ -221,7 +248,14 @@ export function FormField({
           </Card>
         </TabsContent>
 
-        <TabsContent value="datetime" className="mt-6">
+        <TabsContent
+          value="datetime"
+          className="mt-6"
+          ref={(el) => {
+            tabRefs.current['datetime'] = el;
+          }}
+          style={{ minHeight: minTabHeight > 0 ? `${minTabHeight}px` : undefined }}
+        >
           <Card>
             <CardHeader>
               <CardTitle>Date & Time</CardTitle>
@@ -257,7 +291,14 @@ export function FormField({
           </Card>
         </TabsContent>
 
-        <TabsContent value="other" className="mt-6">
+        <TabsContent
+          value="other"
+          className="mt-6"
+          ref={(el) => {
+            tabRefs.current['other'] = el;
+          }}
+          style={{ minHeight: minTabHeight > 0 ? `${minTabHeight}px` : undefined }}
+        >
           <Card>
             <CardHeader>
               <CardTitle>Other Information</CardTitle>
@@ -283,7 +324,14 @@ export function FormField({
           </Card>
         </TabsContent>
 
-        <TabsContent value="location" className="mt-6">
+        <TabsContent
+          value="location"
+          className="mt-6"
+          ref={(el) => {
+            tabRefs.current['location'] = el;
+          }}
+          style={{ minHeight: minTabHeight > 0 ? `${minTabHeight}px` : undefined }}
+        >
           <Card>
             <CardHeader>
               <CardTitle>Location</CardTitle>
@@ -304,7 +352,14 @@ export function FormField({
           </Card>
         </TabsContent>
 
-        <TabsContent value="files" className="mt-6">
+        <TabsContent
+          value="files"
+          className="mt-6"
+          ref={(el) => {
+            tabRefs.current['files'] = el;
+          }}
+          style={{ minHeight: minTabHeight > 0 ? `${minTabHeight}px` : undefined }}
+        >
           <Card>
             <CardHeader>
               <CardTitle>Files</CardTitle>
@@ -336,7 +391,14 @@ export function FormField({
           </Card>
         </TabsContent>
 
-        <TabsContent value="content" className="mt-6">
+        <TabsContent
+          value="content"
+          className="mt-6"
+          ref={(el) => {
+            tabRefs.current['content'] = el;
+          }}
+          style={{ minHeight: minTabHeight > 0 ? `${minTabHeight}px` : undefined }}
+        >
           <Card>
             <CardHeader>
               <CardTitle>Text Content</CardTitle>
