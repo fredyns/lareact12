@@ -27,7 +27,7 @@ class EnumController extends Controller
         // Map of allowed enum classes for security
         // Add new enums here to make them available via API
         $allowedEnums = [
-            'ItemEnumerate' => \App\Enums\Sample\ItemEnumerate::class,
+            'Sample/ItemEnumerate' => \App\Enums\Sample\ItemEnumerate::class,
             'UserRole' => \App\Enums\UserRole::class,
             // Add more enums here as needed
         ];

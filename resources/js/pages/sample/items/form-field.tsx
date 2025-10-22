@@ -132,7 +132,7 @@ export function FormField({
                   label="Status"
                   value={data.enumerate}
                   onChange={(value) => setData('enumerate', value)}
-                  enumClass="ItemEnumerate"
+                  enumClass="Sample/ItemEnumerate"
                   error={errors.enumerate}
                 />
               </div>
