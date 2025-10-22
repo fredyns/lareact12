@@ -10,6 +10,7 @@ import { ShowText } from '@/components/shorty/show-text';
 import { ShowWysiwyg } from '@/components/shorty/show-wysiwyg';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, Item } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
@@ -82,18 +83,54 @@ export default function Show({ item, enumerateOptions }: Props) {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <div className="space-y-6">
-            {/* Basic Information Card */}
+        <div className="grid grid-cols-1 gap-6">
+            {/* Main Information Card */}
+            <Card>
+                <CardHeader>
+                    <CardTitle>Main Information</CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-col gap-4">
+                    <div className="flex flex-col md:flex-row gap-4">
+                        <div className="flex-1 md:w-1/3">
+                            <ShowField label="String" value={item.string} />
+                        </div>
+
+                        <div className="flex-1 md:w-1/3">
+                            <ShowField label="Email" value={item.email} />
+                        </div>
+
+                        <div className="flex-1 md:w-1/3">
+                            <ShowBadge
+                                label="Status"
+                                value={getEnumerateLabel(item.enumerate)}
+                                variant={item.enumerate === 'enable' ? 'default' : 'secondary'}
+                                icon={item.enumerate === 'enable' ? Check : X}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="w-full">
+                        <ShowText label="Text" value={item.text} />
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+        <Tabs defaultValue="basic" className="w-full">
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="basic">Basic</TabsTrigger>
+            <TabsTrigger value="datetime">Date & Time</TabsTrigger>
+            <TabsTrigger value="other">Other</TabsTrigger>
+            <TabsTrigger value="location">Location</TabsTrigger>
+            <TabsTrigger value="files">Files</TabsTrigger>
+            <TabsTrigger value="content">Content</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="basic" className="mt-6">
             <Card>
               <CardHeader>
                 <CardTitle>Basic Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <ShowField label="String" value={item.string} />
-
-                <ShowField label="Email" value={item.email} />
-
                 <ShowColor color={item.color} />
 
                 <ShowField label="Integer" value={item.integer} />
@@ -102,18 +139,12 @@ export default function Show({ item, enumerateOptions }: Props) {
 
                 <ShowField label="NPWP" value={item.npwp} />
 
-                <ShowBadge
-                  label="Status"
-                  value={getEnumerateLabel(item.enumerate)}
-                  variant={item.enumerate === 'enable' ? 'default' : 'secondary'}
-                  icon={item.enumerate === 'enable' ? Check : X}
-                />
-
                 <ShowField label="User" value={item.user?.name} />
               </CardContent>
             </Card>
+          </TabsContent>
 
-            {/* Date & Time */}
+          <TabsContent value="datetime" className="mt-6">
             <Card>
               <CardHeader>
                 <CardTitle>Date & Time</CardTitle>
@@ -126,8 +157,9 @@ export default function Show({ item, enumerateOptions }: Props) {
                 <ShowDatetime label="Datetime" value={item.datetime} format="ddd, MMM dd, yyyy HH:mm" />
               </CardContent>
             </Card>
+          </TabsContent>
 
-            {/* Other Information */}
+          <TabsContent value="other" className="mt-6">
             <Card>
               <CardHeader>
                 <CardTitle>Other Information</CardTitle>
@@ -138,20 +170,20 @@ export default function Show({ item, enumerateOptions }: Props) {
                 <ShowField label="Boolean" value={item.boolean ? 'True' : 'False'} />
               </CardContent>
             </Card>
+          </TabsContent>
 
-            {/* Location */}
+          <TabsContent value="location" className="mt-6">
             <Card>
               <CardHeader>
                 <CardTitle>Location</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <ShowMap latitude={item.latitude} longitude={item.longitude} popupText={item.string} />
+                <ShowMap latitude={item.latitude} longitude={item.longitude} popupText={item.string} ratio={4/3} />
               </CardContent>
             </Card>
-          </div>
+          </TabsContent>
 
-          <div className="space-y-6">
-            {/* Files */}
+          <TabsContent value="files" className="mt-6">
             <Card>
               <CardHeader>
                 <CardTitle>Files</CardTitle>
@@ -162,22 +194,21 @@ export default function Show({ item, enumerateOptions }: Props) {
                 <ShowImage label="Image (JPG, JPEG, PNG)" url={item.image_url} alt={item.string} />
               </CardContent>
             </Card>
+          </TabsContent>
 
-            {/* Text Content */}
+          <TabsContent value="content" className="mt-6">
             <Card>
               <CardHeader>
                 <CardTitle>Text Content</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <ShowText label="Text" value={item.text} />
-
                 <ShowMarkdown label="Markdown Content" value={item.markdown_text} />
 
                 <ShowWysiwyg label="WYSIWYG Content" value={item.wysiwyg} />
               </CardContent>
             </Card>
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
 
         {/* Sub Items Section */}
         <div className="mt-6">
