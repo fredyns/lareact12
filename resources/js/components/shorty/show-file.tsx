@@ -1,18 +1,22 @@
+import { Skeleton } from '@/components/ui/skeleton';
 import { FileText } from 'lucide-react';
 
 interface ShowFileProps {
   label: string;
   url: string | null;
   path: string | null;
+  loading?: boolean;
 }
 
-export function ShowFile({ label, url, path }: ShowFileProps) {
+export function ShowFile({ label, url, path, loading = false }: ShowFileProps) {
   const fileName = path ? path.split('/').pop() || 'Download file' : 'Download file';
 
   return (
     <div className="space-y-2">
       <p className="text-sm text-muted-foreground">{label}</p>
-      {url ? (
+      {loading ? (
+        <Skeleton className="h-20 w-full" />
+      ) : url ? (
         <a
           href={url}
           target="_blank"

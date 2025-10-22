@@ -1,7 +1,6 @@
 <?php
 /**
  * Todo:
- *  24. @ show-modal for sub-item:  show dialog title persistently, without shimmering effect.
  *  25. @ edit-modal for sub-item: show dialog title persistently, without shimmering effect.
  *  26. @ index-section for sub-items: limit selected columns to save memory
  *  27. @ show-modal for sub-item: pass only `subItem` object instead of `id`. use optimistic to show fields.

@@ -1,4 +1,5 @@
 import { Dialog, DialogHeader, DialogOverlay, DialogPortal, DialogTitle } from '@/components/ui/dialog';
+import { Skeleton } from '@/components/ui/skeleton';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -20,6 +21,7 @@ interface ShowMapProps {
   popupText?: string;
   zoom?: number;
   ratio?: number;
+  loading?: boolean;
 }
 
 // Zoom level 11 is approximately 5km view
@@ -44,7 +46,7 @@ function ScaleControl() {
   return null;
 }
 
-export function ShowMap({ latitude, longitude, popupText = 'Location', zoom = DEFAULT_ZOOM, ratio = 1 }: ShowMapProps) {
+export function ShowMap({ latitude, longitude, popupText = 'Location', zoom = DEFAULT_ZOOM, ratio = 1, loading = false }: ShowMapProps) {
   const [showMapModal, setShowMapModal] = useState(false);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const thumbnailMapRef = useRef<L.Map | null>(null);
@@ -162,16 +164,26 @@ export function ShowMap({ latitude, longitude, popupText = 'Location', zoom = DE
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <p className="text-sm text-muted-foreground">Latitude</p>
-          <p className="font-medium">{latitude ?? '-'}</p>
+          {loading ? (
+            <Skeleton className="h-6 w-full" />
+          ) : (
+            <p className="font-medium">{latitude ?? '-'}</p>
+          )}
         </div>
         <div className="space-y-2">
           <p className="text-sm text-muted-foreground">Longitude</p>
-          <p className="font-medium">{longitude ?? '-'}</p>
+          {loading ? (
+            <Skeleton className="h-6 w-full" />
+          ) : (
+            <p className="font-medium">{longitude ?? '-'}</p>
+          )}
         </div>
       </div>
 
       <div className="mt-2">
-        {isValidLocation ? (
+        {loading ? (
+          <Skeleton className="h-[360px] w-full min-h-[360px]" />
+        ) : isValidLocation ? (
           <div
             ref={thumbnailContainerRef}
             className="w-full cursor-pointer rounded-lg border transition-opacity hover:opacity-80"

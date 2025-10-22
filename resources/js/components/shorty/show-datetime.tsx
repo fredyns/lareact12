@@ -1,10 +1,13 @@
+import { Skeleton } from '@/components/ui/skeleton';
+
 interface ShowDatetimeProps {
   label: string;
   value: string | null | undefined;
   format?: string | Intl.DateTimeFormatOptions;
+  loading?: boolean;
 }
 
-export function ShowDatetime({ label, value, format }: ShowDatetimeProps) {
+export function ShowDatetime({ label, value, format, loading = false }: ShowDatetimeProps) {
   const formatValue = (val: string) => {
     const date = new Date(val);
     
@@ -46,7 +49,11 @@ export function ShowDatetime({ label, value, format }: ShowDatetimeProps) {
   return (
     <div className="space-y-2">
       <p className="text-sm text-muted-foreground">{label}</p>
-      <p className="font-medium">{value ? formatValue(value) : '-'}</p>
+      {loading ? (
+        <Skeleton className="h-6 w-full" />
+      ) : (
+        <p className="font-medium">{value ? formatValue(value) : '-'}</p>
+      )}
     </div>
   );
 }

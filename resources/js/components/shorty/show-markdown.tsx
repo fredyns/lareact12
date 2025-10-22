@@ -1,3 +1,4 @@
+import { Skeleton } from '@/components/ui/skeleton';
 import { normalizeMarkdown } from '@/utils/markdown';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -5,14 +6,18 @@ import remarkGfm from 'remark-gfm';
 interface ShowMarkdownProps {
   label: string;
   value: string | null | undefined;
+  loading?: boolean;
 }
 
-export function ShowMarkdown({ label, value }: ShowMarkdownProps) {
+export function ShowMarkdown({ label, value, loading = false }: ShowMarkdownProps) {
   return (
     <div className="mt-2">
       <h3 className="mb-2 text-sm font-medium text-muted-foreground">{label}</h3>
-      <div className="prose prose-sm dark:prose-invert max-w-none">
-        {value ? (
+      {loading ? (
+        <Skeleton className="h-32 w-full" />
+      ) : (
+        <div className="prose prose-sm dark:prose-invert max-w-none">
+          {value ? (
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
@@ -74,10 +79,11 @@ export function ShowMarkdown({ label, value }: ShowMarkdownProps) {
           >
             {normalizeMarkdown(value)}
           </ReactMarkdown>
-        ) : (
-          <div className="rounded-lg bg-muted/50 p-4 text-muted-foreground">-</div>
-        )}
-      </div>
+          ) : (
+            <div className="rounded-lg bg-muted/50 p-4 text-muted-foreground">-</div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
