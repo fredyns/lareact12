@@ -1,3 +1,5 @@
+import { InputSelectUser } from '@/components/select-from-table/input-select-user';
+import { InputAddress } from '@/components/shorty/input-address';
 import { InputCheckbox } from '@/components/shorty/input-checkbox';
 import { InputColor } from '@/components/shorty/input-color';
 import { InputDate } from '@/components/shorty/input-date';
@@ -6,17 +8,16 @@ import { InputEmail } from '@/components/shorty/input-email';
 import { InputEnum } from '@/components/shorty/input-enum';
 import { InputFile } from '@/components/shorty/input-file';
 import { InputImage } from '@/components/shorty/input-image';
-import { InputAddress } from '@/components/shorty/input-address';
 import { InputMap } from '@/components/shorty/input-map';
 import { InputMarkdown } from '@/components/shorty/input-markdown';
 import { InputNpwp } from '@/components/shorty/input-npwp';
 import { InputNumber } from '@/components/shorty/input-number';
-import { InputSelectUser } from '@/components/select-from-table/input-select-user';
 import { InputString } from '@/components/shorty/input-string';
 import { InputTextarea } from '@/components/shorty/input-textarea';
 import { InputTime } from '@/components/shorty/input-time';
 import { InputWysiwyg } from '@/components/shorty/input-wysiwyg';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { SelectOption, SubItem } from '@/types';
 
 interface FormData {
@@ -98,33 +99,79 @@ export function FormField({
   const wysiwygInitialValue = subItem?.wysiwyg || '';
   return (
     <>
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="space-y-6">
-          {/* Basic Information */}
+      <div className="grid grid-cols-1 gap-6">
+        {/* Main Information Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Main Information</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 md:flex-row">
+              <div className="flex-1 md:w-1/3">
+                <InputString
+                  id="string"
+                  label="String"
+                  value={data.string}
+                  onChange={(value) => setData('string', value)}
+                  placeholder="Enter string value"
+                  error={errors.string}
+                  required
+                />
+              </div>
+
+              <div className="flex-1 md:w-1/3">
+                <InputEmail
+                  id="email"
+                  label="Email"
+                  value={data.email}
+                  onChange={(value) => setData('email', value)}
+                  error={errors.email}
+                  placeholder="Enter email address"
+                />
+              </div>
+
+              <div className="flex-1 md:w-1/3">
+                <InputEnum
+                  id="enumerate"
+                  label="Status"
+                  value={data.enumerate}
+                  onChange={(value) => setData('enumerate', value)}
+                  options={enumerateOptions}
+                  error={errors.enumerate}
+                />
+              </div>
+            </div>
+
+            <div className="w-full">
+              <InputTextarea
+                id="text"
+                label="Text"
+                value={data.text}
+                onChange={(value) => setData('text', value)}
+                rows={3}
+                placeholder="Enter text content"
+                error={errors.text}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      <Tabs defaultValue="basic" className="w-full">
+        <TabsList className="grid w-full grid-cols-6">
+          <TabsTrigger value="basic">Basic</TabsTrigger>
+          <TabsTrigger value="datetime">Date & Time</TabsTrigger>
+          <TabsTrigger value="other">Other</TabsTrigger>
+          <TabsTrigger value="location">Location</TabsTrigger>
+          <TabsTrigger value="files">Files</TabsTrigger>
+          <TabsTrigger value="content">Content</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="basic" className="mt-6">
           <Card>
             <CardHeader>
               <CardTitle>Basic Information</CardTitle>
             </CardHeader>
             <CardContent>
-              <InputString
-                id="string"
-                label="String"
-                value={data.string}
-                onChange={(value) => setData('string', value)}
-                placeholder="Enter string value"
-                error={errors.string}
-                required
-              />
-
-              <InputEmail
-                id="email"
-                label="Email"
-                value={data.email}
-                onChange={(value) => setData('email', value)}
-                error={errors.email}
-                placeholder="Enter email address"
-              />
-
               <InputColor
                 id="color"
                 label="Color"
@@ -162,15 +209,6 @@ export function FormField({
                 error={errors.npwp}
               />
 
-              <InputEnum
-                id="enumerate"
-                label="Status"
-                value={data.enumerate}
-                onChange={(value) => setData('enumerate', value)}
-                options={enumerateOptions}
-                error={errors.enumerate}
-              />
-
               <InputSelectUser
                 id="user_id"
                 label="User"
@@ -181,8 +219,9 @@ export function FormField({
               />
             </CardContent>
           </Card>
+        </TabsContent>
 
-          {/* Date & Time */}
+        <TabsContent value="datetime" className="mt-6">
           <Card>
             <CardHeader>
               <CardTitle>Date & Time</CardTitle>
@@ -216,8 +255,9 @@ export function FormField({
               />
             </CardContent>
           </Card>
+        </TabsContent>
 
-          {/* Other Information */}
+        <TabsContent value="other" className="mt-6">
           <Card>
             <CardHeader>
               <CardTitle>Other Information</CardTitle>
@@ -241,27 +281,30 @@ export function FormField({
               />
             </CardContent>
           </Card>
+        </TabsContent>
 
-          {/* Location */}
+        <TabsContent value="location" className="mt-6">
           <Card>
             <CardHeader>
               <CardTitle>Location</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <InputMap
-                latitude={data.latitude}
-                longitude={data.longitude}
-                onLatitudeChange={(value) => setData('latitude', value)}
-                onLongitudeChange={(value) => setData('longitude', value)}
-                latitudeError={errors.latitude}
-                longitudeError={errors.longitude}
-              />
+              <div className={'w-sm'}>
+                <InputMap
+                  latitude={data.latitude}
+                  longitude={data.longitude}
+                  onLatitudeChange={(value) => setData('latitude', value)}
+                  onLongitudeChange={(value) => setData('longitude', value)}
+                  latitudeError={errors.latitude}
+                  longitudeError={errors.longitude}
+                  ratio={4 / 3}
+                />
+              </div>
             </CardContent>
           </Card>
-        </div>
+        </TabsContent>
 
-        <div className="space-y-6">
-          {/* Files */}
+        <TabsContent value="files" className="mt-6">
           <Card>
             <CardHeader>
               <CardTitle>Files</CardTitle>
@@ -291,23 +334,14 @@ export function FormField({
               />
             </CardContent>
           </Card>
+        </TabsContent>
 
-          {/* Text Content */}
+        <TabsContent value="content" className="mt-6">
           <Card>
             <CardHeader>
               <CardTitle>Text Content</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <InputTextarea
-                id="text"
-                label="Text"
-                value={data.text}
-                onChange={(value) => setData('text', value)}
-                rows={3}
-                placeholder="Enter text content"
-                error={errors.text}
-              />
-
               <InputMarkdown
                 id="markdown_text"
                 label="Markdown Text"
@@ -328,8 +362,8 @@ export function FormField({
               />
             </CardContent>
           </Card>
-        </div>
-      </div>
+        </TabsContent>
+      </Tabs>
     </>
   );
 }
