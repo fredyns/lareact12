@@ -287,15 +287,17 @@ export function FormField({
               <CardTitle>Location</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <InputMap
-                latitude={data.latitude}
-                longitude={data.longitude}
-                onLatitudeChange={(value) => setData('latitude', value)}
-                onLongitudeChange={(value) => setData('longitude', value)}
-                latitudeError={errors.latitude}
-                longitudeError={errors.longitude}
-                ratio={4 / 3}
-              />
+              <div className={'w-sm'}>
+                <InputMap
+                  latitude={data.latitude}
+                  longitude={data.longitude}
+                  onLatitudeChange={(value) => setData('latitude', value)}
+                  onLongitudeChange={(value) => setData('longitude', value)}
+                  latitudeError={errors.latitude}
+                  longitudeError={errors.longitude}
+                  ratio={4 / 3}
+                />
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
