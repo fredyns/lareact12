@@ -2,14 +2,13 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogOverlay, DialogPortal, DialogTitle } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import sample from '@/routes/sample';
-import { SelectOption, SubItem } from '@/types';
+import { SubItem } from '@/types';
 import { getSubItemUploadPath, getTempUploadPath } from '@/utils/upload';
 import { Activity, FormEvent, useEffect, useState } from 'react';
 import { FormField } from './form-field';
 
 interface SubItemEditModalProps {
   subItem: SubItem;
-  enumerateOptions: SelectOption[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
@@ -41,7 +40,6 @@ interface FormData {
 
 export function SubItemEditModal({
   subItem: subItemProp,
-  enumerateOptions,
   open,
   onOpenChange,
   onSuccess,
@@ -224,7 +222,6 @@ export function SubItemEditModal({
                   data={data}
                   setData={(key, value) => setData((prev) => ({ ...prev, [key]: value }))}
                   errors={errors}
-                  enumerateOptions={enumerateOptions}
                   subItem={subItem || undefined}
                   uploadPath={subItem ? getSubItemUploadPath(subItem) : getTempUploadPath()}
                   loading={loading}

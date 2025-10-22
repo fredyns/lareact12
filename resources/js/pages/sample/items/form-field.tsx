@@ -70,7 +70,6 @@ interface FormFieldProps {
   data: FormData;
   setData: <K extends keyof FormData>(key: K, value: FormData[K]) => void;
   errors: FormErrors;
-  enumerateOptions: { value: string; label: string }[];
   // Optional: Pass item for edit mode to auto-populate optional props
   item?: Item;
   // Optional: Pass uploadPath directly for create mode
@@ -81,7 +80,6 @@ export function FormField({
   data,
   setData,
   errors,
-  enumerateOptions,
   item,
   uploadPath: uploadPathProp,
 }: FormFieldProps) {
@@ -134,7 +132,7 @@ export function FormField({
                   label="Status"
                   value={data.enumerate}
                   onChange={(value) => setData('enumerate', value)}
-                  options={enumerateOptions}
+                  enumClass="ItemEnumerate"
                   error={errors.enumerate}
                 />
               </div>

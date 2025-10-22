@@ -1,17 +1,13 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, SelectOption } from '@/types';
+import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft, Save } from 'lucide-react';
 import { dashboard } from '@/routes';
 import sample from '@/routes/sample';
 import { FormField } from './form-field';
 import { getTempUploadPath } from '@/utils/upload';
-
-interface Props {
-  enumerateOptions: SelectOption[];
-}
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -28,7 +24,7 @@ const breadcrumbs: BreadcrumbItem[] = [
   },
 ];
 
-export default function Create({ enumerateOptions }: Props) {
+export default function Create() {
   const { data, setData, post, processing, errors, reset } = useForm({
     string: '',
     email: '',
@@ -81,7 +77,6 @@ export default function Create({ enumerateOptions }: Props) {
             data={data}
             setData={setData}
             errors={errors}
-            enumerateOptions={enumerateOptions}
             uploadPath={getTempUploadPath()}
           />
 

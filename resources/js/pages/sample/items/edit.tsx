@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Item, SelectOption } from '@/types';
+import type { BreadcrumbItem, Item } from '@/types';
 import { getItemUploadPath } from '@/utils/upload';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft, Save } from 'lucide-react';
@@ -11,7 +11,6 @@ import { FormField } from './form-field';
 
 interface Props {
   item: Item;
-  enumerateOptions: SelectOption[];
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -29,7 +28,7 @@ const breadcrumbs: BreadcrumbItem[] = [
   },
 ];
 
-export default function Edit({ item, enumerateOptions }: Props) {
+export default function Edit({ item }: Props) {
   const { data, setData, put, processing, errors } = useForm({
     string: item.string,
     email: item.email || '',
@@ -83,7 +82,6 @@ export default function Edit({ item, enumerateOptions }: Props) {
             data={data}
             setData={setData}
             errors={errors}
-            enumerateOptions={enumerateOptions}
             item={item}
             uploadPath={getItemUploadPath(item)}
           />

@@ -47,7 +47,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     // Enum API Routes
-    Route::get('enums/{enumClass}', [EnumController::class, 'show'])->name('enums.show');
+    Route::get('enums/{enumClass}', [EnumController::class, 'show'])
+        ->where('enumClass', '.*')
+        ->name('enums.show');
 
     // Generic Upload Routes for MinIO
     Route::prefix('upload')->name('upload.')->group(function () {

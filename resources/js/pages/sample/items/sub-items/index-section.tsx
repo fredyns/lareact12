@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import sample from '@/routes/sample';
-import { SelectOption, SubItem } from '@/types';
+import { SubItem } from '@/types';
 import { Link } from '@inertiajs/react';
 
 import { Edit, Eye, Plus, Search, Trash2, X } from 'lucide-react';
@@ -16,15 +16,12 @@ import { SubItemShowModal } from './show-modal';
 
 interface SubItemsSectionProps {
   itemId: string;
-  enumerateOptions?: SelectOption[];
 }
 
-export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }: SubItemsSectionProps) {
+export function IndexSection({ itemId }: SubItemsSectionProps) {
   const [subItems, setSubItems] = useState<SubItem[]>([]);
   const [visibleRows, setVisibleRows] = useState<Set<number>>(new Set());
   const [loading, setLoading] = useState(true);
-  const [enumerateOptions, setEnumerateOptions] = useState<SelectOption[]>([]);
-  const [enumLoading, setEnumLoading] = useState(true);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -36,38 +33,6 @@ export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }:
   const [toItem, setToItem] = useState(0);
   const [search, setSearch] = useState('');
   const pageSize = 10;
-
-  // Fetch enumerate options from API
-  const fetchEnumerateOptions = useEffectEvent(async () => {
-    if (enumerateOptionsProp) {
-      setEnumerateOptions(enumerateOptionsProp);
-      setEnumLoading(false);
-      return;
-    }
-
-    try {
-      const response = await fetch('/enums/ItemEnumerate', {
-        headers: {
-          Accept: 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-        },
-        credentials: 'same-origin',
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        setEnumerateOptions(result.data || []);
-      }
-    } catch (error) {
-      console.error('Failed to fetch enumerate options:', error);
-    } finally {
-      setEnumLoading(false);
-    }
-  });
-
-  useEffect(() => {
-    fetchEnumerateOptions();
-  }, []);
 
   // Fetch sub-items asynchronously
   useEffect(() => {
@@ -252,7 +217,7 @@ export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }:
         <CardHeader>
           <div className="flex flex-row items-center justify-between">
             <CardTitle>Sub Items</CardTitle>
-            <Button size="sm" onClick={() => setCreateModalOpen(true)} disabled={enumLoading}>
+            <Button size="sm" onClick={() => setCreateModalOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
               Add Sub Item
             </Button>
@@ -359,7 +324,7 @@ export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }:
                           <Button size="sm" variant="ghost" onClick={() => handleView(subItem)}>
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Button size="sm" variant="ghost" onClick={() => handleEdit(subItem)} disabled={enumLoading}>
+                          <Button size="sm" variant="ghost" onClick={() => handleEdit(subItem)}>
                             <Edit className="h-4 w-4" />
                           </Button>
                           <Button size="sm" variant="ghost" onClick={() => handleDelete(subItem)}>
@@ -431,20 +396,18 @@ export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }:
         />
       )}
 
-      {createModalOpen && !enumLoading && (
+      {createModalOpen && (
         <SubItemCreateModal
           itemId={itemId}
-          enumerateOptions={enumerateOptions}
           open={createModalOpen}
           onOpenChange={setCreateModalOpen}
           onSuccess={handleCreateSuccess}
         />
       )}
 
-      {editModalOpen && selectedSubItem && !enumLoading && (
+      {editModalOpen && selectedSubItem && (
         <SubItemEditModal
           subItem={selectedSubItem}
-          enumerateOptions={enumerateOptions}
           open={editModalOpen}
           onOpenChange={setEditModalOpen}
           onSuccess={handleUpdateSuccess}

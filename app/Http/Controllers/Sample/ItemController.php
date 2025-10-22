@@ -94,9 +94,7 @@ class ItemController extends Controller
     {
         $this->authorize('create', Item::class);
 
-        return Inertia::render('sample/items/create', [
-            'enumerateOptions' => ItemEnumerate::toSelectOptions(),
-        ]);
+        return Inertia::render('sample/items/create');
     }
 
     /**
@@ -171,7 +169,6 @@ class ItemController extends Controller
 
         return Inertia::render('sample/items/edit', [
             'item' => (new ItemResource($item))->toArray(request()),
-            'enumerateOptions' => ItemEnumerate::toSelectOptions(),
         ]);
     }
 

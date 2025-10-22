@@ -8,6 +8,7 @@
  *  35. create 'edit-modal' for `sample_tree_nodes` placed in show item page.
  *  36. sorting `sample_tree_nodes` function in index section with drag & drop.
  *  37. rename InputAddress > InputIpAddress
- *  38. 
+ *  38. make InputEnum directly access `/enums/${enumClass}`. ensure its controller. implement to other forms.
+ *  39.
  * 
  */ 

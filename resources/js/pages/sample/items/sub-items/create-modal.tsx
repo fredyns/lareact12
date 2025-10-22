@@ -7,14 +7,12 @@ import {
   DialogPortal,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { SelectOption } from '@/types';
 import { Activity, FormEvent, useState } from 'react';
 import sample from '@/routes/sample';
 import { FormField } from './form-field';
 
 interface SubItemCreateModalProps {
   itemId: string;
-  enumerateOptions: SelectOption[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
@@ -46,7 +44,6 @@ interface FormData {
 
 export function SubItemCreateModal({
   itemId,
-  enumerateOptions,
   open,
   onOpenChange,
   onSuccess,
@@ -160,7 +157,6 @@ export function SubItemCreateModal({
               data={data}
               setData={(key, value) => setData({ ...data, [key]: value })}
               errors={errors}
-              enumerateOptions={enumerateOptions}
               uploadPath={`tmp/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, '0')}/${String(new Date().getDate()).padStart(2, '0')}/sample_sub_items`}
             />
 

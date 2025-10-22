@@ -1,6 +1,6 @@
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface EnumOption {
   value: string;
@@ -12,7 +12,7 @@ interface InputEnumProps {
   label: string;
   value: string;
   onChange: (value: string) => void;
-  options: EnumOption[];
+  enumClass: string; // e.g., 'ItemEnumerate'
   error?: string;
   required?: boolean;
   disabled?: boolean;
@@ -24,18 +24,48 @@ export function InputEnum({
   label,
   value,
   onChange,
-  options,
+  enumClass,
   error,
   required = false,
   disabled = false,
   loading = false,
 }: InputEnumProps) {
+  const [options, setOptions] = useState<EnumOption[]>([]);
+  const [fetchingOptions, setFetchingOptions] = useState(true);
+
+  useEffect(() => {
+    const fetchOptions = async () => {
+      setFetchingOptions(true);
+      try {
+        const response = await fetch(`/enums/${enumClass}`, {
+          headers: {
+            Accept: 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+          credentials: 'same-origin',
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          setOptions(result.data || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch enum options:', error);
+      } finally {
+        setFetchingOptions(false);
+      }
+    };
+
+    fetchOptions();
+  }, [enumClass]);
+
+  const isLoading = loading || fetchingOptions;
   return (
     <div className="space-y-2">
       <Label htmlFor={id}>
         {label} {required && <span className="text-destructive">*</span>}
       </Label>
-      {loading ? (
+      {isLoading ? (
         <Skeleton className="h-10 w-full" />
       ) : (
         <div className="flex flex-wrap gap-2">
