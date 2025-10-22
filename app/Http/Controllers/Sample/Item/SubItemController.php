@@ -21,8 +21,8 @@ class SubItemController extends Controller
     /**
      * Display a listing of sub-items for a specific item.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $itemId
+     * @param \Illuminate\Http\Request $request
+     * @param string $itemId
      * @return \Illuminate\Http\JsonResponse
      */
     public function index(Request $request, string $itemId)
@@ -35,7 +35,10 @@ class SubItemController extends Controller
         $search = $request->input('search');
 
         // $query = SubItem::where('item_id', $itemId);
-        $query = $item->subItems();
+        $query = $item->subItems()->select([
+            // list only the necessary columns to save memory
+            'id', 'item_id', 'string', 'email', 'integer', 'enumerate',
+        ]);
 
         // Apply search if provided
         if ($search) {
@@ -63,7 +66,7 @@ class SubItemController extends Controller
     /**
      * Store a newly created sub-item.
      *
-     * @param  \App\Http\Requests\Sample\Item\StoreSubItemRequest  $request
+     * @param \App\Http\Requests\Sample\Item\StoreSubItemRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(StoreSubItemRequest $request)
@@ -72,10 +75,10 @@ class SubItemController extends Controller
         $this->authorize('view', $item);
 
         $data = $request->validated();
-        
+
         // Create the sub-item
         $subItem = SubItem::create($data);
-        
+
         // Load relationships for consistent data structure
         $subItem->load(['user', 'creator', 'updater']);
 
@@ -87,8 +90,8 @@ class SubItemController extends Controller
     /**
      * Display the specified sub-item.
      *
-     * @param  string  $itemId
-     * @param  string  $subItemId
+     * @param string $itemId
+     * @param string $subItemId
      * @return \Illuminate\Http\JsonResponse
      */
     public function show(string $itemId, string $subItemId)
@@ -108,9 +111,9 @@ class SubItemController extends Controller
     /**
      * Update the specified sub-item.
      *
-     * @param  \App\Http\Requests\Sample\Item\UpdateSubItemRequest  $request
-     * @param  string  $itemId
-     * @param  string  $subItemId
+     * @param \App\Http\Requests\Sample\Item\UpdateSubItemRequest $request
+     * @param string $itemId
+     * @param string $subItemId
      * @return \Illuminate\Http\JsonResponse
      */
     public function update(UpdateSubItemRequest $request, string $itemId, string $subItemId)
@@ -122,10 +125,10 @@ class SubItemController extends Controller
             ->findOrFail($subItemId);
 
         $data = $request->validated();
-        
+
         // Update the sub-item
         $subItem->update($data);
-        
+
         // Reload relationships for consistent data structure
         $subItem->load(['user', 'creator', 'updater']);
 
@@ -137,8 +140,8 @@ class SubItemController extends Controller
     /**
      * Remove the specified sub-item.
      *
-     * @param  string  $itemId
-     * @param  string  $subItemId
+     * @param string $itemId
+     * @param string $subItemId
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(string $itemId, string $subItemId)

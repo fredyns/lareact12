@@ -30,17 +30,20 @@ interface SubItemShowModalProps {
 }
 
 export function SubItemShowModal({ subItem: subItemProp, open, onOpenChange }: SubItemShowModalProps) {
-  const [subItem, setSubItem] = useState<SubItem | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Initialize with prop data for optimistic UI
+  const [subItem, setSubItem] = useState<SubItem | null>(subItemProp);
+  const [loadingFullData, setLoadingFullData] = useState(true);
 
   useEffect(() => {
     if (open && subItemProp?.id) {
+      // Set initial data immediately (optimistic UI)
+      setSubItem(subItemProp);
       fetchSubItem();
     }
   }, [open, subItemProp?.id]);
 
   const fetchSubItem = async () => {
-    setLoading(true);
+    setLoadingFullData(true);
     try {
       const url = sample.items.subItems.show.url({ item: subItemProp.item_id, subItem: subItemProp.id });
       const response = await fetch(url, {
@@ -58,7 +61,7 @@ export function SubItemShowModal({ subItem: subItemProp, open, onOpenChange }: S
     } catch (error) {
       console.error('Failed to fetch sub-item:', error);
     } finally {
-      setLoading(false);
+      setLoadingFullData(false);
     }
   };
 
@@ -82,27 +85,27 @@ export function SubItemShowModal({ subItem: subItemProp, open, onOpenChange }: S
                     <CardTitle>Basic Information</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <ShowField label="String" value={subItem?.string} loading={loading} />
+                    <ShowField label="String" value={subItem?.string} loading={false} />
 
-                    <ShowField label="Email" value={subItem?.email} loading={loading} />
+                    <ShowField label="Email" value={subItem?.email} loading={false} />
 
-                    <ShowColor color={subItem?.color ?? null} loading={loading} />
+                    <ShowColor color={subItem?.color ?? null} loading={loadingFullData} />
 
-                    <ShowField label="Integer" value={subItem?.integer} loading={loading} />
+                    <ShowField label="Integer" value={subItem?.integer} loading={false} />
 
-                    <ShowField label="Decimal" value={subItem?.decimal} loading={loading} />
+                    <ShowField label="Decimal" value={subItem?.decimal} loading={loadingFullData} />
 
-                    <ShowField label="NPWP" value={subItem?.npwp} loading={loading} />
+                    <ShowField label="NPWP" value={subItem?.npwp} loading={loadingFullData} />
 
                     <ShowBadge
                       label="Status"
                       value={subItem?.enumerate || 'N/A'}
                       variant={subItem?.enumerate === 'enable' ? 'default' : 'secondary'}
                       icon={subItem?.enumerate === 'enable' ? Check : X}
-                      loading={loading}
+                      loading={false}
                     />
 
-                    <ShowField label="User" value={subItem?.user?.name} loading={loading} />
+                    <ShowField label="User" value={subItem?.user?.name} loading={loadingFullData} />
                   </CardContent>
                 </Card>
 
@@ -112,11 +115,11 @@ export function SubItemShowModal({ subItem: subItemProp, open, onOpenChange }: S
                     <CardTitle>Date & Time</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <ShowDatetime label="Date" value={subItem?.date} format="ddd, MMM dd, yyyy" loading={loading} />
+                    <ShowDatetime label="Date" value={subItem?.date} format="ddd, MMM dd, yyyy" loading={loadingFullData} />
 
-                    <ShowDatetime label="Time" value={subItem?.time} format="HH:mm" loading={loading} />
+                    <ShowDatetime label="Time" value={subItem?.time} format="HH:mm" loading={loadingFullData} />
 
-                    <ShowDatetime label="Datetime" value={subItem?.datetime} format="ddd, MMM dd, yyyy HH:mm" loading={loading} />
+                    <ShowDatetime label="Datetime" value={subItem?.datetime} format="ddd, MMM dd, yyyy HH:mm" loading={loadingFullData} />
                   </CardContent>
                 </Card>
 
@@ -126,9 +129,9 @@ export function SubItemShowModal({ subItem: subItemProp, open, onOpenChange }: S
                     <CardTitle>Other Information</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <ShowField label="IP Address" value={subItem?.ip_address} loading={loading} />
+                    <ShowField label="IP Address" value={subItem?.ip_address} loading={loadingFullData} />
 
-                    <ShowField label="Boolean" value={subItem?.boolean ? 'True' : 'False'} loading={loading} />
+                    <ShowField label="Boolean" value={subItem?.boolean ? 'True' : 'False'} loading={loadingFullData} />
                   </CardContent>
                 </Card>
               </div>
@@ -144,7 +147,7 @@ export function SubItemShowModal({ subItem: subItemProp, open, onOpenChange }: S
                       latitude={subItem?.latitude ?? null}
                       longitude={subItem?.longitude ?? null}
                       popupText={subItem?.string}
-                      loading={loading}
+                      loading={loadingFullData}
                     />
                   </CardContent>
                 </Card>
@@ -159,14 +162,14 @@ export function SubItemShowModal({ subItem: subItemProp, open, onOpenChange }: S
                       label="File (PDF, DOCX, PPTX, XLSX, ZIP, RAR)"
                       url={subItem?.file_url ?? null}
                       path={subItem?.file ?? null}
-                      loading={loading}
+                      loading={loadingFullData}
                     />
 
                     <ShowImage
                       label="Image (JPG, JPEG, PNG)"
                       url={subItem?.image_url ?? null}
                       alt={subItem?.string ?? 'Sub Item Image'}
-                      loading={loading}
+                      loading={loadingFullData}
                     />
                   </CardContent>
                 </Card>
@@ -177,11 +180,11 @@ export function SubItemShowModal({ subItem: subItemProp, open, onOpenChange }: S
                     <CardTitle>Text Content</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <ShowText label="Text" value={subItem?.text} loading={loading} />
+                    <ShowText label="Text" value={subItem?.text} loading={loadingFullData} />
 
-                    <ShowMarkdown label="Markdown Content" value={subItem?.markdown_text} loading={loading} />
+                    <ShowMarkdown label="Markdown Content" value={subItem?.markdown_text} loading={loadingFullData} />
 
-                    <ShowWysiwyg label="WYSIWYG Content" value={subItem?.wysiwyg} loading={loading} />
+                    <ShowWysiwyg label="WYSIWYG Content" value={subItem?.wysiwyg} loading={loadingFullData} />
                   </CardContent>
                 </Card>
               </div>
