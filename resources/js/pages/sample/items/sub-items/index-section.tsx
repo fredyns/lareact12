@@ -443,7 +443,6 @@ export function IndexSection({ itemId, enumerateOptions: enumerateOptionsProp }:
 
       {editModalOpen && selectedSubItem && !enumLoading && (
         <SubItemEditModal
-          itemId={itemId}
           subItem={selectedSubItem}
           enumerateOptions={enumerateOptions}
           open={editModalOpen}

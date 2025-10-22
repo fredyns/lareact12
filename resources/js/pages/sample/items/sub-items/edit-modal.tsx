@@ -8,7 +8,6 @@ import { Activity, FormEvent, useEffect, useState } from 'react';
 import { FormField } from './form-field';
 
 interface SubItemEditModalProps {
-  itemId: string;
   subItem: SubItem;
   enumerateOptions: SelectOption[];
   open: boolean;
@@ -41,7 +40,6 @@ interface FormData {
 }
 
 export function SubItemEditModal({
-  itemId,
   subItem: subItemProp,
   enumerateOptions,
   open,
@@ -52,7 +50,7 @@ export function SubItemEditModal({
   const [subItem, setSubItem] = useState<SubItem | null>(subItemProp);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<FormData>({
-    item_id: itemId,
+    item_id: subItemProp.item_id,
     string: subItemProp.string || '',
     email: subItemProp.email || '',
     color: subItemProp.color || '#000000',
@@ -83,7 +81,7 @@ export function SubItemEditModal({
       // Set initial data immediately (optimistic UI)
       setSubItem(subItemProp);
       setData({
-        item_id: itemId,
+        item_id: subItemProp.item_id,
         string: subItemProp.string || '',
         email: subItemProp.email || '',
         color: subItemProp.color || '#000000',
@@ -113,7 +111,7 @@ export function SubItemEditModal({
   const fetchSubItem = async () => {
     setLoading(true);
     try {
-      const response = await fetch(sample.items.subItems.show.url([itemId, subItemProp.id]), {
+      const response = await fetch(sample.items.subItems.show.url([subItemProp.item_id, subItemProp.id]), {
         headers: {
           Accept: 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
@@ -126,7 +124,7 @@ export function SubItemEditModal({
         setSubItem(result.data);
         // Update form with full data
         setData({
-          item_id: itemId,
+          item_id: result.data.item_id,
           string: result.data.string || '',
           email: result.data.email || '',
           color: result.data.color || '#000000',
@@ -161,7 +159,7 @@ export function SubItemEditModal({
     setProcessing(true);
     setErrors({});
 
-    fetch(sample.items.subItems.update.url([itemId, subItemProp.id]), {
+    fetch(sample.items.subItems.update.url([subItemProp.item_id, subItemProp.id]), {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
