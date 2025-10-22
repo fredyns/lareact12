@@ -109,6 +109,9 @@ export function ShowMap({ latitude, longitude, popupText = 'Location', zoom = DE
   });
 
   useEffect(() => {
+    // Don't calculate dimensions while loading (container doesn't exist yet)
+    if (loading) return;
+
     updateDimensions();
     window.addEventListener('resize', updateDimensions);
 
@@ -122,10 +125,11 @@ export function ShowMap({ latitude, longitude, popupText = 'Location', zoom = DE
       window.removeEventListener('resize', updateDimensions);
       resizeObserver.disconnect();
     };
-  }, []);
+  }, [loading]);
 
   useEffect(() => {
-    if (!isValidLocation || !thumbnailContainerRef.current || dimensions.width === 0) return;
+    // Don't initialize map while loading or if location is invalid
+    if (loading || !isValidLocation || !thumbnailContainerRef.current || dimensions.width === 0) return;
 
     // Create thumbnail map
     const map = L.map(thumbnailContainerRef.current, {
@@ -157,7 +161,7 @@ export function ShowMap({ latitude, longitude, popupText = 'Location', zoom = DE
     return () => {
       map.remove();
     };
-  }, [latitude, longitude, zoom, isValidLocation, dimensions]);
+  }, [latitude, longitude, zoom, isValidLocation, dimensions, loading]);
 
   return (
     <>
