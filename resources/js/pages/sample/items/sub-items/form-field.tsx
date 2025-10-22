@@ -1,5 +1,5 @@
 import { InputSelectUser } from '@/components/select-from-table/input-select-user';
-import { InputAddress } from '@/components/shorty/input-address';
+import { InputIpAddress } from '@/components/shorty/input-ip-address';
 import { InputCheckbox } from '@/components/shorty/input-checkbox';
 import { InputColor } from '@/components/shorty/input-color';
 import { InputDate } from '@/components/shorty/input-date';
@@ -18,7 +18,7 @@ import { InputTime } from '@/components/shorty/input-time';
 import { InputWysiwyg } from '@/components/shorty/input-wysiwyg';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import type { SelectOption, SubItem } from '@/types';
+import type { SubItem } from '@/types';
 import { useEffect, useRef, useState } from 'react';
 
 interface FormData {
@@ -317,7 +317,7 @@ export function FormField({
               <CardTitle>Other Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <InputAddress
+              <InputIpAddress
                 id="ip_address"
                 label="IP Address"
                 value={data.ip_address}

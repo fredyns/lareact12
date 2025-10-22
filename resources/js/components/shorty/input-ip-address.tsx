@@ -11,7 +11,7 @@ interface InputIpAddressProps extends Omit<React.InputHTMLAttributes<HTMLInputEl
   loading?: boolean;
 }
 
-export function InputAddress({
+export function InputIpAddress({
   id,
   label,
   value,

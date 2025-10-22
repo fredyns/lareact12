@@ -7,7 +7,6 @@
  *  34. create 'show-modal' for `sample_tree_nodes` placed in show item page.
  *  35. create 'edit-modal' for `sample_tree_nodes` placed in show item page.
  *  36. sorting `sample_tree_nodes` function in index section with drag & drop.
- *  37. rename InputAddress > InputIpAddress
  *  39.
  * 
  */ 

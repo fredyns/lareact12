@@ -6,7 +6,7 @@ import { InputEmail } from '@/components/shorty/input-email';
 import { InputEnum } from '@/components/shorty/input-enum';
 import { InputFile } from '@/components/shorty/input-file';
 import { InputImage } from '@/components/shorty/input-image';
-import { InputAddress } from '@/components/shorty/input-address';
+import { InputIpAddress } from '@/components/shorty/input-ip-address';
 import { InputMap } from '@/components/shorty/input-map';
 import { InputMarkdown } from '@/components/shorty/input-markdown';
 import { InputNpwp } from '@/components/shorty/input-npwp';
@@ -187,7 +187,7 @@ export function FormField({
                 label="Status"
                 value={data.enumerate}
                 onChange={(value) => setData('enumerate', value)}
-                options={enumerateOptions}
+                enumClass="Sample/ItemEnumerate"
                 error={errors.enumerate}
               />
 
@@ -243,7 +243,7 @@ export function FormField({
               <CardTitle>Other Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <InputAddress
+              <InputIpAddress
                 id="ip_address"
                 label="IP Address"
                 value={data.ip_address}

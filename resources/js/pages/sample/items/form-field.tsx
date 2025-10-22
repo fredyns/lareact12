@@ -1,5 +1,5 @@
 import { InputSelectUser } from '@/components/select-from-table/input-select-user';
-import { InputAddress } from '@/components/shorty/input-address';
+import { InputIpAddress } from '@/components/shorty/input-ip-address';
 import { InputCheckbox } from '@/components/shorty/input-checkbox';
 import { InputColor } from '@/components/shorty/input-color';
 import { InputDate } from '@/components/shorty/input-date';
@@ -259,7 +259,7 @@ export function FormField({
               <CardTitle>Other Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <InputAddress
+              <InputIpAddress
                 id="ip_address"
                 label="IP Address"
                 value={data.ip_address}
