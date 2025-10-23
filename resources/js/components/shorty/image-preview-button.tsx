@@ -14,7 +14,7 @@ interface ImagePreviewButtonProps {
 export function ImagePreviewButton({
   imageUrl,
   imageAlt = 'Image',
-  buttonText = 'View Image',
+  buttonText = 'Preview',
   variant = 'outline',
   size = 'sm',
 }: ImagePreviewButtonProps) {

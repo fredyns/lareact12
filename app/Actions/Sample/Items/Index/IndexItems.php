@@ -65,7 +65,7 @@ class IndexItems extends Controller
         // Return Inertia view
         return Inertia::render('sample/items/index', [
             'items' => [
-                'data' => $items->items(),
+                'data' => ItemResource::collection($items->items())->resolve(),
                 'current_page' => $items->currentPage(),
                 'last_page' => $items->lastPage(),
                 'per_page' => $items->perPage(),
