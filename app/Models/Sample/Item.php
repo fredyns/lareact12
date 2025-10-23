@@ -3,6 +3,7 @@
 namespace App\Models\Sample;
 
 use App\Enums\Sample\ItemEnumerate;
+use App\Models\Traits\CaseInsensitiveSorting;
 use App\Models\Traits\Searchable;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -49,6 +50,7 @@ class Item extends Model
 {
     use HasFactory;
     use Searchable;
+    use CaseInsensitiveSorting;
 
     /**
      * The table associated with the model.
