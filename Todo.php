@@ -11,6 +11,7 @@
  *  40. logs for `login`
  *  41. create image thumbnail with `intervention/image`
  *  42. implement next performance optimization @ `documentation/PERFORMANCE_RECOMMENDATIONS_NEXT.md`
- *  43.
+ *  43. create notification system
+ *  44.
  * 
  */ 
