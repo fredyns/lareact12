@@ -273,9 +273,16 @@ export default function ItemsIndex({ items, filters, selectedColumns }: Props) {
           </Badge>
         );
       case 'enumerate':
+        if (!item.enumerate) {
+          return (
+            <Badge variant="outline" className="text-muted-foreground">
+              N/A
+            </Badge>
+          );
+        }
         return (
           <Badge variant={item.enumerate === 'enable' ? 'default' : 'secondary'}>
-            {item.enumerate ? item.enumerate.charAt(0).toUpperCase() + item.enumerate.slice(1) : 'N/A'}
+            {item.enumerate.charAt(0).toUpperCase() + item.enumerate.slice(1)}
           </Badge>
         );
       case 'file':
