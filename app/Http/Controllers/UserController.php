@@ -2,16 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Users\AssignRoleToUser;
+use App\Actions\Users\DeleteUser;
+use App\Actions\Users\IndexUsers;
+use App\Actions\Users\RemoveRoleFromUser;
+use App\Actions\Users\StoreUser;
+use App\Actions\Users\UpdateUser;
 use App\Http\Resources\UserResourceCollection;
 use App\Models\RBAC\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class UserController extends Controller
 {
+    public function __construct(
+        protected IndexUsers $indexUsers,
+        protected StoreUser $storeUser,
+        protected UpdateUser $updateUser,
+        protected DeleteUser $deleteUser,
+        protected AssignRoleToUser $assignRoleToUser,
+        protected RemoveRoleFromUser $removeRoleFromUser
+    ) {
+        // Authorization is handled in individual methods
+    }
     /**
      * Display a listing of the users.
      */
@@ -19,25 +33,15 @@ class UserController extends Controller
     {
         $this->authorize('viewAny', User::class);
 
-        // Search functionality and build query
-        $search = (string)$request->get('search', '');
-        $query = User::search($search);
-
-        // Sorting
-        $sortField = $request->get('sort', 'created_at');
-        $sortDirection = $request->get('direction', 'desc');
-
-        $allowedSorts = ['name', 'email', 'created_at', 'email_verified_at'];
-        if (in_array($sortField, $allowedSorts)) {
-            $query->orderBy($sortField, $sortDirection);
-        }
-
-        $users = $query->paginate(10)->withQueryString();
+        $users = $this->indexUsers->handle($request);
 
         // Return API response if requested
         if ($request->wantsJson()) {
             return new UserResourceCollection($users);
         }
+
+        $sortField = $request->get('sort', 'created_at');
+        $sortDirection = $request->get('direction', 'desc');
 
         return Inertia::render('users/index', [
             'users' => $users,
@@ -66,17 +70,7 @@ class UserController extends Controller
     {
         $this->authorize('create', User::class);
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-        ]);
+        $user = $this->storeUser->handle($request);
 
         // Return JSON for AJAX requests (e.g., from InputSelectUser component)
         if ($request->wantsJson()) {
@@ -137,23 +131,7 @@ class UserController extends Controller
     {
         $this->authorize('update', $user);
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'password' => 'nullable|string|min:8|confirmed',
-        ]);
-
-        $updateData = [
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-        ];
-
-        // Only update password if provided
-        if (!empty($validated['password'])) {
-            $updateData['password'] = Hash::make($validated['password']);
-        }
-
-        $user->update($updateData);
+        $user = $this->updateUser->handle($request, $user);
 
         return redirect()->route('users.index')
             ->with('success', 'User updated successfully.');
@@ -166,7 +144,7 @@ class UserController extends Controller
     {
         $this->authorize('delete', $user);
 
-        $user->delete();
+        $this->deleteUser->handle($user);
 
         return redirect()->route('users.index')
             ->with('success', 'User deleted successfully.');
@@ -179,18 +157,12 @@ class UserController extends Controller
     {
         $this->authorize('update', $user);
 
-        $validated = $request->validate([
-            'role_id' => 'required|exists:roles,id',
-        ]);
+        $result = $this->assignRoleToUser->handle($request, $user);
 
-        $role = Role::findById($validated['role_id']);
-
-        if (!$user->hasRole($role)) {
-            $user->assignRole($role);
-            return back()->with('success', "Role '{$role->name}' assigned successfully.");
-        }
-
-        return back()->with('info', "User already has the role '{$role->name}'.");
+        return back()->with(
+            $result['success'] ? 'success' : 'info',
+            $result['message']
+        );
     }
 
     /**
@@ -200,13 +172,11 @@ class UserController extends Controller
     {
         $this->authorize('update', $user);
 
-        $role = Role::findById($roleId);
+        $result = $this->removeRoleFromUser->handle($user, $roleId);
 
-        if ($user->hasRole($role)) {
-            $user->removeRole($role);
-            return back()->with('success', "Role '{$role->name}' removed successfully.");
-        }
-
-        return back()->with('info', "User doesn't have the role '{$role->name}'.");
+        return back()->with(
+            $result['success'] ? 'success' : 'info',
+            $result['message']
+        );
     }
 }

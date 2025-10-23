@@ -1,15 +1,20 @@
 <?php
 
+use App\Actions\Sample\Items\Create\CreateItem;
+use App\Actions\Sample\Items\Create\StoreItem;
+use App\Actions\Sample\Items\Delete\DeleteItem;
+use App\Actions\Sample\Items\Edit\EditItem;
+use App\Actions\Sample\Items\Edit\UpdateItem;
+use App\Actions\Sample\Items\Index\IndexItems;
+use App\Actions\Sample\Items\Show\ShowItem;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\EnumController;
 use App\Http\Controllers\RBAC\PermissionController;
 use App\Http\Controllers\RBAC\RoleController;
-use App\Http\Controllers\Sample\ItemController;
 use App\Http\Controllers\Sample\Item\SubItemController as ItemSubItemController;
 use App\Http\Controllers\Sample\SubItemController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\UserController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -72,7 +77,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Sample Routes with prefix and namespace
     Route::prefix('sample')->name('sample.')->group(function () {
-        Route::resource('items', ItemController::class);
+        // Items - using single-action controllers
+        Route::get('items', IndexItems::class)->name('items.index');
+        Route::get('items/create', CreateItem::class)->name('items.create');
+        Route::post('items', StoreItem::class)->name('items.store');
+        Route::get('items/{item}', ShowItem::class)->name('items.show');
+        Route::get('items/{item}/edit', EditItem::class)->name('items.edit');
+        Route::put('items/{item}', UpdateItem::class)->name('items.update');
+        Route::patch('items/{item}', UpdateItem::class);
+        Route::delete('items/{item}', DeleteItem::class)->name('items.destroy');
         
         // Embedded sub-items routes (for item show page)
         Route::prefix('items/{item}/sub-items')->name('items.sub-items.')->group(function () {
