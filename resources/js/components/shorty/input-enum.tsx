@@ -1,38 +1,30 @@
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SelectOption, Sample_ItemEnumerateOptions } from '@/types/enums.generated';
+import { SelectOption } from '@/types/enums.generated';
 
 interface InputEnumProps {
   id: string;
   label: string;
   value: string;
   onChange: (value: string) => void;
-  enumClass: string; // e.g., 'Sample/ItemEnumerate'
+  options: SelectOption[];
   error?: string;
   required?: boolean;
   disabled?: boolean;
   loading?: boolean;
 }
 
-// Map enum class names to their options
-const enumOptionsMap: Record<string, SelectOption[]> = {
-  'Sample/ItemEnumerate': Sample_ItemEnumerateOptions,
-  'ItemEnumerate': Sample_ItemEnumerateOptions,
-};
-
 export function InputEnum({
   id,
   label,
   value,
   onChange,
-  enumClass,
+  options,
   error,
   required = false,
   disabled = false,
   loading = false,
 }: InputEnumProps) {
-  // Get options from generated enums (compile-time, no API call!)
-  const options = enumOptionsMap[enumClass] || [];
 
   const isLoading = loading;
   return (

@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import Select from 'react-select';
+import { Sample_ItemEnumerateOptions } from '@/types/enums.generated';
 import { dashboard } from '@/routes';
 import sample from '@/routes/sample';
 
@@ -64,11 +65,10 @@ interface Props {
     sort_field: string;
     sort_direction: string;
   };
-  enumerateOptions: { value: string; label: string }[];
   items: { id: string; string: string }[];
 }
 
-export default function SubItemsIndex({ subItems, filters, enumerateOptions }: Props) {
+export default function SubItemsIndex({ subItems, filters }: Props) {
   const breadcrumbs: BreadcrumbItem[] = [
     {
       title: 'Dashboard',
@@ -81,7 +81,7 @@ export default function SubItemsIndex({ subItems, filters, enumerateOptions }: P
   ];
   const [search, setSearch] = useState(filters.search || '');
   const [enumerate, setEnumerate] = useState(
-    filters.enumerate ? enumerateOptions.find((option) => option.value === filters.enumerate) : null,
+    filters.enumerate ? Sample_ItemEnumerateOptions.find((option) => option.value === filters.enumerate) : null,
   );
 
   const handleSort = (field: string) => {
@@ -204,7 +204,7 @@ export default function SubItemsIndex({ subItems, filters, enumerateOptions }: P
                     placeholder="Filter by status"
                     value={enumerate}
                     onChange={handleEnumerateChange}
-                    options={enumerateOptions}
+                    options={Sample_ItemEnumerateOptions}
                     className="react-select-container"
                     classNamePrefix="react-select"
                     styles={{

@@ -8,15 +8,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import AsyncSelect from 'react-select/async';
 import { Item, SelectOption } from '@/types';
 import { Plus } from 'lucide-react';
 import { InputString } from '@/components/shorty/input-string';
 import { InputEmail } from '@/components/shorty/input-email';
 import { InputEnum } from '@/components/shorty/input-enum';
+import { Sample_ItemEnumerateOptions } from '@/types/enums.generated';
 import sample from '@/routes/sample';
-import enums from '@/routes/enums';
 
 interface InputSelectSampleItemProps {
   id: string;
@@ -45,8 +45,6 @@ export function InputSelectSampleItem({
   const [isCreating, setIsCreating] = useState(false);
   const [selectedValue, setSelectedValue] = useState<SelectOption | null>(defaultValue || null);
   const [searchInput, setSearchInput] = useState('');
-  const [enumerateOptions, setEnumerateOptions] = useState<SelectOption[]>([]);
-  const [isLoadingEnum, setIsLoadingEnum] = useState(true);
 
   // Form state for creating new item
   const [newItemData, setNewItemData] = useState({
@@ -55,37 +53,6 @@ export function InputSelectSampleItem({
     enumerate: '',
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-
-  // Fetch enum options on mount
-  useEffect(() => {
-    const fetchEnumOptions = async () => {
-      try {
-        const response = await fetch(enums.show.url('ItemEnumerate'), {
-          method: 'GET',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest',
-          },
-          credentials: 'same-origin',
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch enum options');
-        }
-
-        const result = await response.json();
-        setEnumerateOptions(result.data || []);
-      } catch (error) {
-        console.error('Error loading enum options:', error);
-        setEnumerateOptions([]);
-      } finally {
-        setIsLoadingEnum(false);
-      }
-    };
-
-    fetchEnumOptions();
-  }, []);
 
   const loadOptions = async (inputValue: string): Promise<SelectOption[]> => {
     setSearchInput(inputValue);
@@ -309,8 +276,8 @@ export function InputSelectSampleItem({
                 setNewItemData({ string: '', email: '', enumerate: '' });
                 setIsDialogOpen(true);
               }}
-              disabled={disabled || isLoadingEnum}
-              title={isLoadingEnum ? 'Loading options...' : 'Add new item'}
+              disabled={disabled}
+              title="Add new item"
             >
               <Plus className="h-4 w-4" />
             </Button>
@@ -355,23 +322,14 @@ export function InputSelectSampleItem({
               error={formErrors.email}
             />
 
-            {isLoadingEnum ? (
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Status</label>
-                <div className="flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm text-muted-foreground">
-                  Loading options...
-                </div>
-              </div>
-            ) : (
-              <InputEnum
-                id="new-item-enumerate"
-                label="Status"
-                value={newItemData.enumerate}
-                onChange={(value) => setNewItemData({ ...newItemData, enumerate: value })}
-                options={enumerateOptions}
-                error={formErrors.enumerate}
-              />
-            )}
+            <InputEnum
+              id="new-item-enumerate"
+              label="Status"
+              value={newItemData.enumerate}
+              onChange={(value) => setNewItemData({ ...newItemData, enumerate: value })}
+              options={Sample_ItemEnumerateOptions}
+              error={formErrors.enumerate}
+            />
           </div>
 
           <DialogFooter>

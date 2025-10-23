@@ -18,7 +18,8 @@ import { InputTextarea } from '@/components/shorty/input-textarea';
 import { InputTime } from '@/components/shorty/input-time';
 import { InputWysiwyg } from '@/components/shorty/input-wysiwyg';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { SelectOption, SubItem } from '@/types';
+import { Sample_ItemEnumerateOptions } from '@/types/enums.generated';
+import type { SubItem } from '@/types';
 
 interface FormData {
   string: string;
@@ -72,7 +73,6 @@ interface FormFieldProps {
   data: FormData;
   setData: <K extends keyof FormData>(key: K, value: FormData[K]) => void;
   errors: FormErrors;
-  enumerateOptions: SelectOption[];
   // Optional: Pass subItem for edit mode to auto-populate optional props
   subItem?: SubItem;
   // Optional: Pass uploadPath directly for create mode
@@ -83,7 +83,6 @@ export function FormField({
   data,
   setData,
   errors,
-  enumerateOptions,
   subItem,
   uploadPath: uploadPathProp,
 }: FormFieldProps) {
@@ -187,7 +186,7 @@ export function FormField({
                 label="Status"
                 value={data.enumerate}
                 onChange={(value) => setData('enumerate', value)}
-                enumClass="Sample/ItemEnumerate"
+                options={Sample_ItemEnumerateOptions}
                 error={errors.enumerate}
               />
 

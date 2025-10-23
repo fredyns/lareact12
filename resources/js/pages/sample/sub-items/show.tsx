@@ -14,12 +14,12 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, SubItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, Check, Edit, Trash2, X } from 'lucide-react';
+import { Sample_ItemEnumerateHelper } from '@/types/enums.generated';
 import { dashboard } from '@/routes';
 import sample from '@/routes/sample';
 
 interface Props {
   subItem: SubItem;
-  enumerateOptions: { value: string; label: string }[];
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -37,7 +37,7 @@ const breadcrumbs: BreadcrumbItem[] = [
   },
 ];
 
-export default function Show({ subItem, enumerateOptions }: Props) {
+export default function Show({ subItem }: Props) {
   const handleDelete = () => {
     if (confirm('Are you sure you want to delete this item?')) {
       router.delete(sample.subItems.destroy.url(subItem.id));
@@ -46,8 +46,7 @@ export default function Show({ subItem, enumerateOptions }: Props) {
 
   const getEnumerateLabel = (value: string | null) => {
     if (!value) return 'N/A';
-    const option = enumerateOptions.find((opt) => opt.value === value);
-    return option ? option.label : value;
+    return Sample_ItemEnumerateHelper.getLabel(value);
   };
 
   return (
