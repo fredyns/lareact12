@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import { SelectEnum } from '@/components/shorty/select-enum';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, Item, PageProps } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
@@ -25,7 +26,6 @@ import {
   X,
 } from 'lucide-react';
 import { useState } from 'react';
-import Select from 'react-select';
 import { dashboard } from '@/routes';
 import sample from '@/routes/sample';
 
@@ -53,7 +53,6 @@ interface Props {
     sort_field: string;
     sort_direction: string;
   };
-  enumerateOptions: { value: string; label: string }[];
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -67,11 +66,9 @@ const breadcrumbs: BreadcrumbItem[] = [
   },
 ];
 
-export default function ItemsIndex({ items, filters, enumerateOptions }: Props) {
+export default function ItemsIndex({ items, filters }: Props) {
   const [search, setSearch] = useState(filters.search || '');
-  const [enumerate, setEnumerate] = useState(
-    filters.enumerate ? enumerateOptions.find((option) => option.value === filters.enumerate) : null,
-  );
+  const [enumerate, setEnumerate] = useState<{ value: string; label: string } | null>(null);
 
   const handleSort = (field: string) => {
     const direction = filters.sort_field === field && filters.sort_direction === 'asc' ? 'desc' : 'asc';
@@ -188,14 +185,12 @@ export default function ItemsIndex({ items, filters, enumerateOptions }: Props) 
               <div className="w-full sm:w-64">
                 <div className="relative">
                   <Filter className="absolute top-2.5 left-2 z-10 h-4 w-4 text-muted-foreground" />
-                  <Select
-                    isClearable
-                    placeholder="Filter by status"
+                  <SelectEnum
+                    enumClass="Sample/ItemEnumerate"
                     value={enumerate}
                     onChange={handleEnumerateChange}
-                    options={enumerateOptions}
-                    className="react-select-container"
-                    classNamePrefix="react-select"
+                    placeholder="Filter by status"
+                    isClearable
                     styles={{
                       control: (base) => ({
                         ...base,
