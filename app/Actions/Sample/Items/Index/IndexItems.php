@@ -28,9 +28,25 @@ class IndexItems extends Controller
         $displayColumns = $request->getColumns($defaultDisplayColumns); // get validated selection
         $queryColumns = array_unique(array_merge($mandatoryColumns, $displayColumns)); // for database query
 
+        $selectColumns = array_map(fn($col) => "sample_items.{$col}", $queryColumns);
+
         // Search functionality and build query
-        $query = Item::search($request->getSearch())
-            ->select($queryColumns);
+        $query = Item::search($request->getSearch());
+
+        // Apply sorting (before select to handle joins properly)
+        $sortField = $request->getSortField();
+        $sortDirection = $request->getSortDirection();
+
+        if ($sortField === 'user_id') {
+            // Sort by user's name using relationship join
+            $query->leftJoin('users', 'sample_items.user_id', '=', 'users.id')
+                ->orderBy('users.name', $sortDirection);
+        } else {
+            $query->orderBy('sample_items.' . $sortField, $sortDirection);
+        }
+
+        // Apply select after joins
+        $query->select($selectColumns);
 
         // Load relationships. creator and updater for audit trail
         $with = ['creator', 'updater'];
@@ -41,18 +57,12 @@ class IndexItems extends Controller
 
         // Apply additional filters (only if validated)
         if ($userId = $request->validated('user_id')) {
-            $query->where('user_id', $userId);
+            $query->where('sample_items.user_id', $userId);
         }
 
         if ($enumerate = $request->validated('enumerate')) {
-            $query->where('enumerate', $enumerate);
+            $query->where('sample_items.enumerate', $enumerate);
         }
-
-        // Apply sorting (already validated)
-        $query->orderBy(
-            $request->getSortField(),
-            $request->getSortDirection()
-        );
 
         // Paginate results
         $items = $query->paginate($request->getPerPage())->withQueryString();

@@ -79,21 +79,21 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const AVAILABLE_COLUMNS = [
-  { value: 'user_id', label: 'User' },
-  { value: 'string', label: 'String' },
-  { value: 'email', label: 'Email' },
-  { value: 'color', label: 'Color' },
-  { value: 'integer', label: 'Integer' },
-  { value: 'decimal', label: 'Decimal' },
-  { value: 'npwp', label: 'NPWP' },
-  { value: 'datetime', label: 'Datetime' },
-  { value: 'date', label: 'Date' },
-  { value: 'time', label: 'Time' },
-  { value: 'ip_address', label: 'IP Address' },
-  { value: 'boolean', label: 'Boolean' },
-  { value: 'enumerate', label: 'Status' },
-  { value: 'file', label: 'File' },
-  { value: 'image', label: 'Image' },
+  { value: 'user_id', label: 'User', sortable: true },
+  { value: 'string', label: 'String', sortable: true },
+  { value: 'email', label: 'Email', sortable: true },
+  { value: 'color', label: 'Color', sortable: true },
+  { value: 'integer', label: 'Integer', sortable: true },
+  { value: 'decimal', label: 'Decimal', sortable: true },
+  { value: 'npwp', label: 'NPWP', sortable: true },
+  { value: 'datetime', label: 'Datetime', sortable: true },
+  { value: 'date', label: 'Date', sortable: true },
+  { value: 'time', label: 'Time', sortable: true },
+  { value: 'ip_address', label: 'IP Address', sortable: true },
+  { value: 'boolean', label: 'Boolean', sortable: true },
+  { value: 'enumerate', label: 'Status', sortable: true },
+  { value: 'file', label: 'File', sortable: false },
+  { value: 'image', label: 'Image', sortable: false },
 ];
 
 export default function ItemsIndex({ items, filters, selectedColumns }: Props) {
@@ -438,14 +438,18 @@ export default function ItemsIndex({ items, filters, selectedColumns }: Props) {
                         if (!columnDef) return null;
                         return (
                           <th key={col} className="h-12 px-4 text-left align-middle font-medium">
-                            <Button
-                              variant="ghost"
-                              onClick={() => handleSort(col)}
-                              className="h-auto p-0 font-medium"
-                            >
-                              {columnDef.label}
-                              {getSortIcon(col)}
-                            </Button>
+                            {columnDef.sortable ? (
+                              <Button
+                                variant="ghost"
+                                onClick={() => handleSort(col)}
+                                className="h-auto p-0 font-medium"
+                              >
+                                {columnDef.label}
+                                {getSortIcon(col)}
+                              </Button>
+                            ) : (
+                              <span className="font-medium">{columnDef.label}</span>
+                            )}
                           </th>
                         );
                       })}
