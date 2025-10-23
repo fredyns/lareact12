@@ -104,6 +104,7 @@ export default function ItemsIndex({ items, filters, selectedColumns }: Props) {
   const [tempColumns, setTempColumns] = useState<string[]>(selectedColumns);
   const [isColumnSelectorOpen, setIsColumnSelectorOpen] = useState(false);
   const [isLoadingColumns, setIsLoadingColumns] = useState(false);
+  const [newlyAddedColumns, setNewlyAddedColumns] = useState<string[]>([]);
 
   const handleSort = (field: string) => {
     const direction = filters.sort_field === field && filters.sort_direction === 'asc' ? 'desc' : 'asc';
@@ -177,6 +178,9 @@ export default function ItemsIndex({ items, filters, selectedColumns }: Props) {
   };
 
   const applyColumnSelection = () => {
+    // Identify newly added columns (in tempColumns but not in current columns)
+    const newColumns = tempColumns.filter((col) => !columns.includes(col));
+    setNewlyAddedColumns(newColumns);
     setIsLoadingColumns(true);
     setColumns(tempColumns);
     router.get(
@@ -192,6 +196,7 @@ export default function ItemsIndex({ items, filters, selectedColumns }: Props) {
         replace: true,
         onFinish: () => {
           setIsLoadingColumns(false);
+          setNewlyAddedColumns([]);
         },
       },
     );
@@ -233,8 +238,8 @@ export default function ItemsIndex({ items, filters, selectedColumns }: Props) {
   );
 
   const renderCellContent = (item: Item, column: string) => {
-    // Show shimmer if loading
-    if (isLoadingColumns) {
+    // Show shimmer only for newly added columns
+    if (isLoadingColumns && newlyAddedColumns.includes(column)) {
       return <Shimmer />;
     }
 
