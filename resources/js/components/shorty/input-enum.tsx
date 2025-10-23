@@ -1,19 +1,24 @@
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
-import React, { useEffect, useState } from 'react';
-import {SelectOption } from '@/types/index';
+import { SelectOption, Sample_ItemEnumerateOptions } from '@/types/enums.generated';
 
 interface InputEnumProps {
   id: string;
   label: string;
   value: string;
   onChange: (value: string) => void;
-  enumClass: string; // e.g., 'ItemEnumerate'
+  enumClass: string; // e.g., 'Sample/ItemEnumerate'
   error?: string;
   required?: boolean;
   disabled?: boolean;
   loading?: boolean;
 }
+
+// Map enum class names to their options
+const enumOptionsMap: Record<string, SelectOption[]> = {
+  'Sample/ItemEnumerate': Sample_ItemEnumerateOptions,
+  'ItemEnumerate': Sample_ItemEnumerateOptions,
+};
 
 export function InputEnum({
   id,
@@ -26,36 +31,10 @@ export function InputEnum({
   disabled = false,
   loading = false,
 }: InputEnumProps) {
-  const [options, setOptions] = useState<SelectOption[]>([]);
-  const [fetchingOptions, setFetchingOptions] = useState(true);
+  // Get options from generated enums (compile-time, no API call!)
+  const options = enumOptionsMap[enumClass] || [];
 
-  useEffect(() => {
-    const fetchOptions = async () => {
-      setFetchingOptions(true);
-      try {
-        const response = await fetch(`/enums/${enumClass}`, {
-          headers: {
-            Accept: 'application/json',
-            'X-Requested-With': 'XMLHttpRequest',
-          },
-          credentials: 'same-origin',
-        });
-
-        if (response.ok) {
-          const result = await response.json();
-          setOptions(result.data || []);
-        }
-      } catch (error) {
-        console.error('Failed to fetch enum options:', error);
-      } finally {
-        setFetchingOptions(false);
-      }
-    };
-
-    fetchOptions();
-  }, [enumClass]);
-
-  const isLoading = loading || fetchingOptions;
+  const isLoading = loading;
   return (
     <div className="space-y-2">
       <Label htmlFor={id}>

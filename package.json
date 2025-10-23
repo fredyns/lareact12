@@ -2,13 +2,14 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "vite build",
-        "build:ssr": "vite build && vite build --ssr",
-        "dev": "vite",
+        "build": "php artisan enums:generate && vite build",
+        "build:ssr": "php artisan enums:generate && vite build && vite build --ssr",
+        "dev": "php artisan enums:generate && vite",
         "format": "prettier --write resources/",
         "format:check": "prettier --check resources/",
         "lint": "eslint . --fix",
-        "types": "tsc --noEmit"
+        "types": "tsc --noEmit",
+        "enums": "php artisan enums:generate"
     },
     "devDependencies": {
         "@eslint/js": "^9.19.0",
