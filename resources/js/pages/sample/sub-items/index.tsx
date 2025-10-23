@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import Select from 'react-select';
-import { Sample_ItemEnumerateOptions } from '@/types/enums.generated';
+import enums from '@/types/enums.generated';
 import { dashboard } from '@/routes';
 import sample from '@/routes/sample';
 
@@ -81,7 +81,7 @@ export default function SubItemsIndex({ subItems, filters }: Props) {
   ];
   const [search, setSearch] = useState(filters.search || '');
   const [enumerate, setEnumerate] = useState(
-    filters.enumerate ? Sample_ItemEnumerateOptions.find((option) => option.value === filters.enumerate) : null,
+    filters.enumerate ? enums.Sample.ItemEnumerate.options.find((option) => option.value === filters.enumerate) : null,
   );
 
   const handleSort = (field: string) => {
@@ -204,7 +204,7 @@ export default function SubItemsIndex({ subItems, filters }: Props) {
                     placeholder="Filter by status"
                     value={enumerate}
                     onChange={handleEnumerateChange}
-                    options={Sample_ItemEnumerateOptions}
+                    options={enums.Sample.ItemEnumerate.options}
                     className="react-select-container"
                     classNamePrefix="react-select"
                     styles={{

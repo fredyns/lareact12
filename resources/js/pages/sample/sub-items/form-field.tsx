@@ -18,7 +18,7 @@ import { InputTextarea } from '@/components/shorty/input-textarea';
 import { InputTime } from '@/components/shorty/input-time';
 import { InputWysiwyg } from '@/components/shorty/input-wysiwyg';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Sample_ItemEnumerateOptions } from '@/types/enums.generated';
+import enums from '@/types/enums.generated';
 import type { SubItem } from '@/types';
 
 interface FormData {
@@ -186,7 +186,7 @@ export function FormField({
                 label="Status"
                 value={data.enumerate}
                 onChange={(value) => setData('enumerate', value)}
-                options={Sample_ItemEnumerateOptions}
+                options={enums.Sample.ItemEnumerate.options}
                 error={errors.enumerate}
               />
 

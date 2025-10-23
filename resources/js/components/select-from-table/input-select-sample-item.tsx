@@ -15,7 +15,7 @@ import { Plus } from 'lucide-react';
 import { InputString } from '@/components/shorty/input-string';
 import { InputEmail } from '@/components/shorty/input-email';
 import { InputEnum } from '@/components/shorty/input-enum';
-import { Sample_ItemEnumerateOptions } from '@/types/enums.generated';
+import enums from '@/types/enums.generated';
 import sample from '@/routes/sample';
 
 interface InputSelectSampleItemProps {
@@ -327,7 +327,7 @@ export function InputSelectSampleItem({
               label="Status"
               value={newItemData.enumerate}
               onChange={(value) => setNewItemData({ ...newItemData, enumerate: value })}
-              options={Sample_ItemEnumerateOptions}
+              options={enums.Sample.ItemEnumerate.options}
               error={formErrors.enumerate}
             />
           </div>

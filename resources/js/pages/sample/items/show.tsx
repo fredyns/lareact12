@@ -15,7 +15,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, Item } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, Check, Edit, Trash2, X } from 'lucide-react';
-import { Sample_ItemEnumerateHelper } from '@/types/enums.generated';
+import enums from '@/types/enums.generated';
 import { dashboard } from '@/routes';
 import sample from '@/routes/sample';
 import { IndexSection as SubItemsIndexSection } from './sub-items/index-section';
@@ -48,7 +48,7 @@ export default function Show({ item }: Props) {
 
   const getEnumerateLabel = (value: string | null) => {
     if (!value) return 'N/A';
-    return Sample_ItemEnumerateHelper.getLabel(value);
+    return enums.Sample.ItemEnumerate.getLabel(value);
   };
 
   return (

@@ -103,14 +103,17 @@ class GenerateEnumTypes extends Command
         // Extract namespace path after App\Enums\
         $fullName = $enum->getName();
         $namespace = '';
+        $namespacePath = '';
         if (preg_match('/App\\\\Enums\\\\(.+)\\\\([^\\\\]+)$/', $fullName, $matches)) {
             $namespace = str_replace('\\', '.', $matches[1]); // e.g., "Sample"
+            $namespacePath = str_replace('\\', '_', $matches[1]); // e.g., "Sample" or "Sample_SubNamespace"
         }
 
         return [
             'name' => $enum->getShortName(),
             'fullName' => $fullName,
             'namespace' => $namespace,
+            'namespacePath' => $namespacePath,
             'cases' => $cases,
             'options' => $options,
         ];
@@ -142,31 +145,33 @@ class GenerateEnumTypes extends Command
             $grouped[$namespace][] = $enum;
         }
 
+        // Generate individual enum types first
         foreach ($grouped as $namespace => $namespaceEnums) {
             if ($namespace !== '_root') {
-                // Add comment for namespace organization
                 $ts .= "// ============================================\n";
                 $ts .= "// Namespace: {$namespace}\n";
                 $ts .= "// ============================================\n\n";
             }
             
             foreach ($namespaceEnums as $enum) {
-                $prefix = $namespace !== '_root' ? $namespace : '';
-                $ts .= $this->generateEnumCode($enum, $prefix);
+                $ts .= $this->generateEnumType($enum);
             }
         }
+
+        // Generate single enums root object
+        $ts .= $this->generateEnumsObject($grouped);
 
         return $ts;
     }
 
-    protected function generateEnumCode(array $enum, string $prefix): string
+    protected function generateEnumType(array $enum): string
     {
         $ts = '';
         
-        // Use prefix for namespaced enums (e.g., Sample_Color instead of namespace)
-        $enumName = $prefix ? "{$prefix}_{$enum['name']}" : $enum['name'];
-        $optionsName = "{$enumName}Options";
-        $helperName = "{$enumName}Helper";
+        // Generate prefixed enum name: Namespace_EnumName
+        $enumName = $enum['namespacePath'] 
+            ? $enum['namespacePath'] . '_' . $enum['name']
+            : $enum['name'];
         
         // Generate TypeScript enum
         $ts .= "// {$enum['fullName']}\n";
@@ -176,23 +181,74 @@ class GenerateEnumTypes extends Command
         }
         $ts .= "}\n\n";
 
-        // Generate select options constant
-        $ts .= "export const {$optionsName}: SelectOption[] = [\n";
-        foreach ($enum['options'] as $option) {
-            $ts .= "  { value: '{$option['value']}', label: '{$option['label']}' },\n";
+        return $ts;
+    }
+
+    protected function generateEnumsObject(array $grouped): string
+    {
+        $ts = '';
+        
+        $ts .= "// ============================================\n";
+        $ts .= "// Enums Root Object\n";
+        $ts .= "// ============================================\n\n";
+        
+        $ts .= "const enums = {\n";
+        
+        // Add namespaced enums
+        foreach ($grouped as $namespace => $namespaceEnums) {
+            if ($namespace === '_root') {
+                continue;
+            }
+            
+            $namespaceName = ucfirst(strtolower($namespace));
+            $ts .= "  {$namespaceName}: {\n";
+            
+            foreach ($namespaceEnums as $enum) {
+                $shortEnumName = $enum['name'];
+                $prefixedEnumName = $enum['namespacePath'] 
+                    ? $enum['namespacePath'] . '_' . $enum['name']
+                    : $enum['name'];
+                
+                $ts .= "    {$shortEnumName}: {\n";
+                $ts .= "      enum: {$prefixedEnumName},\n";
+                $ts .= "      options: [\n";
+                foreach ($enum['options'] as $option) {
+                    $ts .= "        { value: '{$option['value']}', label: '{$option['label']}' },\n";
+                }
+                $ts .= "      ] as SelectOption[],\n";
+                $ts .= "      getLabel: (value: string): string => {\n";
+                $ts .= "        const option = enums.{$namespaceName}.{$shortEnumName}.options.find(o => o.value === value);\n";
+                $ts .= "        return option?.label ?? value;\n";
+                $ts .= "      },\n";
+                $ts .= "      values: Object.values({$prefixedEnumName}),\n";
+                $ts .= "    },\n";
+            }
+            
+            $ts .= "  },\n";
         }
-        $ts .= "];\n\n";
-
-        // Generate helper object
-        $ts .= "export const {$helperName} = {\n";
-        $ts .= "  getLabel: (value: string): string => {\n";
-        $ts .= "    const option = {$optionsName}.find(o => o.value === value);\n";
-        $ts .= "    return option?.label ?? value;\n";
-        $ts .= "  },\n";
-        $ts .= "  getOptions: (): SelectOption[] => {$optionsName},\n";
-        $ts .= "  values: Object.values({$enumName}),\n";
+        
+        // Add root level enums
+        foreach ($grouped['_root'] ?? [] as $enum) {
+            $enumName = $enum['name'];
+            
+            $ts .= "  {$enumName}: {\n";
+            $ts .= "    enum: {$enumName},\n";
+            $ts .= "    options: [\n";
+            foreach ($enum['options'] as $option) {
+                $ts .= "      { value: '{$option['value']}', label: '{$option['label']}' },\n";
+            }
+            $ts .= "    ] as SelectOption[],\n";
+            $ts .= "    getLabel: (value: string): string => {\n";
+            $ts .= "      const option = enums.{$enumName}.options.find(o => o.value === value);\n";
+            $ts .= "      return option?.label ?? value;\n";
+            $ts .= "    },\n";
+            $ts .= "    values: Object.values({$enumName}),\n";
+            $ts .= "  },\n";
+        }
+        
         $ts .= "};\n\n";
-
+        $ts .= "export default enums;\n\n";
+        
         return $ts;
     }
 }
