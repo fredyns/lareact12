@@ -9,19 +9,20 @@ use Illuminate\Validation\Rules\Enum;
 
 /**
  * Index Items Request
- * 
+ *
  * Handles validation for filtering and sorting items in the index view.
  * All filter parameters, sorting options, and pagination settings are validated
  * before being executed in the query.
- * 
+ *
  * @property string|null $search Search query string (max 255 characters)
  * @property string|null $user_id UUID of the user to filter by
  * @property string|null $enumerate Enumerate value to filter by
+ * @property array|null $columns Array of columns to display
  * @property string|null $sort_field Field to sort by (string, email, integer, decimal, datetime, date, created_at, updated_at)
  * @property string|null $sort_direction Sort direction (asc or desc)
  * @property int|null $page Current page number (min 1)
  * @property int|null $per_page Items per page (min 10, max 100, must be multiple of 10)
- * 
+ *
  */
 class IndexItemsRequest extends FormRequest
 {
@@ -43,11 +44,35 @@ class IndexItemsRequest extends FormRequest
         return [
             // Search
             'search' => ['nullable', 'string', 'max:255'],
-            
+
             // Filters
             'user_id' => ['nullable', 'uuid', 'exists:users,id'],
             'enumerate' => ['nullable', new Enum(ItemEnumerate::class)],
-            
+
+            // Columns
+            'columns' => ['nullable', 'array'],
+            'columns.*' => [
+                'nullable',
+                'string',
+                Rule::in([
+                    'user_id',
+                    'string',
+                    'email',
+                    'color',
+                    'integer',
+                    'decimal',
+                    'npwp',
+                    'datetime',
+                    'date',
+                    'time',
+                    'ip_address',
+                    'boolean',
+                    'enumerate',
+                    'file',
+                    'image',
+                ]),
+            ],
+
             // Sorting
             'sort_field' => [
                 'nullable',
@@ -68,7 +93,7 @@ class IndexItemsRequest extends FormRequest
                 'string',
                 Rule::in(['asc', 'desc']),
             ],
-            
+
             // Pagination
             'page' => ['nullable', 'integer', 'min:1'],
             'per_page' => [
@@ -123,7 +148,7 @@ class IndexItemsRequest extends FormRequest
      */
     public function getSearch(): string
     {
-        return (string) $this->validated('search', '');
+        return (string)$this->validated('search', '');
     }
 
     /**
@@ -147,6 +172,16 @@ class IndexItemsRequest extends FormRequest
      */
     public function getPerPage(): int
     {
-        return (int) $this->validated('per_page', 10);
+        return (int)$this->validated('per_page', 10);
+    }
+
+    /**
+     * Get validated columns with defaults
+     */
+    public function getColumns($defaultDisplayColumns): array
+    {
+        $columns = $this->validated('columns', $defaultDisplayColumns);
+
+        return array_unique($columns);
     }
 }

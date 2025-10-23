@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,8 +9,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { SelectEnum } from '@/components/shorty/select-enum';
 import { InputSelectUser } from '@/components/select-from-table/input-select-user';
+import { ImagePreviewButton } from '@/components/shorty/image-preview-button';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, Item, PageProps, SelectOption } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
@@ -17,8 +25,10 @@ import {
   ArrowDown,
   ArrowUp,
   ArrowUpDown,
+  Columns,
   Edit,
   Eye,
+  FileText,
   Filter,
   MoreHorizontal,
   Plus,
@@ -54,6 +64,7 @@ interface Props {
     sort_field: string;
     sort_direction: string;
   };
+  selectedColumns: string[];
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -67,10 +78,30 @@ const breadcrumbs: BreadcrumbItem[] = [
   },
 ];
 
-export default function ItemsIndex({ items, filters }: Props) {
+const AVAILABLE_COLUMNS = [
+  { value: 'user_id', label: 'User' },
+  { value: 'string', label: 'String' },
+  { value: 'email', label: 'Email' },
+  { value: 'color', label: 'Color' },
+  { value: 'integer', label: 'Integer' },
+  { value: 'decimal', label: 'Decimal' },
+  { value: 'npwp', label: 'NPWP' },
+  { value: 'datetime', label: 'Datetime' },
+  { value: 'date', label: 'Date' },
+  { value: 'time', label: 'Time' },
+  { value: 'ip_address', label: 'IP Address' },
+  { value: 'boolean', label: 'Boolean' },
+  { value: 'enumerate', label: 'Status' },
+  { value: 'file', label: 'File' },
+  { value: 'image', label: 'Image' },
+];
+
+export default function ItemsIndex({ items, filters, selectedColumns }: Props) {
   const [search, setSearch] = useState(filters.search || '');
   const [enumerate, setEnumerate] = useState<{ value: string; label: string } | null>(null);
   const [selectedUser, setSelectedUser] = useState<SelectOption | null>(null);
+  const [columns, setColumns] = useState<string[]>(selectedColumns);
+  const [isColumnSelectorOpen, setIsColumnSelectorOpen] = useState(false);
 
   const handleSort = (field: string) => {
     const direction = filters.sort_field === field && filters.sort_direction === 'asc' ? 'desc' : 'asc';
@@ -80,6 +111,7 @@ export default function ItemsIndex({ items, filters }: Props) {
         search,
         user_id: selectedUser?.value,
         enumerate: enumerate?.value,
+        columns,
         sort_field: field,
         sort_direction: direction,
       },
@@ -92,12 +124,12 @@ export default function ItemsIndex({ items, filters }: Props) {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    router.get(sample.items.index.url(), { search, user_id: selectedUser?.value, enumerate: enumerate?.value }, { preserveState: true });
+    router.get(sample.items.index.url(), { search, user_id: selectedUser?.value, enumerate: enumerate?.value, columns }, { preserveState: true });
   };
 
   const handleClearSearch = () => {
     setSearch('');
-    router.get(sample.items.index.url(), { user_id: selectedUser?.value, enumerate: enumerate?.value }, { preserveState: true });
+    router.get(sample.items.index.url(), { user_id: selectedUser?.value, enumerate: enumerate?.value, columns }, { preserveState: true });
   };
 
   const handleEnumerateChange = (selected: { value: string; label: string } | null) => {
@@ -108,6 +140,7 @@ export default function ItemsIndex({ items, filters }: Props) {
         search,
         user_id: selectedUser?.value,
         enumerate: selected?.value || null,
+        columns,
       },
       {
         preserveState: true,
@@ -125,12 +158,37 @@ export default function ItemsIndex({ items, filters }: Props) {
         search,
         user_id: userId || null,
         enumerate: enumerate?.value,
+        columns,
       },
       {
         preserveState: true,
         replace: true,
       },
     );
+  };
+
+  const handleColumnToggle = (column: string) => {
+    const newColumns = columns.includes(column)
+      ? columns.filter((c) => c !== column)
+      : [...columns, column];
+    setColumns(newColumns);
+  };
+
+  const applyColumnSelection = () => {
+    router.get(
+      sample.items.index.url(),
+      {
+        search,
+        user_id: selectedUser?.value,
+        enumerate: enumerate?.value,
+        columns,
+      },
+      {
+        preserveState: true,
+        replace: true,
+      },
+    );
+    setIsColumnSelectorOpen(false);
   };
 
   const handleDelete = (item: Item) => {
@@ -154,6 +212,69 @@ export default function ItemsIndex({ items, filters }: Props) {
       hour: '2-digit',
       minute: '2-digit',
     });
+  };
+
+  const renderCellContent = (item: Item, column: string) => {
+    switch (column) {
+      case 'user_id':
+        return <div className="text-sm">{item.user?.name || 'N/A'}</div>;
+      case 'string':
+        return <div className="font-medium">{item.string}</div>;
+      case 'email':
+        return <div className="text-sm text-muted-foreground">{item.email}</div>;
+      case 'color':
+        return (
+          <div className="flex items-center gap-2">
+            <div className="h-6 w-6 rounded border" style={{ backgroundColor: item.color || '#000' }} />
+            <span className="text-sm">{item.color}</span>
+          </div>
+        );
+      case 'integer':
+        return <div className="text-sm">{item.integer}</div>;
+      case 'decimal':
+        return <div className="text-sm">{item.decimal}</div>;
+      case 'npwp':
+        return <div className="font-mono text-sm">{item.npwp}</div>;
+      case 'datetime':
+        return <div className="text-sm">{item.datetime ? formatDate(item.datetime) : 'N/A'}</div>;
+      case 'date':
+        return <div className="text-sm">{item.date || 'N/A'}</div>;
+      case 'time':
+        return <div className="text-sm">{item.time || 'N/A'}</div>;
+      case 'ip_address':
+        return <div className="font-mono text-sm">{item.ip_address}</div>;
+      case 'boolean':
+        return (
+          <Badge variant={item.boolean ? 'default' : 'secondary'}>
+            {item.boolean ? 'Yes' : 'No'}
+          </Badge>
+        );
+      case 'enumerate':
+        return (
+          <Badge variant={item.enumerate === 'enable' ? 'default' : 'secondary'}>
+            {item.enumerate ? item.enumerate.charAt(0).toUpperCase() + item.enumerate.slice(1) : 'N/A'}
+          </Badge>
+        );
+      case 'file':
+        return item.file ? (
+          <Button
+            variant="outline"
+            size="sm"
+            asChild
+          >
+            <a href={item.file_url ?? undefined} target="_blank" rel="noopener noreferrer">
+              <FileText className="h-4 w-4 mr-2" />
+              View File
+            </a>
+          </Button>
+        ) : (
+          <span className="text-sm text-muted-foreground">No file</span>
+        );
+      case 'image':
+        return <ImagePreviewButton imageUrl={item.image_url} imageAlt={`Image for ${item.string}`} />;
+      default:
+        return <div className="text-sm">N/A</div>;
+    }
   };
 
   return (
@@ -232,6 +353,47 @@ export default function ItemsIndex({ items, filters }: Props) {
                   />
                 </div>
               </div>
+
+              <Popover open={isColumnSelectorOpen} onOpenChange={setIsColumnSelectorOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="default">
+                    <Columns className="mr-2 h-4 w-4" />
+                    Columns
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80" align="end">
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="mb-3 font-medium">Select Columns</h4>
+                      <div className="space-y-2">
+                        {AVAILABLE_COLUMNS.map((col) => (
+                          <div key={col.value} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`column-${col.value}`}
+                              checked={columns.includes(col.value)}
+                              onCheckedChange={() => handleColumnToggle(col.value)}
+                            />
+                            <Label
+                              htmlFor={`column-${col.value}`}
+                              className="cursor-pointer text-sm font-normal"
+                            >
+                              {col.label}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex justify-end space-x-2">
+                      <Button variant="outline" size="sm" onClick={() => setIsColumnSelectorOpen(false)}>
+                        Cancel
+                      </Button>
+                      <Button size="sm" onClick={applyColumnSelection}>
+                        Apply
+                      </Button>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
           </CardHeader>
           <CardContent>
@@ -241,38 +403,22 @@ export default function ItemsIndex({ items, filters }: Props) {
                   <thead>
                     <tr className="border-b bg-muted/50">
                       <th className="h-12 w-16 px-4 text-left align-middle font-medium">#</th>
-                      <th className="h-12 px-4 text-left align-middle font-medium">
-                        <Button variant="ghost" onClick={() => handleSort('string')} className="h-auto p-0 font-medium">
-                          String
-                          {getSortIcon('string')}
-                        </Button>
-                      </th>
-                      <th className="h-12 px-4 text-left align-middle font-medium hidden sm:table-cell">
-                        <Button variant="ghost" onClick={() => handleSort('email')} className="h-auto p-0 font-medium">
-                          Email
-                          {getSortIcon('email')}
-                        </Button>
-                      </th>
-                      <th className="h-12 px-4 text-left align-middle font-medium">
-                        <Button
-                          variant="ghost"
-                          onClick={() => handleSort('enumerate')}
-                          className="h-auto p-0 font-medium"
-                        >
-                          Status
-                          {getSortIcon('enumerate')}
-                        </Button>
-                      </th>
-                      <th className="hidden h-12 px-4 text-left align-middle font-medium sm:table-cell">
-                        <Button
-                          variant="ghost"
-                          onClick={() => handleSort('created_at')}
-                          className="h-auto p-0 font-medium"
-                        >
-                          Created
-                          {getSortIcon('created_at')}
-                        </Button>
-                      </th>
+                      {columns.map((col) => {
+                        const columnDef = AVAILABLE_COLUMNS.find((c) => c.value === col);
+                        if (!columnDef) return null;
+                        return (
+                          <th key={col} className="h-12 px-4 text-left align-middle font-medium">
+                            <Button
+                              variant="ghost"
+                              onClick={() => handleSort(col)}
+                              className="h-auto p-0 font-medium"
+                            >
+                              {columnDef.label}
+                              {getSortIcon(col)}
+                            </Button>
+                          </th>
+                        );
+                      })}
                       <th className="h-12 px-4 text-right align-middle font-medium">Actions</th>
                     </tr>
                   </thead>
@@ -284,21 +430,11 @@ export default function ItemsIndex({ items, filters }: Props) {
                             {(items.current_page - 1) * items.per_page + index + 1}
                           </div>
                         </td>
-                        <td className="p-4 align-middle">
-                          <div className="font-medium">{item.string}</div>
-                          <div className="text-sm text-muted-foreground sm:hidden">{item.email}</div>
-                        </td>
-                        <td className="p-4 align-middle hidden sm:table-cell">
-                          <div className="text-sm text-muted-foreground">{item.email}</div>
-                        </td>
-                        <td className="p-4 align-middle">
-                          <Badge variant={item.enumerate === 'enable' ? 'default' : 'secondary'}>
-                            {item.enumerate ? item.enumerate.charAt(0).toUpperCase() + item.enumerate.slice(1) : 'N/A'}
-                          </Badge>
-                        </td>
-                        <td className="hidden p-4 align-middle sm:table-cell">
-                          <div className="text-sm text-muted-foreground">{formatDate(item.created_at)}</div>
-                        </td>
+                        {columns.map((col) => (
+                          <td key={col} className="p-4 align-middle">
+                            {renderCellContent(item, col)}
+                          </td>
+                        ))}
                         <td className="p-4 text-right align-middle">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -330,7 +466,7 @@ export default function ItemsIndex({ items, filters }: Props) {
                     ))}
                     {items.data.length === 0 && (
                       <tr>
-                        <td colSpan={6} className="p-4 text-center text-muted-foreground">
+                        <td colSpan={columns.length + 2} className="p-4 text-center text-muted-foreground">
                           No items found.
                         </td>
                       </tr>

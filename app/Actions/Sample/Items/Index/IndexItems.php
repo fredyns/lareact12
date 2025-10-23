@@ -23,9 +23,21 @@ class IndexItems extends Controller
     {
         $this->authorize('viewAny', Item::class);
 
+        $mandatoryColumns = ['id', 'created_at', 'updated_at']; //internal use
+        $defaultDisplayColumns = ['string', 'email', 'enumerate']; // when invalid or none selected
+        $displayColumns = $request->getColumns($defaultDisplayColumns); // get validated selection
+        $queryColumns = array_unique(array_merge($mandatoryColumns, $displayColumns)); // for database query
+
         // Search functionality and build query
         $query = Item::search($request->getSearch())
-            ->with(['user', 'creator', 'updater']);
+            ->select($queryColumns);
+
+        // Load relationships. creator and updater for audit trail
+        $with = ['creator', 'updater'];
+        if (in_array('user_id', $queryColumns)) {
+            $with[] = 'user';
+        }
+        $query->with($with);
 
         // Apply additional filters (only if validated)
         if ($userId = $request->validated('user_id')) {
@@ -61,6 +73,7 @@ class IndexItems extends Controller
                 'links' => $items->linkCollection()->toArray(),
             ],
             'filters' => $request->only(['search', 'user_id', 'enumerate', 'sort_field', 'sort_direction']),
+            'selectedColumns' => $displayColumns,
         ]);
     }
 }
