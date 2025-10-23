@@ -1,6 +1,6 @@
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SelectOption } from '@/types/enums.generated';
+import { SelectOption } from '@/types';
 
 interface InputEnumProps {
   id: string;
