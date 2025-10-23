@@ -9,6 +9,8 @@
  *  36. sorting `sample_tree_nodes` function in index section with drag & drop.
  *  39. `login as other user` feature.
  *  40. logs for `login`
- *  41.
+ *  41. create image thumbnail with `intervention/image`
+ *  42. implement next performance optimization @ `documentation/PERFORMANCE_RECOMMENDATIONS_NEXT.md`
+ *  43.
  * 
  */ 
