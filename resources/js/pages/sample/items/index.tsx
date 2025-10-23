@@ -101,7 +101,9 @@ export default function ItemsIndex({ items, filters, selectedColumns }: Props) {
   const [enumerate, setEnumerate] = useState<{ value: string; label: string } | null>(null);
   const [selectedUser, setSelectedUser] = useState<SelectOption | null>(null);
   const [columns, setColumns] = useState<string[]>(selectedColumns);
+  const [tempColumns, setTempColumns] = useState<string[]>(selectedColumns);
   const [isColumnSelectorOpen, setIsColumnSelectorOpen] = useState(false);
+  const [isLoadingColumns, setIsLoadingColumns] = useState(false);
 
   const handleSort = (field: string) => {
     const direction = filters.sort_field === field && filters.sort_direction === 'asc' ? 'desc' : 'asc';
@@ -168,26 +170,36 @@ export default function ItemsIndex({ items, filters, selectedColumns }: Props) {
   };
 
   const handleColumnToggle = (column: string) => {
-    const newColumns = columns.includes(column)
-      ? columns.filter((c) => c !== column)
-      : [...columns, column];
-    setColumns(newColumns);
+    const newColumns = tempColumns.includes(column)
+      ? tempColumns.filter((c) => c !== column)
+      : [...tempColumns, column];
+    setTempColumns(newColumns);
   };
 
   const applyColumnSelection = () => {
+    setIsLoadingColumns(true);
+    setColumns(tempColumns);
     router.get(
       sample.items.index.url(),
       {
         search,
         user_id: selectedUser?.value,
         enumerate: enumerate?.value,
-        columns,
+        columns: tempColumns,
       },
       {
         preserveState: true,
         replace: true,
+        onFinish: () => {
+          setIsLoadingColumns(false);
+        },
       },
     );
+    setIsColumnSelectorOpen(false);
+  };
+
+  const handleCancelColumnSelection = () => {
+    setTempColumns(columns);
     setIsColumnSelectorOpen(false);
   };
 
@@ -214,7 +226,18 @@ export default function ItemsIndex({ items, filters, selectedColumns }: Props) {
     });
   };
 
+  const Shimmer = () => (
+    <div className="animate-pulse">
+      <div className="h-4 bg-muted rounded w-20"></div>
+    </div>
+  );
+
   const renderCellContent = (item: Item, column: string) => {
+    // Show shimmer if loading
+    if (isLoadingColumns) {
+      return <Shimmer />;
+    }
+
     switch (column) {
       case 'user_id':
         return <div className="text-sm">{item.user?.name || 'N/A'}</div>;
@@ -370,7 +393,7 @@ export default function ItemsIndex({ items, filters, selectedColumns }: Props) {
                           <div key={col.value} className="flex items-center space-x-2">
                             <Checkbox
                               id={`column-${col.value}`}
-                              checked={columns.includes(col.value)}
+                              checked={tempColumns.includes(col.value)}
                               onCheckedChange={() => handleColumnToggle(col.value)}
                             />
                             <Label
@@ -384,7 +407,7 @@ export default function ItemsIndex({ items, filters, selectedColumns }: Props) {
                       </div>
                     </div>
                     <div className="flex justify-end space-x-2">
-                      <Button variant="outline" size="sm" onClick={() => setIsColumnSelectorOpen(false)}>
+                      <Button variant="outline" size="sm" onClick={handleCancelColumnSelection}>
                         Cancel
                       </Button>
                       <Button size="sm" onClick={applyColumnSelection}>
