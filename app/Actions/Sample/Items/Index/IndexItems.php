@@ -39,23 +39,33 @@ class IndexItems extends Controller
 
         // Text fields that should use case-insensitive sorting
         $textFields = ['user_id', 'string', 'email', 'color', 'npwp', 'ip_address', 'enumerate'];
-        $dbConnection = config('database.default');
-        $postgresSorting = ($dbConnection == 'pgsql');
+        $dbDriver = config('database.default');
+        $driver = config("database.connections.{$dbDriver}.driver");
 
         if ($sortField === 'user_id') {
             // Sort by user's name using relationship join
             $query->leftJoin('users', 'sample_items.user_id', '=', 'users.id');
             
-            if ($postgresSorting) {
+            if ($driver === 'pgsql') {
+                // PostgreSQL: Use LOWER() for case-insensitive sorting
                 $query->orderByRaw("LOWER(users.name) {$sortDirection}");
+            } elseif ($driver === 'sqlite') {
+                // SQLite: Use COLLATE NOCASE for case-insensitive sorting
+                $query->orderByRaw("users.name COLLATE NOCASE {$sortDirection}");
             } else {
+                // MySQL: Uses native case-insensitive collation
                 $query->orderBy('users.name', $sortDirection);
             }
         } elseif (in_array($sortField, $textFields)) {
-            // Case-insensitive sorting for text fields (PostgreSQL only)
-            if ($postgresSorting) {
+            // Case-insensitive sorting for text fields
+            if ($driver === 'pgsql') {
+                // PostgreSQL: Use LOWER() for case-insensitive sorting
                 $query->orderByRaw("LOWER(sample_items.{$sortField}) {$sortDirection}");
+            } elseif ($driver === 'sqlite') {
+                // SQLite: Use COLLATE NOCASE for case-insensitive sorting
+                $query->orderByRaw("sample_items.{$sortField} COLLATE NOCASE {$sortDirection}");
             } else {
+                // MySQL: Uses native case-insensitive collation
                 $query->orderBy('sample_items.' . $sortField, $sortDirection);
             }
         } else {
