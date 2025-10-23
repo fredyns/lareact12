@@ -10,7 +10,18 @@ use Illuminate\Validation\Rules\Enum;
 /**
  * Index Items Request
  * 
- * Handles validation for filtering and sorting items in the index view
+ * Handles validation for filtering and sorting items in the index view.
+ * All filter parameters, sorting options, and pagination settings are validated
+ * before being executed in the query.
+ * 
+ * @property string|null $search Search query string (max 255 characters)
+ * @property string|null $user_id UUID of the user to filter by
+ * @property string|null $enumerate Enumerate value to filter by
+ * @property string|null $sort_field Field to sort by (string, email, integer, decimal, datetime, date, created_at, updated_at)
+ * @property string|null $sort_direction Sort direction (asc or desc)
+ * @property int|null $page Current page number (min 1)
+ * @property int|null $per_page Items per page (min 10, max 100, must be multiple of 10)
+ * 
  */
 class IndexItemsRequest extends FormRequest
 {
@@ -60,7 +71,17 @@ class IndexItemsRequest extends FormRequest
             
             // Pagination
             'page' => ['nullable', 'integer', 'min:1'],
-            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'per_page' => [
+                'nullable',
+                'integer',
+                'min:10',
+                'max:100',
+                function ($attribute, $value, $fail) {
+                    if ($value % 10 !== 0) {
+                        $fail('The ' . $attribute . ' must be a multiple of 10.');
+                    }
+                },
+            ],
         ];
     }
 
@@ -92,6 +113,7 @@ class IndexItemsRequest extends FormRequest
         return [
             'sort_field.in' => 'The selected sort field is invalid. Allowed fields: string, email, integer, decimal, datetime, date, created_at, updated_at.',
             'sort_direction.in' => 'The sort direction must be either asc or desc.',
+            'per_page.min' => 'You must display at least 10 items per page.',
             'per_page.max' => 'You cannot display more than 100 items per page.',
         ];
     }

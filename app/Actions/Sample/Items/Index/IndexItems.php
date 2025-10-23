@@ -28,13 +28,13 @@ class IndexItems extends Controller
         $query = Item::search($request->getSearch())
             ->with(['user', 'creator', 'updater']);
 
-        // Apply additional filters
-        if ($request->filled('user_id')) {
-            $query->where('user_id', $request->validated('user_id'));
+        // Apply additional filters (only if validated)
+        if ($userId = $request->validated('user_id')) {
+            $query->where('user_id', $userId);
         }
 
-        if ($request->filled('enumerate')) {
-            $query->where('enumerate', $request->validated('enumerate'));
+        if ($enumerate = $request->validated('enumerate')) {
+            $query->where('enumerate', $enumerate);
         }
 
         // Apply sorting (already validated)
