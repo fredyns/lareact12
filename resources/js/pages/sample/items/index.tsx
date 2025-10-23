@@ -9,8 +9,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { SelectEnum } from '@/components/shorty/select-enum';
+import { InputSelectUser } from '@/components/select-from-table/input-select-user';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, Item, PageProps } from '@/types';
+import { type BreadcrumbItem, Item, PageProps, SelectOption } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
   ArrowDown,
@@ -69,6 +70,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function ItemsIndex({ items, filters }: Props) {
   const [search, setSearch] = useState(filters.search || '');
   const [enumerate, setEnumerate] = useState<{ value: string; label: string } | null>(null);
+  const [selectedUser, setSelectedUser] = useState<SelectOption | null>(null);
 
   const handleSort = (field: string) => {
     const direction = filters.sort_field === field && filters.sort_direction === 'asc' ? 'desc' : 'asc';
@@ -76,6 +78,7 @@ export default function ItemsIndex({ items, filters }: Props) {
       sample.items.index.url(),
       {
         search,
+        user_id: selectedUser?.value,
         enumerate: enumerate?.value,
         sort_field: field,
         sort_direction: direction,
@@ -89,12 +92,12 @@ export default function ItemsIndex({ items, filters }: Props) {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    router.get(sample.items.index.url(), { search, enumerate: enumerate?.value }, { preserveState: true });
+    router.get(sample.items.index.url(), { search, user_id: selectedUser?.value, enumerate: enumerate?.value }, { preserveState: true });
   };
 
   const handleClearSearch = () => {
     setSearch('');
-    router.get(sample.items.index.url(), { enumerate: enumerate?.value }, { preserveState: true });
+    router.get(sample.items.index.url(), { user_id: selectedUser?.value, enumerate: enumerate?.value }, { preserveState: true });
   };
 
   const handleEnumerateChange = (selected: { value: string; label: string } | null) => {
@@ -103,7 +106,25 @@ export default function ItemsIndex({ items, filters }: Props) {
       sample.items.index.url(),
       {
         search,
+        user_id: selectedUser?.value,
         enumerate: selected?.value || null,
+      },
+      {
+        preserveState: true,
+        replace: true,
+      },
+    );
+  };
+
+  const handleUserChange = (userId: string) => {
+    const user = selectedUser?.value === userId ? selectedUser : null;
+    setSelectedUser(user);
+    router.get(
+      sample.items.index.url(),
+      {
+        search,
+        user_id: userId || null,
+        enumerate: enumerate?.value,
       },
       {
         preserveState: true,
@@ -183,13 +204,24 @@ export default function ItemsIndex({ items, filters }: Props) {
               </form>
 
               <div className="w-full sm:w-64">
+                <InputSelectUser
+                  id="user-filter"
+                  label=""
+                  onChange={handleUserChange}
+                  defaultValue={selectedUser}
+                  placeholder="User"
+                  allowCreate={false}
+                />
+              </div>
+
+              <div className="w-full sm:w-64">
                 <div className="relative">
                   <Filter className="absolute top-2.5 left-2 z-10 h-4 w-4 text-muted-foreground" />
                   <SelectEnum
                     enumClass="Sample/ItemEnumerate"
                     value={enumerate}
                     onChange={handleEnumerateChange}
-                    placeholder="Filter by status"
+                    placeholder="Status"
                     isClearable
                     styles={{
                       control: (base) => ({
