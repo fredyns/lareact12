@@ -1,11 +1,7 @@
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import React, { useEffect, useState } from 'react';
-
-interface EnumOption {
-  value: string;
-  label: string;
-}
+import {SelectOption } from '@/types/index';
 
 interface InputEnumProps {
   id: string;
@@ -30,7 +26,7 @@ export function InputEnum({
   disabled = false,
   loading = false,
 }: InputEnumProps) {
-  const [options, setOptions] = useState<EnumOption[]>([]);
+  const [options, setOptions] = useState<SelectOption[]>([]);
   const [fetchingOptions, setFetchingOptions] = useState(true);
 
   useEffect(() => {
