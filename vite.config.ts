@@ -25,5 +25,56 @@ export default defineConfig({
     },
     esbuild: {
         jsx: 'automatic',
+        // Drop console and debugger in production
+        drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : [],
+    },
+    build: {
+        // Performance optimizations
+        target: 'es2020',
+        minify: 'esbuild',
+        cssMinify: true,
+        
+        // Code splitting for better caching
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    // Vendor chunk for stable dependencies
+                    'vendor': [
+                        'react',
+                        'react-dom',
+                        '@inertiajs/react',
+                    ],
+                    // UI components chunk
+                    'ui': [
+                        'lucide-react',
+                        '@radix-ui/react-dialog',
+                        '@radix-ui/react-dropdown-menu',
+                        '@radix-ui/react-select',
+                        '@radix-ui/react-checkbox',
+                    ],
+                    // Heavy libraries chunk (only include if used)
+                    'heavy': [
+                        '@tinymce/tinymce-react',
+                        'leaflet',
+                        'react-leaflet',
+                    ],
+                },
+            },
+        },
+        
+        // Chunk size warnings
+        chunkSizeWarningLimit: 1000,
+        
+        // Source maps for production debugging (optional)
+        sourcemap: false,
+    },
+    
+    // Optimize dependencies
+    optimizeDeps: {
+        include: [
+            'react',
+            'react-dom',
+            '@inertiajs/react',
+        ],
     },
 });

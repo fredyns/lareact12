@@ -55,10 +55,14 @@ class IndexItems extends Controller
         // Apply select after joins
         $query->select($selectColumns);
 
-        // Load relationships. creator and updater for audit trail
-        $with = ['creator', 'updater'];
+        // Load relationships with optimized select to reduce data transfer
+        // Only load necessary columns for each relationship
+        $with = [
+            'creator:id,name',  // Only load id and name for creator
+            'updater:id,name',  // Only load id and name for updater
+        ];
         if (in_array('user_id', $queryColumns)) {
-            $with[] = 'user';
+            $with[] = 'user:id,name,email';  // Only load necessary user fields
         }
         $query->with($with);
 

@@ -21,7 +21,9 @@ class ItemResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $minioService = app(MinioService::class);
+        // Only instantiate MinioService if file/image fields exist
+        // This avoids unnecessary service instantiation for list views
+        $minioService = ($this->file || $this->image) ? app(MinioService::class) : null;
         
         return [
             'id' => $this->id,
@@ -44,11 +46,11 @@ class ItemResource extends JsonResource
             'enumerate' => $this->enumerate?->value,
             'text' => $this->text,
             'file' => $this->file,
-            'file_url' => $this->file ? $minioService->getDownloadUrl($this->file) : null,
-            'file_download_url' => $this->file ? $minioService->getDownloadUrl($this->file, true) : null,
+            'file_url' => $this->file && $minioService ? $minioService->getDownloadUrl($this->file) : null,
+            'file_download_url' => $this->file && $minioService ? $minioService->getDownloadUrl($this->file, true) : null,
             'image' => $this->image,
-            'image_url' => $this->image ? $minioService->getDownloadUrl($this->image) : null,
-            'image_download_url' => $this->image ? $minioService->getDownloadUrl($this->image, true) : null,
+            'image_url' => $this->image && $minioService ? $minioService->getDownloadUrl($this->image) : null,
+            'image_download_url' => $this->image && $minioService ? $minioService->getDownloadUrl($this->image, true) : null,
             'markdown_text' => $this->markdown_text,
             'wysiwyg' => $this->wysiwyg,
             'latitude' => $this->latitude,
