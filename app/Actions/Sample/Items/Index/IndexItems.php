@@ -37,11 +37,29 @@ class IndexItems extends Controller
         $sortField = $request->getSortField();
         $sortDirection = $request->getSortDirection();
 
+        // Text fields that should use case-insensitive sorting
+        $textFields = ['user_id', 'string', 'email', 'color', 'npwp', 'ip_address', 'enumerate'];
+        $dbConnection = config('database.default');
+        $postgresSorting = ($dbConnection == 'pgsql');
+
         if ($sortField === 'user_id') {
             // Sort by user's name using relationship join
-            $query->leftJoin('users', 'sample_items.user_id', '=', 'users.id')
-                ->orderBy('users.name', $sortDirection);
+            $query->leftJoin('users', 'sample_items.user_id', '=', 'users.id');
+            
+            if ($postgresSorting) {
+                $query->orderByRaw("LOWER(users.name) {$sortDirection}");
+            } else {
+                $query->orderBy('users.name', $sortDirection);
+            }
+        } elseif (in_array($sortField, $textFields)) {
+            // Case-insensitive sorting for text fields (PostgreSQL only)
+            if ($postgresSorting) {
+                $query->orderByRaw("LOWER(sample_items.{$sortField}) {$sortDirection}");
+            } else {
+                $query->orderBy('sample_items.' . $sortField, $sortDirection);
+            }
         } else {
+            // Regular sorting for numeric/date fields
             $query->orderBy('sample_items.' . $sortField, $sortDirection);
         }
 
