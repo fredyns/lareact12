@@ -133,10 +133,7 @@ class GenerateEnumTypes extends Command
         $ts .= " * Generated at: " . now()->toDateTimeString() . "\n";
         $ts .= " */\n\n";
 
-        $ts .= "export interface SelectOption {\n";
-        $ts .= "  value: string;\n";
-        $ts .= "  label: string;\n";
-        $ts .= "}\n\n";
+        $ts .= "import type { SelectOption } from '@/types';\n\n";
 
         // Group enums by namespace
         $grouped = [];
