@@ -1,44 +1,20 @@
-import { Badge } from '@/components/ui/badge';
+import { InputSelectUser } from '@/components/select-from-table/input-select-user';
+import { SelectEnum } from '@/components/shorty/select-enum';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { SelectEnum } from '@/components/shorty/select-enum';
-import { InputSelectUser } from '@/components/select-from-table/input-select-user';
-import { ImagePreviewButton } from '@/components/shorty/image-preview-button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, Item, PageProps, SelectOption } from '@/types';
-import { Head, Link, router, usePage } from '@inertiajs/react';
-import {
-  ArrowDown,
-  ArrowUp,
-  ArrowUpDown,
-  Columns,
-  Edit,
-  Eye,
-  FileText,
-  Filter,
-  MoreHorizontal,
-  Plus,
-  Search,
-  Trash2,
-  X,
-} from 'lucide-react';
-import { useState } from 'react';
 import { dashboard } from '@/routes';
 import sample from '@/routes/sample';
+import { type BreadcrumbItem, Item, SelectOption } from '@/types';
+import { Head, Link, router } from '@inertiajs/react';
+import { Columns, Filter, LayoutGrid, Plus, Search, Table, X } from 'lucide-react';
+import { useState } from 'react';
+import { ItemsCards } from './index-cards';
+import { ItemsTable } from './index-table';
 
 interface PaginationLink {
   url: string | null;
@@ -55,6 +31,8 @@ interface ItemsData {
   links: PaginationLink[];
 }
 
+type ViewMode = 'table' | 'cards';
+
 interface Props {
   items: ItemsData;
   filters: {
@@ -65,6 +43,7 @@ interface Props {
     sort_direction: string;
   };
   selectedColumns: string[];
+  viewMode?: ViewMode;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -96,7 +75,7 @@ const AVAILABLE_COLUMNS = [
   { value: 'image', label: 'Image', sortable: false },
 ];
 
-export default function ItemsIndex({ items, filters, selectedColumns }: Props) {
+export default function ItemsIndex({ items, filters, selectedColumns, viewMode: initialViewMode }: Props) {
   const [search, setSearch] = useState(filters.search || '');
   const [enumerate, setEnumerate] = useState<{ value: string; label: string } | null>(null);
   const [selectedUser, setSelectedUser] = useState<SelectOption | null>(null);
@@ -105,6 +84,7 @@ export default function ItemsIndex({ items, filters, selectedColumns }: Props) {
   const [isColumnSelectorOpen, setIsColumnSelectorOpen] = useState(false);
   const [isLoadingColumns, setIsLoadingColumns] = useState(false);
   const [newlyAddedColumns, setNewlyAddedColumns] = useState<string[]>([]);
+  const [viewMode, setViewMode] = useState<ViewMode>(initialViewMode || 'table');
 
   const handleSort = (field: string) => {
     const direction = filters.sort_field === field && filters.sort_direction === 'asc' ? 'desc' : 'asc';
@@ -117,6 +97,7 @@ export default function ItemsIndex({ items, filters, selectedColumns }: Props) {
         columns,
         sort_field: field,
         sort_direction: direction,
+        view_mode: viewMode,
       },
       {
         preserveState: true,
@@ -127,12 +108,20 @@ export default function ItemsIndex({ items, filters, selectedColumns }: Props) {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    router.get(sample.items.index.url(), { search, user_id: selectedUser?.value, enumerate: enumerate?.value, columns }, { preserveState: true });
+    router.get(
+      sample.items.index.url(),
+      { search, user_id: selectedUser?.value, enumerate: enumerate?.value, columns, view_mode: viewMode },
+      { preserveState: true },
+    );
   };
 
   const handleClearSearch = () => {
     setSearch('');
-    router.get(sample.items.index.url(), { user_id: selectedUser?.value, enumerate: enumerate?.value, columns }, { preserveState: true });
+    router.get(
+      sample.items.index.url(),
+      { user_id: selectedUser?.value, enumerate: enumerate?.value, columns, view_mode: viewMode },
+      { preserveState: true },
+    );
   };
 
   const handleEnumerateChange = (selected: { value: string; label: string } | null) => {
@@ -144,6 +133,7 @@ export default function ItemsIndex({ items, filters, selectedColumns }: Props) {
         user_id: selectedUser?.value,
         enumerate: selected?.value || null,
         columns,
+        view_mode: viewMode,
       },
       {
         preserveState: true,
@@ -162,6 +152,7 @@ export default function ItemsIndex({ items, filters, selectedColumns }: Props) {
         user_id: userId || null,
         enumerate: enumerate?.value,
         columns,
+        view_mode: viewMode,
       },
       {
         preserveState: true,
@@ -180,14 +171,14 @@ export default function ItemsIndex({ items, filters, selectedColumns }: Props) {
   const applyColumnSelection = () => {
     // Identify newly added columns (in tempColumns but not in current columns)
     const newColumns = tempColumns.filter((col) => !columns.includes(col));
-    
+
     // If only removing columns (no new columns added), just update state without server request
     if (newColumns.length === 0) {
       setColumns(tempColumns);
       setIsColumnSelectorOpen(false);
       return;
     }
-    
+
     // If there are new columns, fetch data from server
     setNewlyAddedColumns(newColumns);
     setIsLoadingColumns(true);
@@ -199,6 +190,7 @@ export default function ItemsIndex({ items, filters, selectedColumns }: Props) {
         user_id: selectedUser?.value,
         enumerate: enumerate?.value,
         columns: tempColumns,
+        view_mode: viewMode,
       },
       {
         preserveState: true,
@@ -220,104 +212,6 @@ export default function ItemsIndex({ items, filters, selectedColumns }: Props) {
   const handleDelete = (item: Item) => {
     if (confirm(`Are you sure you want to delete "${item.string}"?`)) {
       router.delete(sample.items.destroy.url(item.id));
-    }
-  };
-
-  const getSortIcon = (field: string) => {
-    if (filters.sort_field !== field) return <ArrowUpDown className="h-4 w-4" />;
-    return filters.sort_direction === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />;
-  };
-
-  const { locale } = usePage<PageProps>().props;
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString(locale, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
-  const Shimmer = () => (
-    <div className="animate-pulse">
-      <div className="h-4 bg-muted rounded w-20"></div>
-    </div>
-  );
-
-  const renderCellContent = (item: Item, column: string) => {
-    // Show shimmer only for newly added columns
-    if (isLoadingColumns && newlyAddedColumns.includes(column)) {
-      return <Shimmer />;
-    }
-
-    switch (column) {
-      case 'user_id':
-        return <div className="text-sm">{item.user?.name || 'N/A'}</div>;
-      case 'string':
-        return <div className="font-medium">{item.string}</div>;
-      case 'email':
-        return <div className="text-sm text-muted-foreground">{item.email}</div>;
-      case 'color':
-        return (
-          <div className="flex items-center gap-2">
-            <div className="h-6 w-6 rounded border" style={{ backgroundColor: item.color || '#000' }} />
-            <span className="text-sm">{item.color}</span>
-          </div>
-        );
-      case 'integer':
-        return <div className="text-sm">{item.integer}</div>;
-      case 'decimal':
-        return <div className="text-sm">{item.decimal}</div>;
-      case 'npwp':
-        return <div className="font-mono text-sm">{item.npwp}</div>;
-      case 'datetime':
-        return <div className="text-sm">{item.datetime ? formatDate(item.datetime) : 'N/A'}</div>;
-      case 'date':
-        return <div className="text-sm">{item.date || 'N/A'}</div>;
-      case 'time':
-        return <div className="text-sm">{item.time || 'N/A'}</div>;
-      case 'ip_address':
-        return <div className="font-mono text-sm">{item.ip_address}</div>;
-      case 'boolean':
-        return (
-          <Badge variant={item.boolean ? 'default' : 'secondary'}>
-            {item.boolean ? 'Yes' : 'No'}
-          </Badge>
-        );
-      case 'enumerate':
-        if (!item.enumerate) {
-          return (
-            <Badge variant="outline" className="text-muted-foreground">
-              N/A
-            </Badge>
-          );
-        }
-        return (
-          <Badge variant={item.enumerate === 'enable' ? 'default' : 'secondary'}>
-            {item.enumerate.charAt(0).toUpperCase() + item.enumerate.slice(1)}
-          </Badge>
-        );
-      case 'file':
-        return item.file ? (
-          <Button
-            variant="outline"
-            size="sm"
-            asChild
-          >
-            <a href={item.file_url ?? undefined} target="_blank" rel="noopener noreferrer">
-              <FileText className="h-4 w-4 mr-2" />
-              View File
-            </a>
-          </Button>
-        ) : (
-          <span className="text-sm text-muted-foreground">No file</span>
-        );
-      case 'image':
-        return <ImagePreviewButton imageUrl={item.image_url} imageAlt={`Image for ${item.string}`} />;
-      default:
-        return <div className="text-sm">N/A</div>;
     }
   };
 
@@ -343,208 +237,142 @@ export default function ItemsIndex({ items, filters, selectedColumns }: Props) {
         <Card>
           <CardHeader>
             <CardTitle>Item Management</CardTitle>
-            <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-              <form onSubmit={handleSearch} className="flex items-center space-x-2">
-                <div className="relative">
-                  <Search className="absolute top-2.5 left-2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search items..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="pr-8 pl-8"
-                  />
-                  {search && (
-                    <button
-                      type="button"
-                      onClick={handleClearSearch}
-                      className="absolute top-2.5 right-2 h-4 w-4 text-muted-foreground hover:text-foreground"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  )}
-                </div>
-                <Button type="submit" variant="outline">
-                  Search
-                </Button>
-              </form>
-
-              <div className="w-full sm:w-64">
-                <InputSelectUser
-                  id="user-filter"
-                  label=""
-                  onChange={handleUserChange}
-                  defaultValue={selectedUser}
-                  placeholder="User"
-                  allowCreate={false}
-                />
-              </div>
-
-              <div className="w-full sm:w-64">
-                <div className="relative">
-                  <Filter className="absolute top-2.5 left-2 z-10 h-4 w-4 text-muted-foreground" />
-                  <SelectEnum
-                    enumClass="Sample/ItemEnumerate"
-                    value={enumerate}
-                    onChange={handleEnumerateChange}
-                    placeholder="Status"
-                    isClearable
-                    styles={{
-                      control: (base) => ({
-                        ...base,
-                        paddingLeft: '24px',
-                      }),
-                    }}
-                  />
-                </div>
-              </div>
-
-              <Popover open={isColumnSelectorOpen} onOpenChange={setIsColumnSelectorOpen}>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" size="default">
-                    <Columns className="mr-2 h-4 w-4" />
-                    Columns
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-80" align="end">
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="mb-3 font-medium">Select Columns</h4>
-                      <div className="space-y-2">
-                        {AVAILABLE_COLUMNS.map((col) => (
-                          <div key={col.value} className="flex items-center space-x-2">
-                            <Checkbox
-                              id={`column-${col.value}`}
-                              checked={tempColumns.includes(col.value)}
-                              onCheckedChange={() => handleColumnToggle(col.value)}
-                            />
-                            <Label
-                              htmlFor={`column-${col.value}`}
-                              className="cursor-pointer text-sm font-normal"
-                            >
-                              {col.label}
-                            </Label>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="flex justify-end space-x-2">
-                      <Button variant="outline" size="sm" onClick={handleCancelColumnSelection}>
-                        Cancel
-                      </Button>
-                      <Button size="sm" onClick={applyColumnSelection}>
-                        Apply
-                      </Button>
-                    </div>
+            <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-1 flex-wrap items-center gap-4">
+                <form onSubmit={handleSearch} className="flex items-center space-x-2">
+                  <div className="relative">
+                    <Search className="absolute top-2.5 left-2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search items..."
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      className="pr-8 pl-8"
+                    />
+                    {search && (
+                      <button
+                        type="button"
+                        onClick={handleClearSearch}
+                        className="absolute top-2.5 right-2 h-4 w-4 text-muted-foreground hover:text-foreground"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
                   </div>
-                </PopoverContent>
-              </Popover>
+                  <Button type="submit" variant="outline">
+                    Search
+                  </Button>
+                </form>
+
+                <div className="w-full sm:w-64">
+                  <InputSelectUser
+                    id="user-filter"
+                    label=""
+                    onChange={handleUserChange}
+                    defaultValue={selectedUser}
+                    placeholder="User"
+                    allowCreate={false}
+                  />
+                </div>
+
+                <div className="w-full sm:w-64">
+                  <div className="relative">
+                    <Filter className="absolute top-2.5 left-2 z-10 h-4 w-4 text-muted-foreground" />
+                    <SelectEnum
+                      enumClass="Sample/ItemEnumerate"
+                      value={enumerate}
+                      onChange={handleEnumerateChange}
+                      placeholder="Status"
+                      isClearable
+                      styles={{
+                        control: (base) => ({
+                          ...base,
+                          paddingLeft: '24px',
+                        }),
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                  {/* Column Selector - Only show in table view */}
+                  {viewMode === 'table' && (
+                      <Popover open={isColumnSelectorOpen} onOpenChange={setIsColumnSelectorOpen}>
+                          <PopoverTrigger asChild>
+                              <Button variant="outline" size="default">
+                                  <Columns className="mr-2 h-4 w-4" />
+                                  Columns
+                              </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-80" align="end">
+                              <div className="space-y-4">
+                                  <div>
+                                      <h4 className="mb-3 font-medium">Select Columns</h4>
+                                      <div className="space-y-2">
+                                          {AVAILABLE_COLUMNS.map((col) => (
+                                              <div key={col.value} className="flex items-center space-x-2">
+                                                  <Checkbox
+                                                      id={`column-${col.value}`}
+                                                      checked={tempColumns.includes(col.value)}
+                                                      onCheckedChange={() => handleColumnToggle(col.value)}
+                                                  />
+                                                  <Label htmlFor={`column-${col.value}`} className="cursor-pointer text-sm font-normal">
+                                                      {col.label}
+                                                  </Label>
+                                              </div>
+                                          ))}
+                                      </div>
+                                  </div>
+                                  <div className="flex justify-end space-x-2">
+                                      <Button variant="outline" size="sm" onClick={handleCancelColumnSelection}>
+                                          Cancel
+                                      </Button>
+                                      <Button size="sm" onClick={applyColumnSelection}>
+                                          Apply
+                                      </Button>
+                                  </div>
+                              </div>
+                          </PopoverContent>
+                      </Popover>
+                  )}
+                  
+                {/* View Mode Toggle */}
+                <div className="flex items-center rounded-lg border bg-background p-1">
+                  <Button
+                    variant={viewMode === 'table' ? 'secondary' : 'ghost'}
+                    size="sm"
+                    onClick={() => setViewMode('table')}
+                    className="h-8 px-3"
+                  >
+                    <Table className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === 'cards' ? 'secondary' : 'ghost'}
+                    size="sm"
+                    onClick={() => setViewMode('cards')}
+                    className="h-8 px-3"
+                  >
+                    <LayoutGrid className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="rounded-md border">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b bg-muted/50">
-                      <th className="h-12 w-16 px-4 text-left align-middle font-medium">#</th>
-                      {columns.map((col) => {
-                        const columnDef = AVAILABLE_COLUMNS.find((c) => c.value === col);
-                        if (!columnDef) return null;
-                        return (
-                          <th key={col} className="h-12 px-4 text-left align-middle font-medium">
-                            {columnDef.sortable ? (
-                              <Button
-                                variant="ghost"
-                                onClick={() => handleSort(col)}
-                                className="h-auto p-0 font-medium"
-                              >
-                                {columnDef.label}
-                                {getSortIcon(col)}
-                              </Button>
-                            ) : (
-                              <span className="font-medium">{columnDef.label}</span>
-                            )}
-                          </th>
-                        );
-                      })}
-                      <th className="h-12 px-4 text-right align-middle font-medium">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {items.data.map((item, index) => (
-                      <tr key={item.id} className="border-b">
-                        <td className="p-4 align-middle">
-                          <div className="font-mono text-sm text-muted-foreground">
-                            {(items.current_page - 1) * items.per_page + index + 1}
-                          </div>
-                        </td>
-                        {columns.map((col) => (
-                          <td key={col} className="p-4 align-middle">
-                            {renderCellContent(item, col)}
-                          </td>
-                        ))}
-                        <td className="p-4 text-right align-middle">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-8 w-8 p-0">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem asChild>
-                                <Link href={sample.items.show.url(item.id)}>
-                                  <Eye className="mr-2 h-4 w-4" />
-                                  View
-                                </Link>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem asChild>
-                                <Link href={sample.items.edit.url(item.id)}>
-                                  <Edit className="mr-2 h-4 w-4" />
-                                  Edit
-                                </Link>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleDelete(item)} className="text-destructive">
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </td>
-                      </tr>
-                    ))}
-                    {items.data.length === 0 && (
-                      <tr>
-                        <td colSpan={columns.length + 2} className="p-4 text-center text-muted-foreground">
-                          No items found.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Pagination */}
-            {items.last_page > 1 && (
-              <div className="flex items-center justify-between space-x-2 py-4">
-                <div className="text-sm text-muted-foreground">
-                  Showing {(items.current_page - 1) * items.per_page + 1} to{' '}
-                  {Math.min(items.current_page * items.per_page, items.total)} of {items.total} results
-                </div>
-                <div className="flex items-center space-x-2">
-                  {items.links &&
-                    items.links.map((link, index) => (
-                      <Button
-                        key={index}
-                        variant={link.active ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => link.url && router.get(link.url)}
-                        disabled={!link.url}
-                        dangerouslySetInnerHTML={{ __html: link.label }}
-                      />
-                    ))}
-                </div>
-              </div>
+            {viewMode === 'table' ? (
+              <ItemsTable
+                items={items}
+                columns={columns}
+                availableColumns={AVAILABLE_COLUMNS}
+                filters={filters}
+                isLoadingColumns={isLoadingColumns}
+                newlyAddedColumns={newlyAddedColumns}
+                onSort={handleSort}
+                onDelete={handleDelete}
+                viewMode={viewMode}
+              />
+            ) : (
+              <ItemsCards items={items} onDelete={handleDelete} viewMode={viewMode} />
             )}
           </CardContent>
         </Card>

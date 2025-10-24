@@ -95,6 +95,7 @@ class IndexItems extends Controller
             ],
             'filters' => $request->only(['search', 'user_id', 'enumerate', 'sort_field', 'sort_direction']),
             'selectedColumns' => $displayColumns,
+            'viewMode' => $request->input('view_mode', 'table'),
         ]);
     }
 }
