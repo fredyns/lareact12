@@ -4,11 +4,13 @@ namespace App\Actions\Sample\Items\Create;
 
 use App\Actions\Sample\Items\ItemRequest;
 use App\Actions\Sample\Shared\MoveFilesToFinalLocation;
+use App\Helpers\Storage;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Sample\ItemResource;
 use App\Models\Sample\Item;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Str;
 
 /**
  * Store Item Action Controller
@@ -29,6 +31,11 @@ class StoreItem extends Controller
         $this->authorize('create', Item::class);
 
         $data = $request->validated();
+
+        if (empty($data['id'])) {
+            $data['id'] = Str::uuid();
+        }
+        $data['upload_path'] = Storage::generateUploadPath('sample_items', $data['id']);
 
         // Create the item first to generate ID and upload_path
         $item = Item::create($data);
