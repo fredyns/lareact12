@@ -23,9 +23,10 @@ interface ItemsData {
 interface Props {
   items: ItemsData;
   viewMode?: string;
+  onDelete: (item: Item) => void;
 }
 
-export function ItemsCards({ items, viewMode }: Props) {
+export function ItemsCards({ items, viewMode, onDelete }: Props) {
   const handleViewDetails = (item: Item) => {
     router.visit(sample.items.show.url(item.id));
   };
@@ -36,7 +37,7 @@ export function ItemsCards({ items, viewMode }: Props) {
 
   const handleDelete = (item: Item) => {
     if (confirm('Are you sure you want to delete this item?')) {
-      router.delete(sample.items.destroy.url(item.id));
+      onDelete(item);
     }
   };
 
