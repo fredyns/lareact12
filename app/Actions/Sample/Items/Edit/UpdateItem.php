@@ -60,7 +60,7 @@ class UpdateItem extends Controller
         if ($request->wantsJson()) {
             return (new ItemResource($item))
                 ->response()
-                ->setStatusCode(200);// todo: standardize json output
+                ->setStatusCode(200);
         }
 
         return redirect()->route('sample.items.show', $item)

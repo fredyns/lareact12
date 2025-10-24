@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * Moves uploaded files from temporary location to final location
  * based on the model's upload_path
- * 
+ *
  * todo: maybe this class should be moved to the Shared folder for all actions. or folder of services?
  */
 class MoveFilesToUploadPath
@@ -23,32 +23,29 @@ class MoveFilesToUploadPath
      * Move files from temporary to final location
      *
      * @param Model $model Model with file and image properties
+     * @param string[] $attributes list of attributes to move
+     * @param bool $save auto save model if any files were moved
      * @return bool True if any files were moved
      */
-    public function handle(Model $model): bool
+    public function handle(Model $model, array $attributes, bool $save = true): bool
     {
-        $filesMoved = false;
-
-        // Move file if exists
-        if ($model->file) {
-            $newPath = $this->minioService->moveToFolder($model->file, $model->upload_path);
-            if ($newPath) {
-                $model->file = $newPath;
-                $filesMoved = true;
+        $filesMoved = 0;
+        foreach ($attributes as $attribute) {
+            if (!$model->{$attribute}) {
+                continue;
             }
-        }
 
-        // Move image if exists
-        if ($model->image) {
-            $newPath = $this->minioService->moveToFolder($model->image, $model->upload_path);
-            if ($newPath) {
-                $model->image = $newPath;
-                $filesMoved = true;
+            $newPath = $this->minioService->moveToFolder($model->{$attribute}, $model->upload_path);
+            if (!$newPath) {
+                continue;
             }
+
+            $model->{$attribute} = $newPath;
+            $filesMoved++;
         }
 
         // Save if any files were moved
-        if ($filesMoved && $model->isDirty(['file', 'image'])) {
+        if ($filesMoved > 0 && $model->isDirty($attributes) && $save) {
             $model->save();
         }
 
