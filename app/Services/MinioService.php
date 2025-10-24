@@ -40,11 +40,22 @@ class MinioService
     }
 
     /**
+     * Put content to a file in MinIO
+     *
+     * @param string $path
+     * @param string $content
+     * @return bool
+     */
+    public function put(string $path, string $content): bool
+    {
+        return $this->disk->put($path, $content);
+    }
+
+    /**
      * Upload a file to MinIO
      *
      * @param UploadedFile $file
      * @param string $directory
-     * @param string|null $filename
      * @return string|false
      */
     public function uploadFile(UploadedFile $file, string $directory = 'uploads'): string|false

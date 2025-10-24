@@ -2,7 +2,7 @@
 
 namespace App\Actions\Sample\Items\Delete;
 
-use App\Actions\DeleteFilesFromStorage;
+use App\Helpers\TrashingFiles;
 use App\Http\Controllers\Controller;
 use App\Models\Sample\Item;
 use Illuminate\Http\JsonResponse;
@@ -16,8 +16,8 @@ use Illuminate\Http\RedirectResponse;
 class DeleteItem extends Controller
 {
     public function __construct(
-        protected DeleteFilesFromStorage $deleteFilesFromStorage
-    ) {}
+        protected TrashingFiles          $trashingFiles
+    ){}
 
     /**
      * Handle the incoming request.
@@ -26,8 +26,8 @@ class DeleteItem extends Controller
     {
         $this->authorize('delete', $item);
 
-        // Delete associated files from MinIO
-        $this->deleteFilesFromStorage->handle([$item->file, $item->image]);
+        // Move associated files to trash
+        $this->trashingFiles->handle($item, ['file', 'image']);
 
         $item->delete();
 
