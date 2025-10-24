@@ -3,10 +3,10 @@
 namespace App\Actions\Sample\Items\Edit;
 
 use App\Actions\Sample\Items\ItemRequest;
+use App\Helpers\MoveFilesToUploadPath;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Sample\ItemResource;
 use App\Models\Sample\Item;
-use App\Services\MinioService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 
@@ -18,7 +18,7 @@ use Illuminate\Http\RedirectResponse;
 class UpdateItem extends Controller
 {
     public function __construct(
-        protected MinioService $minioService
+        protected MoveFilesToUploadPath $moveFilesToUploadPath
     ) {}
 
     /**
@@ -35,27 +35,17 @@ class UpdateItem extends Controller
 
         $data = $request->validated();
 
-        // Handle file uploads using MinIO
-        if ($request->hasFile('file')) {
-            // Delete old file if exists
-            if ($item->file) {
-                $this->minioService->deleteFile($item->file);
-            }
-            // Move new file to final location
-            $data['file'] = $this->minioService->moveToFolder($data['file'], $item->upload_path) ?? $data['file'];
-        }
+        // Fill the model with validated data
+        $item->fill($data);
 
-        if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($item->image) {
-                $this->minioService->deleteFile($item->image);
-            }
-            // Move new image to final location
-            $data['image'] = $this->minioService->moveToFolder($data['image'], $item->upload_path) ?? $data['image'];
-        }
+        // Move uploaded files to the final location
+        $this->moveFilesToUploadPath->handle($item, ['file', 'image'], false);
 
-        $item->update($data);
-        $item = $item->fresh(['user', 'creator', 'updater']);
+        // Save everything in a single operation
+        $item->save();
+
+        // Refresh relationships
+        $item->load(['user', 'creator', 'updater']);
 
         if ($request->wantsJson()) {
             return (new ItemResource($item))
