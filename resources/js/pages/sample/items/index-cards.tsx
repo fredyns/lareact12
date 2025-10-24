@@ -50,7 +50,6 @@ export function ItemsCards({ items, viewMode }: Props) {
                 id={item.id}
                 title={item.string || 'Untitled'}
                 description={item.user?.name || 'No description'}
-                content={item.text || 'No content available'}
                 image={item.image_url ?? undefined}
                 onPreview={() => {}}
                 onViewDetails={() => handleViewDetails(item)}

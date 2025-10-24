@@ -6,7 +6,6 @@ interface MorphingCardProps {
   id: string;
   title: string;
   description: string;
-  content: string;
   image?: string;
   isExpanded?: boolean;
   onExpand?: () => void;
@@ -38,7 +37,6 @@ export function MorphingCard({
   id,
   title,
   description,
-  content,
   image,
   isExpanded = false,
   onExpand,
@@ -217,9 +215,6 @@ export function MorphingCard({
                     <p className="text-sm text-muted-foreground mt-1">{description}</p>
                   </div>
 
-                  <div className="prose prose-sm dark:prose-invert max-w-none">
-                    <p className="text-muted-foreground whitespace-pre-wrap">{content}</p>
-                  </div>
 
                   {/* Action Buttons */}
                   <div className="flex gap-3 pt-4 border-t">
