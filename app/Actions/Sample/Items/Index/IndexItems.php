@@ -23,7 +23,7 @@ class IndexItems extends Controller
     {
         $this->authorize('viewAny', Item::class);
 
-        $mandatoryColumns = ['id', 'created_at', 'updated_at']; //internal use
+        $mandatoryColumns = ['id', 'created_at', 'updated_at', 'image', 'file']; //internal use
         $defaultDisplayColumns = ['string', 'email', 'enumerate']; // when invalid or none selected
         $displayColumns = $request->getColumns($defaultDisplayColumns); // get validated selection
         $queryColumns = array_unique(array_merge($mandatoryColumns, $displayColumns)); // for database query

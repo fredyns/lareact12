@@ -1,16 +1,9 @@
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Item } from '@/types';
-import { Link, router } from '@inertiajs/react';
-import { Edit, Eye, MoreHorizontal, Trash2, User } from 'lucide-react';
+import { router } from '@inertiajs/react';
 import sample from '@/routes/sample';
+import { MorphingCard } from '@/components/ui/morphing-card';
+import { useState } from 'react';
 
 interface PaginationLink {
   url: string | null;
@@ -29,103 +22,57 @@ interface ItemsData {
 
 interface Props {
   items: ItemsData;
-  onDelete: (item: Item) => void;
   viewMode?: string;
 }
 
-export function ItemsCards({ items, onDelete, viewMode }: Props) {
+export function ItemsCards({ items, viewMode }: Props) {
+  const handleViewDetails = (item: Item) => {
+    router.visit(sample.items.show.url(item.id));
+  };
+
+  const handleEdit = (item: Item) => {
+    router.visit(sample.items.edit.url(item.id));
+  };
+
+  const handleDelete = (item: Item) => {
+    if (confirm('Are you sure you want to delete this item?')) {
+      router.delete(sample.items.destroy.url(item.id));
+    }
+  };
+
   return (
-    <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {items.data.map((item) => (
-          <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-            <CardHeader className="p-4 pb-3">
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex items-start gap-3 flex-1 min-w-0">
-                  {item.image_url ? (
-                    <img
-                      src={item.image_url}
-                      alt={item.string}
-                      className="h-32 w-32 rounded object-cover flex-shrink-0"
-                    />
-                  ) : (
-                    <div className="h-32 w-32 rounded bg-muted flex items-center justify-center flex-shrink-0">
-                      <span className="text-muted-foreground text-xs">No image</span>
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-base line-clamp-2 mb-1">{item.string}</h3>
-                    {item.enumerate && (
-                      <Badge variant={item.enumerate === 'enable' ? 'default' : 'secondary'} className="text-xs">
-                        {item.enumerate.charAt(0).toUpperCase() + item.enumerate.slice(1)}
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0 flex-shrink-0">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem asChild>
-                      <Link href={sample.items.show.url(item.id)}>
-                        <Eye className="mr-2 h-4 w-4" />
-                        View
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href={sample.items.edit.url(item.id)}>
-                        <Edit className="mr-2 h-4 w-4" />
-                        Edit
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onDelete(item)} className="text-destructive">
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </CardHeader>
-            <CardContent className="p-4 pt-0 space-y-2">
-              {item.user && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <User className="h-4 w-4" />
-                  <span className="truncate">{item.user.name}</span>
-                </div>
-              )}
-              {item.text && (
-                <p className="text-sm text-muted-foreground line-clamp-3">{item.text}</p>
-              )}
-            </CardContent>
-            <CardFooter className="p-4 pt-0 flex gap-2">
-              <Button variant="outline" size="sm" asChild className="flex-1">
-                <Link href={sample.items.show.url(item.id)}>
-                  <Eye className="mr-2 h-4 w-4" />
-                  View
-                </Link>
-              </Button>
-              <Button variant="outline" size="sm" asChild className="flex-1">
-                <Link href={sample.items.edit.url(item.id)}>
-                  <Edit className="mr-2 h-4 w-4" />
-                  Edit
-                </Link>
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
-        {items.data.length === 0 && (
-          <div className="col-span-full p-8 text-center text-muted-foreground">
-            No items found.
-          </div>
-        )}
+    <div className="p-4">
+      <div className="w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <AnimatePresence>
+          {items.data.map((item) => (
+            <div key={item.id} className="h-full">
+              <MorphingCard
+                id={item.id}
+                title={item.string || 'Untitled'}
+                description={item.user?.name || 'No description'}
+                content={item.text || 'No content available'}
+                image={item.image_url ?? undefined}
+                onPreview={() => {}}
+                onViewDetails={() => handleViewDetails(item)}
+                onEdit={() => handleEdit(item)}
+                onDelete={() => handleDelete(item)}
+                actionText="View Details"
+                className="h-full"
+              />
+            </div>
+          ))}
+          
+          {items.data.length === 0 && (
+            <div className="col-span-full p-8 text-center text-muted-foreground">
+              No items found.
+            </div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Pagination */}
       {items.last_page > 1 && (
-        <div className="flex items-center justify-between space-x-2 py-4">
+        <div className="flex items-center justify-between space-x-2 py-4 mt-6">
           <div className="text-sm text-muted-foreground">
             Showing {(items.current_page - 1) * items.per_page + 1} to{' '}
             {Math.min(items.current_page * items.per_page, items.total)} of {items.total} results
@@ -133,10 +80,13 @@ export function ItemsCards({ items, onDelete, viewMode }: Props) {
           <div className="flex items-center space-x-2">
             {items.links &&
               items.links.map((link, index) => (
-                <Button
+                <button
                   key={index}
-                  variant={link.active ? 'default' : 'outline'}
-                  size="sm"
+                  className={`inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
+                    link.active
+                      ? 'bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2'
+                      : 'border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3 py-2'
+                  }`}
                   onClick={() => {
                     if (link.url) {
                       const url = new URL(link.url, window.location.origin);
@@ -153,6 +103,6 @@ export function ItemsCards({ items, onDelete, viewMode }: Props) {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
