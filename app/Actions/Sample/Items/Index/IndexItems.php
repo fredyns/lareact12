@@ -24,9 +24,9 @@ class IndexItems extends Controller
         $this->authorize('viewAny', Item::class);
 
         $viewMode = $request->input('view_mode', 'table');
-        $mandatoryColumns = ['id', 'created_at', 'updated_at']; //internal use
+        $mandatoryColumns = ['id', 'image', 'string', 'text', 'created_at', 'updated_at']; //internal use
         $defaultDisplayColumns = ['string', 'email', 'enumerate']; // when invalid or none selected
-        $displayColumns = $viewMode == 'table' ? $request->getColumns($defaultDisplayColumns) : ['image', 'string', 'text']; // get validated selection or card fields
+        $displayColumns = $request->getColumns($defaultDisplayColumns); // get validated selection
         $queryColumns = array_unique(array_merge($mandatoryColumns, $displayColumns)); // for database query
 
         $selectColumns = array_map(fn($col) => "sample_items.{$col}", $queryColumns);
