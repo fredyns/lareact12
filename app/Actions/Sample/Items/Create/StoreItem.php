@@ -32,18 +32,22 @@ class StoreItem extends Controller
 
         $data = $request->validated();
 
-        if (empty($data['id'])) {
-            $data['id'] = Str::uuid();
-        }
-        $data['upload_path'] = Storage::generateUploadPath('sample_items', $data['id']);
+        // Create a model instance, set UUID & Set an upload path for file operations
+        $item = new Item();
+        $item->id = (string)Str::uuid();
+        $item->upload_path = Storage::generateUploadPath('sample_items', $item->id);
 
-        // Create the item first to generate ID and upload_path
-        $item = Item::create($data);
+        // Fill with validated data
+        $item->fill($data);
 
-        // Move uploaded files from temporary location to final location
-        $this->moveFilesToUploadPath->handle($item);
+        // Move uploaded files to the final location
+        $this->moveFilesToUploadPath->handle($item, ['file', 'image']);
 
-        $item = $item->fresh(['user', 'creator', 'updater']); // explain
+        // Save everything in a single operation
+        $item->save();
+
+        // Refresh relationships
+        $item->load(['user', 'creator', 'updater']);
 
         if ($request->wantsJson()) {
             return (new ItemResource($item))
