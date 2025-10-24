@@ -2,8 +2,8 @@
 
 namespace App\Actions\Sample\Items\Create;
 
-use App\Actions\MoveFilesToUploadPath;
 use App\Actions\Sample\Items\ItemRequest;
+use App\Helpers\MoveFilesToUploadPath;
 use App\Helpers\Storage;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Sample\ItemResource;

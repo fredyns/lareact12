@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions;
+namespace App\Helpers;
 
 use App\Services\MinioService;
 use Illuminate\Database\Eloquent\Model;

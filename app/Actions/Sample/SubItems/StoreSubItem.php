@@ -2,7 +2,7 @@
 
 namespace App\Actions\Sample\SubItems;
 
-use App\Actions\MoveFilesToUploadPath;
+use App\Helpers\MoveFilesToUploadPath;
 use App\Models\Sample\SubItem;
 
 /**
