@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 /**
  * @method static Builder search(string $search)
+ * @method Builder search(string $search)
  */
 trait Searchable
 {

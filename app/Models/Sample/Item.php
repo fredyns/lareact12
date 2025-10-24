@@ -45,6 +45,8 @@ use Illuminate\Support\Str;
  * @property-read User|null $creator
  * @property-read User|null $updater
  * @property-read \Illuminate\Database\Eloquent\Collection<int, SubItem> $subItems
+ * 
+ * @method static create(array $data)
  */
 class Item extends Model
 {

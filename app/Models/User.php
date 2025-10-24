@@ -21,6 +21,8 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string $password
  * @property string $remember_token
  *
+ * @method static create(array $data)
+ *
  */
 class User extends Authenticatable
 {
