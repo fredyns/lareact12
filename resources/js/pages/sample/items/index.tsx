@@ -180,6 +180,15 @@ export default function ItemsIndex({ items, filters, selectedColumns }: Props) {
   const applyColumnSelection = () => {
     // Identify newly added columns (in tempColumns but not in current columns)
     const newColumns = tempColumns.filter((col) => !columns.includes(col));
+    
+    // If only removing columns (no new columns added), just update state without server request
+    if (newColumns.length === 0) {
+      setColumns(tempColumns);
+      setIsColumnSelectorOpen(false);
+      return;
+    }
+    
+    // If there are new columns, fetch data from server
     setNewlyAddedColumns(newColumns);
     setIsLoadingColumns(true);
     setColumns(tempColumns);
