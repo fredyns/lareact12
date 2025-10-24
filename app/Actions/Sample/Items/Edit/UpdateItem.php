@@ -39,7 +39,7 @@ class UpdateItem extends Controller
         $item->fill($data);
 
         // Move uploaded files to the final location
-        $this->moveFilesToUploadPath->handle($item, ['file', 'image'], false);
+        $this->moveFilesToUploadPath->handle($item, ['file', 'image']);
 
         // Save everything in a single operation
         $item->save();

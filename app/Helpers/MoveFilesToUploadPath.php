@@ -24,10 +24,9 @@ class MoveFilesToUploadPath
      *
      * @param Model $model Model with file and image properties
      * @param string[] $attributes list of attributes to move
-     * @param bool $save auto save model if any files were moved
      * @return bool True if any files were moved
      */
-    public function handle(Model $model, array $attributes, bool $save = true): bool
+    public function handle(Model $model, array $attributes): bool
     {
         $filesMoved = 0;
         foreach ($attributes as $attribute) {
@@ -45,7 +44,7 @@ class MoveFilesToUploadPath
         }
 
         // Save if any files were moved
-        if ($filesMoved > 0 && $model->isDirty($attributes) && $save) {
+        if ($filesMoved > 0 && $model->isDirty($attributes)) {
             $model->save();
         }
 
