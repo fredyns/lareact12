@@ -2,8 +2,8 @@
 
 namespace App\Actions\Sample\Items\Create;
 
+use App\Actions\MoveFilesToUploadPath;
 use App\Actions\Sample\Items\ItemRequest;
-use App\Actions\Sample\Shared\MoveFilesToFinalLocation;
 use App\Helpers\Storage;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Sample\ItemResource;
@@ -20,7 +20,7 @@ use Illuminate\Support\Str;
 class StoreItem extends Controller
 {
     public function __construct(
-        protected MoveFilesToFinalLocation $moveFilesToFinalLocation
+        protected MoveFilesToUploadPath $moveFilesToUploadPath
     ) {}
 
     /**
@@ -41,7 +41,7 @@ class StoreItem extends Controller
         $item = Item::create($data);
 
         // Move uploaded files from temporary location to final location
-        $this->moveFilesToFinalLocation->handle($item);
+        $this->moveFilesToUploadPath->handle($item);
 
         $item = $item->fresh(['user', 'creator', 'updater']); // explain
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions\Sample\Shared;
+namespace App\Actions;
 
 use App\Services\MinioService;
 
@@ -26,6 +26,7 @@ class DeleteFilesFromStorage
     {
         $filePaths = is_array($files) ? $files : [$files];
         
+        // todo: move files to trash & saves model as json
         $this->minioService->deleteFiles($filePaths);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Actions\Sample\SubItems;
 
-use App\Actions\Sample\Shared\DeleteFilesFromStorage;
+use App\Actions\DeleteFilesFromStorage;
 use App\Models\Sample\SubItem;
 
 /**

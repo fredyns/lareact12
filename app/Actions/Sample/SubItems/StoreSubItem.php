@@ -2,7 +2,7 @@
 
 namespace App\Actions\Sample\SubItems;
 
-use App\Actions\Sample\Shared\MoveFilesToFinalLocation;
+use App\Actions\MoveFilesToUploadPath;
 use App\Models\Sample\SubItem;
 
 /**
@@ -13,7 +13,7 @@ use App\Models\Sample\SubItem;
 class StoreSubItem
 {
     public function __construct(
-        protected MoveFilesToFinalLocation $moveFilesToFinalLocation
+        protected MoveFilesToUploadPath $moveFilesToFinalLocation
     ) {}
 
     /**

@@ -2,7 +2,7 @@
 
 namespace App\Actions\Sample\Items\Delete;
 
-use App\Actions\Sample\Shared\DeleteFilesFromStorage;
+use App\Actions\DeleteFilesFromStorage;
 use App\Http\Controllers\Controller;
 use App\Models\Sample\Item;
 use Illuminate\Http\JsonResponse;

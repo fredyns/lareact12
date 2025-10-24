@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions\Sample\Shared;
+namespace App\Actions;
 
 use App\Services\MinioService;
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * 
  * todo: maybe this class should be moved to the Shared folder for all actions. or folder of services?
  */
-class MoveFilesToFinalLocation
+class MoveFilesToUploadPath
 {
     public function __construct(
         protected MinioService $minioService
