@@ -220,10 +220,9 @@ export default function Show({ item }: Props) {
                 <CardTitle>Files</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <ShowFile label="File (PDF, DOCX, PPTX, XLSX, ZIP, RAR)" url={item.file_url} path={item.file} />
-
                 <ShowImage label="Image (JPG, JPEG, PNG)" url={item.image_url} alt={item.string} />
-              </CardContent>
+
+                <ShowFile label="File (PDF, DOCX, PPTX, XLSX, ZIP, RAR)" url={item.file_url} path={item.file} />              </CardContent>
             </Card>
           </TabsContent>
 

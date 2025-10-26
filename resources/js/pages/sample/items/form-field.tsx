@@ -307,17 +307,6 @@ export function FormField({
               <CardTitle>Files</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <InputFile
-                id="file"
-                label="File (PDF, DOCX, PPTX, XLSX, ZIP, RAR)"
-                currentFileUrl={currentFileUrl}
-                currentFileName={currentFileName}
-                onFileChange={(filePath) => setData('file', filePath)}
-                uploadPath={uploadPath}
-                accept=".pdf,.docx,.pptx,.xlsx,.zip,.rar"
-                maxSize={10 * 1024 * 1024} // 10MB
-              />
-
               <InputImage
                 id="image"
                 label="Image (JPG, JPEG, PNG)"
@@ -328,6 +317,17 @@ export function FormField({
                 uploadPath={uploadPath}
                 accept=".jpg,.jpeg,.png,.heic"
                 maxSize={5 * 1024 * 1024} // 5MB
+              />
+
+              <InputFile
+                id="file"
+                label="File (PDF, DOCX, PPTX, XLSX, ZIP, RAR)"
+                currentFileUrl={currentFileUrl}
+                currentFileName={currentFileName}
+                onFileChange={(filePath) => setData('file', filePath)}
+                uploadPath={uploadPath}
+                accept=".pdf,.docx,.pptx,.xlsx,.zip,.rar"
+                maxSize={10 * 1024 * 1024} // 10MB
               />
             </CardContent>
           </Card>
