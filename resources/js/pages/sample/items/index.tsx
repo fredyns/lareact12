@@ -211,50 +211,8 @@ export default function ItemsIndex({ items, filters, selectedColumns, viewMode: 
 
   const handleViewModeChange = (newMode: ViewMode) => {
     if (newMode === 'cards') {
-      // Required fields for cards view
-      const requiredFields = ['image', 'string', 'text'];
-      const hasAllRequiredFields = requiredFields.every((field) => columns.includes(field));
-
-      if (!hasAllRequiredFields) {
-        // Add missing required fields
-        const newColumns = Array.from(new Set([...columns, ...requiredFields]));
-        setColumns(newColumns);
-        setTempColumns(newColumns);
-        setViewMode(newMode);
-
-        // Refresh data with new columns
-        router.get(
-          sample.items.index.url(),
-          {
-            search,
-            user_id: selectedUser?.value,
-            enumerate: enumerate?.value,
-            columns: newColumns,
-            view_mode: newMode,
-          },
-          {
-            preserveState: true,
-            replace: true,
-          },
-        );
-      } else {
-        // All required fields already selected, just change view mode
-        setViewMode(newMode);
-        router.get(
-          sample.items.index.url(),
-          {
-            search,
-            user_id: selectedUser?.value,
-            enumerate: enumerate?.value,
-            columns,
-            view_mode: newMode,
-          },
-          {
-            preserveState: true,
-            replace: true,
-          },
-        );
-      }
+      // All columns always available from controller, just switch view mode
+      setViewMode(newMode);
     } else {
       // Switching to table view
       setViewMode(newMode);
