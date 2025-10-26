@@ -13,12 +13,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, Item } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ArrowLeft, Check, Edit, Trash2, X } from 'lucide-react';
 import enums from '@/types/enums.generated';
 import { dashboard } from '@/routes';
 import sample from '@/routes/sample';
 import { IndexSection as SubItemsIndexSection } from './sub-items/index-section';
+import { useState, useEffect } from 'react';
 
 interface Props {
   item: Item;
@@ -40,6 +41,26 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Show({ item }: Props) {
+  const { url } = usePage();
+  const [activeTab, setActiveTab] = useState<string>('basic');
+
+  // Initialize tab from URL query parameter on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tabParam = params.get('tab');
+    if (tabParam && ['basic', 'datetime', 'other', 'location', 'files', 'content'].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, []);
+
+  // Update URL when tab changes
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    const params = new URLSearchParams(window.location.search);
+    params.set('tab', value);
+    window.history.replaceState({}, '', `${url.split('?')[0]}?${params.toString()}`);
+  };
+
   const handleDelete = () => {
     if (confirm('Are you sure you want to delete this item?')) {
       router.delete(sample.items.destroy.url(item.id));
@@ -114,7 +135,7 @@ export default function Show({ item }: Props) {
                 </CardContent>
             </Card>
         </div>
-        <Tabs defaultValue="basic" className="w-full">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="basic">Basic</TabsTrigger>
             <TabsTrigger value="datetime">Date & Time</TabsTrigger>
