@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Item } from '@/types';
 import { getItemUploadPath } from '@/utils/upload';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { ArrowLeft, Save } from 'lucide-react';
 import { dashboard } from '@/routes';
 import sample from '@/routes/sample';
@@ -69,12 +69,10 @@ export default function Edit({ item }: Props) {
             <h1 className="text-2xl font-bold tracking-tight">Edit Item</h1>
             <p className="text-muted-foreground">Update item information and settings</p>
           </div>
-          <Link href={sample.items.index.url()}>
-            <Button variant="outline">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Items
-            </Button>
-          </Link>
+          <Button variant="outline" onClick={() => window.history.back()}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -89,11 +87,9 @@ export default function Edit({ item }: Props) {
           <Card className="col-span-full">
             <CardContent className="pt-6">
               <div className="flex items-center justify-end space-x-2">
-                <Link href={sample.items.index.url()}>
-                  <Button type="button" variant="outline">
-                    Cancel
-                  </Button>
-                </Link>
+                <Button type="button" variant="outline" onClick={() => window.history.back()}>
+                  Cancel
+                </Button>
                 <Button type="submit" disabled={processing}>
                   <Save className="mr-2 h-4 w-4" />
                   {processing ? 'Updating...' : 'Update Item'}
