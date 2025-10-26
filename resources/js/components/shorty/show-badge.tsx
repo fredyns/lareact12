@@ -22,7 +22,9 @@ export function ShowBadge({ label, value, variant = 'default', icon: Icon, loadi
           {value}
         </Badge>
       ) : (
-        <p className="font-medium">-</p>
+        <span className="inline-flex items-center justify-center rounded-md border border-muted-foreground/30 px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap bg-transparent text-muted-foreground">
+          N/A
+        </span>
       )}
     </div>
   );

@@ -47,7 +47,7 @@ export default function Show({ item }: Props) {
   };
 
   const getEnumerateLabel = (value: string | null) => {
-    if (!value) return 'N/A';
+    if (!value) return null;
     return enums.Sample.ItemEnumerate.getLabel(value);
   };
 
@@ -103,7 +103,7 @@ export default function Show({ item }: Props) {
                                 label="Status"
                                 value={getEnumerateLabel(item.enumerate)}
                                 variant={item.enumerate === 'enable' ? 'default' : 'secondary'}
-                                icon={item.enumerate === 'enable' ? Check : X}
+                                icon={item.enumerate ? (item.enumerate === 'enable' ? Check : X) : undefined}
                             />
                         </div>
                     </div>
