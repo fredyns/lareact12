@@ -174,7 +174,11 @@ export function TimePicker({
           </Button>
           <Button
             size="sm"
-            onClick={() => setOpen(false)}
+            onClick={() => {
+              // Submit the current time selection when Done is clicked
+              handleTimeChange(hours, minutes, period)
+              setOpen(false)
+            }}
           >
             Done
           </Button>
