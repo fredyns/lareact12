@@ -1,6 +1,6 @@
 import { ShowBadge } from '@/components/shorty/show-badge';
 import { ShowColor } from '@/components/shorty/show-color';
-import { ShowDatetime } from '@/components/shorty/show-datetime';
+import { getLocale, ShowDatetime } from '@/components/shorty/show-datetime';
 import { ShowField } from '@/components/shorty/show-field';
 import { ShowFile } from '@/components/shorty/show-file';
 import { ShowImage } from '@/components/shorty/show-image';
@@ -12,14 +12,25 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, Item } from '@/types';
-import { Head, Link, router, usePage } from '@inertiajs/react';
-import { ArrowLeft, Check, Edit, Trash2, X } from 'lucide-react';
-import enums from '@/types/enums.generated';
 import { dashboard } from '@/routes';
 import sample from '@/routes/sample';
+import { type BreadcrumbItem, Item } from '@/types';
+import enums from '@/types/enums.generated';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { ArrowLeft, Check, Edit, Trash2, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { IndexSection as SubItemsIndexSection } from './sub-items/index-section';
-import { useState, useEffect } from 'react';
+
+// Get date format based on locale
+const getDateFormat = (locale: string): string => {
+  switch (locale) {
+    case 'id':
+      return 'EEEE, dd MMMM yyyy';
+    case 'en':
+    default:
+      return 'EEEE, MMMM dd, yyyy';
+  }
+};
 
 interface Props {
   item: Item;
@@ -104,36 +115,36 @@ export default function Show({ item }: Props) {
         </div>
 
         <div className="grid grid-cols-1 gap-6">
-            {/* Main Information Card */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>Main Information</CardTitle>
-                </CardHeader>
-                <CardContent className="flex flex-col gap-4">
-                    <div className="flex flex-col md:flex-row gap-4">
-                        <div className="flex-1 md:w-1/3">
-                            <ShowField label="String" value={item.string} />
-                        </div>
+          {/* Main Information Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Main Information</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4">
+              <div className="flex flex-col gap-4 md:flex-row">
+                <div className="flex-1 md:w-1/3">
+                  <ShowField label="String" value={item.string} />
+                </div>
 
-                        <div className="flex-1 md:w-1/3">
-                            <ShowField label="Email" value={item.email} />
-                        </div>
+                <div className="flex-1 md:w-1/3">
+                  <ShowField label="Email" value={item.email} />
+                </div>
 
-                        <div className="flex-1 md:w-1/3">
-                            <ShowBadge
-                                label="Status"
-                                value={getEnumerateLabel(item.enumerate)}
-                                variant={item.enumerate === 'enable' ? 'default' : 'secondary'}
-                                icon={item.enumerate ? (item.enumerate === 'enable' ? Check : X) : undefined}
-                            />
-                        </div>
-                    </div>
+                <div className="flex-1 md:w-1/3">
+                  <ShowBadge
+                    label="Status"
+                    value={getEnumerateLabel(item.enumerate)}
+                    variant={item.enumerate === 'enable' ? 'default' : 'secondary'}
+                    icon={item.enumerate ? (item.enumerate === 'enable' ? Check : X) : undefined}
+                  />
+                </div>
+              </div>
 
-                    <div className="w-full">
-                        <ShowText label="Text" value={item.text} />
-                    </div>
-                </CardContent>
-            </Card>
+              <div className="w-full">
+                <ShowText label="Text" value={item.text} />
+              </div>
+            </CardContent>
+          </Card>
         </div>
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="grid w-full grid-cols-6">
@@ -170,11 +181,11 @@ export default function Show({ item }: Props) {
                 <CardTitle>Date & Time</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <ShowDatetime label="Date" value={item.date} format="EEEE, MMMM dd, yyyy" />
+                <ShowDatetime label="Date" value={item.date} format={getDateFormat(getLocale())} />
 
                 <ShowDatetime label="Time" value={item.time} format="HH:mm" />
 
-                <ShowDatetime label="Datetime" value={item.datetime} format="EEEE, MMMM dd, yyyy HH:mm" />
+                <ShowDatetime label="Datetime" value={item.datetime} format={`${getDateFormat(getLocale())} HH:mm`} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -198,7 +209,7 @@ export default function Show({ item }: Props) {
                 <CardTitle>Location</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <ShowMap latitude={item.latitude} longitude={item.longitude} popupText={item.string} ratio={4/3} />
+                <ShowMap latitude={item.latitude} longitude={item.longitude} popupText={item.string} ratio={4 / 3} />
               </CardContent>
             </Card>
           </TabsContent>

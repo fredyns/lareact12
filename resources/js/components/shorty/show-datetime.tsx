@@ -1,5 +1,25 @@
 import { format as formatDate } from 'date-fns';
+import { enUS, id } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
+
+// Get locale from HTML lang attribute or default to 'en'
+export const getLocale = (): string => {
+  const lang = document.documentElement.lang || 'en';
+  // Return the base language code (e.g., 'en', 'id')
+  return lang.split('-')[0];
+};
+
+// Get date-fns locale object based on HTML lang attribute
+export const getDateFnsLocale = () => {
+  const lang = getLocale();
+  switch (lang) {
+    case 'id':
+      return id;
+    case 'en':
+    default:
+      return enUS;
+  }
+};
 
 interface ShowDatetimeProps {
   label: string;
@@ -40,9 +60,9 @@ export function ShowDatetime({ label, value, format, loading = false }: ShowDate
         case 'datetime':
           return date.toLocaleString();
         default:
-          // For custom ICU patterns, use date-fns format
+          // For custom ICU patterns, use date-fns format with locale
           try {
-            return formatDate(date, format);
+            return formatDate(date, format, { locale: getDateFnsLocale() });
           } catch {
             return date.toLocaleString();
           }
