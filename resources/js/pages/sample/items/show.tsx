@@ -149,11 +149,11 @@ export default function Show({ item }: Props) {
                 <CardTitle>Date & Time</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <ShowDatetime label="Date" value={item.date} format="ddd, MMM dd, yyyy" />
+                <ShowDatetime label="Date" value={item.date} format="EEEE, MMMM dd, yyyy" />
 
                 <ShowDatetime label="Time" value={item.time} format="HH:mm" />
 
-                <ShowDatetime label="Datetime" value={item.datetime} format="ddd, MMM dd, yyyy HH:mm" />
+                <ShowDatetime label="Datetime" value={item.datetime} format="EEEE, MMMM dd, yyyy HH:mm" />
               </CardContent>
             </Card>
           </TabsContent>
