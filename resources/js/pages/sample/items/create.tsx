@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { ArrowLeft, Save } from 'lucide-react';
 import { dashboard } from '@/routes';
 import sample from '@/routes/sample';
@@ -64,12 +64,10 @@ export default function Create() {
             <h1 className="text-2xl font-bold tracking-tight">Create Item</h1>
             <p className="text-muted-foreground">Add a new sample item to the system</p>
           </div>
-          <Link href={sample.items.index.url()}>
-            <Button variant="outline">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Items
-            </Button>
-          </Link>
+          <Button variant="outline" onClick={() => window.history.back()}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Items
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
