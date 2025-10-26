@@ -12,7 +12,7 @@ import sample from '@/routes/sample';
 import { type BreadcrumbItem, Item, SelectOption } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { Columns, Filter, LayoutGrid, Plus, Search, Table, X } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ItemsCards } from './index-cards';
 import { ItemsTable } from './index-table';
 
@@ -84,7 +84,16 @@ export default function ItemsIndex({ items, filters, selectedColumns, viewMode: 
   const [isColumnSelectorOpen, setIsColumnSelectorOpen] = useState(false);
   const [isLoadingColumns, setIsLoadingColumns] = useState(false);
   const [newlyAddedColumns, setNewlyAddedColumns] = useState<string[]>([]);
-  const [viewMode, setViewMode] = useState<ViewMode>(initialViewMode || 'table');
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    // Initialize from localStorage, fallback to prop, then default to 'table'
+    const stored = localStorage.getItem('sample-items-view-mode');
+    return (stored as ViewMode) || initialViewMode || 'table';
+  });
+
+  // Persist view mode to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('sample-items-view-mode', viewMode);
+  }, [viewMode]);
 
   const handleSort = (field: string) => {
     const direction = filters.sort_field === field && filters.sort_direction === 'asc' ? 'desc' : 'asc';
@@ -211,6 +220,15 @@ export default function ItemsIndex({ items, filters, selectedColumns, viewMode: 
 
   const handleViewModeChange = (newMode: ViewMode) => {
     setViewMode(newMode);
+    // Update URL without refreshing
+    const params = new URLSearchParams({
+      search,
+      ...(selectedUser?.value && { user_id: selectedUser.value }),
+      ...(enumerate?.value && { enumerate: enumerate.value }),
+      columns: columns.join(','),
+      view_mode: newMode,
+    });
+    window.history.replaceState(null, '', `${sample.items.index.url()}?${params.toString()}`);
   };
 
   const handleDelete = (item: Item) => {
