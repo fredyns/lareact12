@@ -36,9 +36,7 @@ export function ItemsCards({ items, viewMode, onDelete }: Props) {
   };
 
   const handleDelete = (item: Item) => {
-    if (confirm('Are you sure you want to delete this item?')) {
-      onDelete(item);
-    }
+    onDelete(item);
   };
 
   return (
