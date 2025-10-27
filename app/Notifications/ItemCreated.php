@@ -113,11 +113,11 @@ class ItemCreated extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         return (new \Illuminate\Notifications\Messages\MailMessage)
-            ->subject('Item Baru Dibuat')
-            ->greeting("Halo {$notifiable->name}!")
-            ->line("Item '{$this->item->string}' telah dibuat.")
-            ->action('Lihat Item', route('sample.items.show', $this->item->id))
-            ->line('Terima kasih telah menggunakan aplikasi kami!');
+            ->subject('New Item Created')
+            ->greeting("Hello {$notifiable->name}!")
+            ->line("Item '{$this->item->string}' has been created.")
+            ->action('View Item', route('sample.items.show', $this->item->id))
+            ->line('Thank you for using our application!');
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Events\NotificationCreated;
 use App\Models\Notification;
 use App\Models\User;
 use App\Notifications\ItemCreated;
@@ -51,9 +52,14 @@ class SendItemCreatedNotification
         ]);
 
         // Batch insert notifications
-        $this->fanoutNotifications($item, $recipients);
+        $notifications = $this->fanoutNotifications($item, $recipients);
 
-        // Send notifications to each recipient
+        // Broadcast to connected users (real-time via WebSocket)
+        foreach ($notifications as $notification) {
+            broadcast(new NotificationCreated($notification, $notification->notifiable_id))->toOthers();
+        }
+
+        // Send notifications to each recipient (email, etc)
         foreach ($recipients as $recipient) {
             $recipient->notify(new ItemCreated($item));
         }
@@ -91,19 +97,19 @@ class SendItemCreatedNotification
      *
      * @param mixed $item The item that was created
      * @param \Illuminate\Database\Eloquent\Collection $recipients Collection of recipient users
-     * @return void
+     * @return \Illuminate\Database\Eloquent\Collection Collection of created notifications
      */
-    private function fanoutNotifications($item, $recipients): void
+    private function fanoutNotifications($item, $recipients)
     {
-        $notifications = $recipients->map(function ($recipient) use ($item) {
+        $notificationData = $recipients->map(function ($recipient) use ($item) {
             return [
                 'id' => Str::uuid(),
                 'notifiable_id' => $recipient->id,
                 'notifiable_type' => User::class,
                 'type' => 'item_created',
                 'data' => json_encode([
-                    'title' => 'Item Baru Dibuat',
-                    'body' => "Item '{$item->string}' telah dibuat",
+                    'title' => 'New Item Created',
+                    'body' => "Item '{$item->string}' just created",
                     'action_url' => route('sample.items.show', $item->id),
                     'icon' => 'package-plus',
                     'meta' => [
@@ -117,10 +123,13 @@ class SendItemCreatedNotification
             ];
         })->toArray();
 
-        Notification::insert($notifications);
+        Notification::insert($notificationData);
 
         Log::info('Notifications fanned out', [
-            'count' => count($notifications),
+            'count' => count($notificationData),
         ]);
+
+        // Return created notifications for broadcasting
+        return Notification::whereIn('id', collect($notificationData)->pluck('id'))->get();
     }
 }

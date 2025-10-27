@@ -113,11 +113,11 @@ class ItemUpdated extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         return (new \Illuminate\Notifications\Messages\MailMessage)
-            ->subject('Item Diperbarui')
-            ->greeting("Halo {$notifiable->name}!")
-            ->line("Item '{$this->item->string}' telah diperbarui.")
-            ->action('Lihat Item', route('sample.items.show', $this->item->id))
-            ->line('Terima kasih telah menggunakan aplikasi kami!');
+            ->subject('Item Updated')
+            ->greeting("Hello {$notifiable->name}!")
+            ->line("Item '{$this->item->string}' has been updated.")
+            ->action('View Item', route('sample.items.show', $this->item->id))
+            ->line('Thank you for using our application!');
     }
 
     /**
