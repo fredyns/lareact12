@@ -1,0 +1,143 @@
+version: '3.8'
+
+services:
+  # PHP Application Server
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lareact12-app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    ports:
+      - '8000:8000'
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_DATABASE=lareact12
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MINIO_ENDPOINT=http://minio:9000
+      - BROADCAST_DRIVER=pusher
+      - PUSHER_APP_ID=1
+      - PUSHER_APP_KEY=app-key
+      - PUSHER_APP_SECRET=app-secret
+      - PUSHER_HOST=soketi
+      - PUSHER_PORT=6001
+      - PUSHER_SCHEME=http
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      soketi:
+        condition: service_healthy
+    networks:
+      - lareact12
+    command: php artisan serve --host=0.0.0.0 --port=8000
+
+  # PostgreSQL Database
+  postgres:
+    image: 'postgres:16-alpine'
+    container_name: lareact12-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: lareact12
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    networks:
+      - lareact12
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache & Queue
+  redis:
+    image: 'redis:7-alpine'
+    container_name: lareact12-redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    networks:
+      - lareact12
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: redis-server --appendonly yes
+
+  # MinIO Object Storage
+  minio:
+    image: 'minio/minio:latest'
+    container_name: lareact12-minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    volumes:
+      - minio_data:/minio_data
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    networks:
+      - lareact12
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: minio server /minio_data --console-address ":9001"
+
+  # Soketi WebSocket Server
+  soketi:
+    image: 'quay.io/soketi/soketi:latest'
+    container_name: lareact12-soketi
+    restart: unless-stopped
+    environment:
+      SOKETI_DEBUG: '1'
+      SOKETI_METRICS_SERVER_PORT: '9601'
+      SOKETI_DEFAULT_APP_ID: '1'
+      SOKETI_DEFAULT_APP_KEY: 'app-key'
+      SOKETI_DEFAULT_APP_SECRET: 'app-secret'
+      SOKETI_DEFAULT_APP_MAX_CONNECTIONS: '10000'
+      SOKETI_DEFAULT_APP_ENABLE_CLIENT_MESSAGES: 'true'
+      SOKETI_DEFAULT_APP_ENABLE_STATISTICS: 'true'
+    ports:
+      - '6001:6001'
+      - '9601:9601'
+    networks:
+      - lareact12
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9601/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  minio_data:
+    driver: local
+
+networks:
+  lareact12:
+    driver: bridge
