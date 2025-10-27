@@ -192,6 +192,11 @@ export default function ItemsIndex({ items, filters, selectedColumns, viewMode: 
     setNewlyAddedColumns(newColumns);
     setIsLoadingColumns(true);
     setColumns(tempColumns);
+    
+    // Get current page number from URL
+    const params = new URLSearchParams(window.location.search);
+    const currentPage = params.get('page');
+    
     router.get(
       sample.items.index.url(),
       {
@@ -200,6 +205,7 @@ export default function ItemsIndex({ items, filters, selectedColumns, viewMode: 
         enumerate: enumerate?.value,
         columns: tempColumns,
         view_mode: viewMode,
+        ...(currentPage && { page: currentPage }),
       },
       {
         preserveState: true,
