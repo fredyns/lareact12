@@ -20,6 +20,7 @@ storage/framework/sessions/*
 storage/framework/views/*
 bootstrap/cache/*
 public/hot
+public/storage
 .DS_Store
 Thumbs.db
 *.bkp

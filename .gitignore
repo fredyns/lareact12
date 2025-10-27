@@ -10,6 +10,7 @@
 /resources/js/types/enums.generated.ts
 /storage/*.key
 /storage/pail
+/storage/docker
 /vendor
 .DS_Store
 .env
