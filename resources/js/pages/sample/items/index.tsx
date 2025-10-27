@@ -220,14 +220,14 @@ export default function ItemsIndex({ items, filters, selectedColumns, viewMode: 
 
   const handleViewModeChange = (newMode: ViewMode) => {
     setViewMode(newMode);
-    // Update URL without refreshing
-    const params = new URLSearchParams({
-      search,
-      ...(selectedUser?.value && { user_id: selectedUser.value }),
-      ...(enumerate?.value && { enumerate: enumerate.value }),
-      columns: columns.join(','),
-      view_mode: newMode,
-    });
+    // Build URL with same structure as pagination links (array format for columns)
+    const params = new URLSearchParams();
+    params.append('search', search);
+    if (selectedUser?.value) params.append('user_id', selectedUser.value);
+    if (enumerate?.value) params.append('enumerate', enumerate.value);
+    columns.forEach((col) => params.append('columns[]', col));
+    params.append('view_mode', newMode);
+    
     window.history.replaceState(null, '', `${sample.items.index.url()}?${params.toString()}`);
   };
 
