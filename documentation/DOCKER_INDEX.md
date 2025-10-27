@@ -121,11 +121,11 @@ docker-compose -f docker-compose.prod.yml exec app php artisan migrate --force
 ### Services & Architecture
 - [DOCKER_SUMMARY.md - Services](DOCKER_SUMMARY.md#service-ports)
 - [DOCKER_SETUP.md - Services Included](DOCKER_SETUP.md#services-included)
-- [docker-compose.yml](docker-compose.yml) - Service definitions
+- [docker-compose.yml](../docker-compose.yml) - Service definitions
 
 ### Configuration
 - [DOCKER_SETUP.md - Environment Configuration](DOCKER_SETUP.md#environment-configuration)
-- [.env.docker](.env.docker) - Development environment
+- [.env.docker](../.env.docker) - Development environment
 - [.env.production.example](.env.production.example) - Production environment
 
 ### Common Commands
@@ -165,12 +165,12 @@ docker-compose -f docker-compose.prod.yml exec app php artisan migrate --force
 
 ### Security
 - [DOCKER_PRODUCTION_DEPLOYMENT.md - Security Hardening](DOCKER_PRODUCTION_DEPLOYMENT.md#security-hardening)
-- [docker/nginx/conf.d/app.conf](docker/nginx/conf.d/app.conf) - Security headers
+- [docker/nginx/conf.d/app.conf](../docker/nginx/conf.d/app.conf) - Security headers
 
 ### Performance Optimization
 - [DOCKER_SETUP.md - Performance Optimization](DOCKER_SETUP.md#performance-optimization)
 - [DOCKER_QUICK_REFERENCE.md - Performance Tips](DOCKER_QUICK_REFERENCE.md#performance-tips)
-- [docker/php/prod.ini](docker/php/prod.ini) - OPcache configuration
+- [docker/php/prod.ini](../docker/php/prod.ini) - OPcache configuration
 
 ---
 

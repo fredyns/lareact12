@@ -7,7 +7,7 @@
 docker-compose.yml
 docker-compose.soketi.yml
 Dockerfile
-DOCKER_SETUP.md
+documentation/DOCKER_SETUP.md
 README.md
 CLAUDE.md
 .idea
