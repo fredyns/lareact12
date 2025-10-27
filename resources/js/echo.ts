@@ -11,6 +11,13 @@ import Pusher from 'pusher-js';
  * @see https://github.com/soketi/soketi
  */
 
+// Extend Window interface to include Pusher
+declare global {
+  interface Window {
+    Pusher: typeof Pusher;
+  }
+}
+
 // Make Pusher globally available for Echo
 window.Pusher = Pusher;
 
