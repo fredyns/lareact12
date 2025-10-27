@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\NotificationController;
-use App\Http\Controllers\Sample\ItemController;
+//use App\Http\Controllers\Sample\ItemController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -38,5 +38,5 @@ Route::middleware('auth:sanctum')->prefix('notification-preferences')->name('not
 
 // Sample API Routes
 Route::middleware('auth:sanctum')->prefix('sample')->name('sample.')->group(function () {
-    Route::apiResource('items', ItemController::class);
+//    Route::apiResource('items', ItemController::class);
 });
