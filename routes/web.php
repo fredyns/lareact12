@@ -7,6 +7,7 @@ use App\Actions\Sample\Items\Edit\EditItem;
 use App\Actions\Sample\Items\Edit\UpdateItem;
 use App\Actions\Sample\Items\Index\IndexItems;
 use App\Actions\Sample\Items\Show\ShowItem;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\EnumController;
 use App\Http\Controllers\RBAC\PermissionController;
@@ -60,6 +61,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('upload')->name('upload.')->group(function () {
         Route::post('file', [UploadController::class, 'uploadFile'])->name('file');
         Route::post('image', [UploadController::class, 'uploadImage'])->name('image');
+    });
+
+    // Notification API Routes (session-based auth for web pages)
+    Route::prefix('api/notifications')->name('api.notifications.')->group(function () {
+        Route::get('/', [NotificationController::class, 'index'])->name('index');
+        Route::get('/count', [NotificationController::class, 'count'])->name('count');
+        Route::patch('/{id}/read', [NotificationController::class, 'markAsRead'])->name('mark-as-read');
+        Route::patch('/read-all', [NotificationController::class, 'markAllAsRead'])->name('mark-all-as-read');
+        Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
+    });
+
+    // Notification Preferences API Routes (session-based auth)
+    Route::prefix('api/notification-preferences')->name('api.notification-preferences.')->group(function () {
+        Route::get('/', [NotificationController::class, 'getPreferences'])->name('index');
+        Route::put('/', [NotificationController::class, 'updatePreference'])->name('update');
+        Route::post('/reset', [NotificationController::class, 'resetPreferences'])->name('reset');
     });
 
     // User Management Routes

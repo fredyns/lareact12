@@ -20,21 +20,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// Notification API Routes
-Route::middleware('auth:sanctum')->prefix('notifications')->name('notifications.')->group(function () {
-    Route::get('/', [NotificationController::class, 'index'])->name('index');
-    Route::get('/count', [NotificationController::class, 'count'])->name('count');
-    Route::patch('/{id}/read', [NotificationController::class, 'markAsRead'])->name('mark-as-read');
-    Route::patch('/read-all', [NotificationController::class, 'markAllAsRead'])->name('mark-all-as-read');
-    Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
-});
-
-// Notification Preferences API Routes
-Route::middleware('auth:sanctum')->prefix('notification-preferences')->name('notification-preferences.')->group(function () {
-    Route::get('/', [NotificationController::class, 'getPreferences'])->name('index');
-    Route::put('/', [NotificationController::class, 'updatePreference'])->name('update');
-    Route::post('/reset', [NotificationController::class, 'resetPreferences'])->name('reset');
-});
+// Note: Notification routes moved to web.php for session-based authentication
+// Web pages use session auth, not Sanctum token auth
+// Pattern: API endpoints called from web pages should use web routes
 
 // Sample API Routes
 Route::middleware('auth:sanctum')->prefix('sample')->name('sample.')->group(function () {

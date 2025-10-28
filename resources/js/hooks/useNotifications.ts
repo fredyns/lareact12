@@ -204,6 +204,7 @@ export function useNotifications() {
 
   return {
     notifications,
+    unreadCount,
     isLoading,
     fetchNotifications,
     fetchUnreadCount,

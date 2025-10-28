@@ -8,68 +8,30 @@ The Laravel Boost guidelines are specifically curated by Laravel maintainers for
 ## Foundational Context
 This application is a Laravel application and its main Laravel ecosystems package & versions are below. You are an expert with them all. Ensure you abide by these specific packages & versions.
 
-- php - 8.3.10
+- php - 8.3.27
 - inertiajs/inertia-laravel (INERTIA) - v2
 - laravel/fortify (FORTIFY) - v1
 - laravel/framework (LARAVEL) - v12
 - laravel/prompts (PROMPTS) - v0
+- laravel/sanctum (SANCTUM) - v4
 - laravel/wayfinder (WAYFINDER) - v0
-- tightenco/ziggy (ZIGGY) - v2
 - laravel/mcp (MCP) - v0
 - laravel/pint (PINT) - v1
 - laravel/sail (SAIL) - v1
 - phpunit/phpunit (PHPUNIT) - v11
 - @inertiajs/react (INERTIA) - v2
+- laravel-echo (ECHO) - v2
 - react (REACT) - v19
 - tailwindcss (TAILWINDCSS) - v4
 - @laravel/vite-plugin-wayfinder (WAYFINDER) - v0
 - eslint (ESLINT) - v9
 - prettier (PRETTIER) - v3
 
-## Code Generator
-
-This will guide future CRUD application development with:
-
-### Database Layer
-- Migration (Create Table): Following database/migrations/2025_09_25_061659_create_sample_items_table.php pattern
-- Migration (Foreign Keys): Separate migration for relationships
-- Migration (Permissions): Following database/migrations/2025_09_25_061844_add_sample_items_permissions.php pattern and extend from 'App\Database\Migrations\BasePermissionMigration'
-- Model: With DocBlock, implementing Searchable trait (app/Models/Sample/Item.php)
-- Factory: Following database/factories/Sample/ItemFactory.php pattern
-- Seeder: Following database/seeders/Sample/ItemSeeder.php pattern, registered in DatabaseSeeder.php
-
-- ### Backend Layer
-- Policy: app/Policies/Sample/ItemPolicy.php
-- Request: app/Http/Requests/Sample/ItemRequest.php
-- Resource: app/Http/Resources/Sample/ItemResource.php
-- Resource Collection: app/Http/Resources/Sample/ItemCollection.php
-- Controller: app/Http/Controllers/Sample/ItemController.php
-- Test: tests/Feature/Sample/ItemTest.php
-
-### Frontend Layer
-- index: resources/js/pages/sample/items/index.tsx
-- form-field Component: resources/js/pages/sample/items/form.tsx (reusable, with shorty components, adjusted card layouts)
-- create: resources/js/pages/sample/items/create.tsx (includes form component)
-- show: resources/js/pages/sample/items/show.tsx (shorty components, adjusted card layouts)
-- edit: resources/js/pages/sample/items/edit.tsx (includes form component)
 
 ## Conventions
 - You must follow all existing code conventions used in this application. When creating or editing a file, check sibling files for the correct structure, approach, naming.
 - Use descriptive names for variables and methods. For example, `isRegisteredForDiscounts`, not `discount()`.
 - Check for existing components to reuse before writing a new one.
-- Frontend layer files should be named in kebab-case
-- all files and folders under 'resources/js' are named in kebab-case
-- for common interfaces, use or create in 'resources/js/types/index.ts'.
-
-## Z-Index Guidelines
-- **<=500**: Base page content
-- **<=1000**: Floating widgets on page
-- **<=5000**: Modal dialogs
-- **<=6000**: Preview windows
-- **<=8000**: Interactive Input widgets, Map Selector, Dropdown inputs
-- **<=9000**: Animation
-- **<=10000**: Main Menu and navigation
-- **>10000**: Top-level modals and overlays (highest priority, critical, danger, etc.)
 
 ## Verification Scripts
 - Do not create verification scripts or tinker when tests cover that functionality and prove it works. Unit and feature tests are more important.
@@ -130,7 +92,6 @@ This will guide future CRUD application development with:
 ## PHP
 
 - Always use curly braces for control structures, even if it has one line.
-- Write comments and PHPDoc for each object, function, and other control structures.
 
 ### Constructors
 - Use PHP 8 constructor property promotion in `__construct()`.
