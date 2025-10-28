@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { usePage } from '@inertiajs/react';
-import echo from '@/echo';
+import { useWebSocket } from '@/contexts/WebSocketContext';
 
 /**
  * User interface
@@ -19,12 +19,21 @@ interface Auth {
 }
 
 /**
+ * Notification data interface
+ */
+interface NotificationData {
+  title: string;
+  body: string;
+  [key: string]: unknown;
+}
+
+/**
  * Notification interface
  */
 interface Notification {
   id: string;
   type: string;
-  data: Record<string, unknown>;
+  data: NotificationData;
   read_at: string | null;
   created_at: string;
   updated_at: string;
@@ -42,6 +51,7 @@ interface Notification {
  */
 export function useNotifications() {
   const { auth } = usePage<{ auth: Auth }>().props;
+  const { pusher } = useWebSocket();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -52,7 +62,6 @@ export function useNotifications() {
       setIsLoading(true);
       const response = await fetch('/api/notifications', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
           'Accept': 'application/json',
         },
       });
@@ -73,7 +82,6 @@ export function useNotifications() {
     try {
       const response = await fetch('/api/notifications/count', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
           'Accept': 'application/json',
         },
       });
@@ -93,7 +101,6 @@ export function useNotifications() {
       const response = await fetch(`/api/notifications/${notificationId}/read`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
           'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
@@ -121,7 +128,6 @@ export function useNotifications() {
       const response = await fetch('/api/notifications/read-all', {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
           'Accept': 'application/json',
         },
       });
@@ -162,34 +168,42 @@ export function useNotifications() {
 
   // Subscribe to real-time notifications
   useEffect(() => {
-    if (!auth?.user?.id) return;
-
     // Fetch initial notifications
     fetchNotifications();
     fetchUnreadCount();
 
-    // Subscribe to private channel
-    const channel = echo.private(`user.${auth.user.id}`);
+    // Subscribe to private notifications channel
+    if (auth.user && pusher) {
+      const channel = `private-App.Models.User.${auth.user.id}`;
+      const channelInstance = pusher.subscribe(channel);
 
-    channel.listen('notification.created', (data: Notification) => {
-      // Add new notification to the beginning
-      setNotifications((prev) => [data, ...prev]);
-      // Increment unread count
-      setUnreadCount((prev) => prev + 1);
-    });
+      // Listen for new notifications
+      channelInstance.bind('notification.created', (notification: Notification) => {
+        setNotifications((prev) => [notification, ...prev]);
+        setUnreadCount((prev) => prev + 1);
+      });
 
-    // Cleanup on unmount
-    return () => {
-      channel.stopListening('notification.created');
-      if (auth?.user?.id) {
-        echo.leaveChannel(`user.${auth.user.id}`);
-      }
-    };
-  }, [auth?.user?.id, fetchNotifications, fetchUnreadCount]);
+      // Listen for read notifications
+      channelInstance.bind('notification.read', (notification: Notification) => {
+        setNotifications((prev) =>
+          prev.map((n) =>
+            n.id === notification.id ? { ...n, read_at: notification.read_at } : n
+          )
+        );
+        setUnreadCount((prev) => Math.max(0, prev - 1));
+      });
+
+      // Cleanup on unmount
+      return () => {
+        channelInstance.unbind('notification.created');
+        channelInstance.unbind('notification.read');
+        pusher.unsubscribe(channel);
+      };
+    }
+  }, [auth?.user?.id, pusher, fetchNotifications, fetchUnreadCount]);
 
   return {
     notifications,
-    unreadCount,
     isLoading,
     fetchNotifications,
     fetchUnreadCount,
