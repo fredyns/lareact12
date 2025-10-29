@@ -52,6 +52,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
+    // Notifications Page
+    Route::get('notifications', function () {
+        return Inertia::render('notifications');
+    })->name('notifications');
+
     // Enum API Routes
     Route::get('enums/{enumClass}', [EnumController::class, 'show'])
         ->where('enumClass', '.*')
