@@ -23,6 +23,37 @@ services:
             redis:
                 condition: service_healthy
     
+    queue:
+        build:
+            context: ./docker/php
+            dockerfile: Dockerfile
+        container_name: lareact12_queue
+        working_dir: /var/www/html
+        volumes:
+            - '.:/var/www/html'
+        environment:
+            - DB_HOST=postgres
+            - DB_PORT=5432
+            - DB_DATABASE=${DB_DATABASE}
+            - DB_USERNAME=${DB_USERNAME}
+            - DB_PASSWORD=${DB_PASSWORD}
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
+        networks:
+            - sail
+        depends_on:
+            postgres:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+        command: php artisan queue:work redis --queue=notifications --sleep=3 --tries=3 --max-time=3600
+        restart: unless-stopped
+        healthcheck:
+            test: ["CMD-SHELL", "ps aux | grep -q '[q]ueue:work' || exit 1"]
+            retries: 3
+            timeout: 5s
+            interval: 30s
+    
     web:
         image: 'nginx:alpine'
         container_name: lareact12_web
