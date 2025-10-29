@@ -96,4 +96,14 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Get the user's notification preferences
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function notificationPreferences()
+    {
+        return $this->hasMany(NotificationPreference::class);
+    }
 }
