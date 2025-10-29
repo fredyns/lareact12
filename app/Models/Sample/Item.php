@@ -6,6 +6,8 @@ use App\Enums\Sample\ItemEnumerate;
 use App\Models\Traits\CaseInsensitiveSorting;
 use App\Models\Traits\Searchable;
 use App\Models\User;
+use App\Notifications\ItemCreated;
+use App\Notifications\ItemUpdated;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -169,6 +171,28 @@ class Item extends Model
 
             if (auth()->check()) {
                 $model->updated_by = auth()->id();
+            }
+        });
+
+        // Trigger notification after item is created
+        static::created(function (Item $model) {
+            if (auth()->check()) {
+                // Notify all users (or specific users based on your business logic)
+                $users = User::all();
+                foreach ($users as $user) {
+                    $user->notify(new ItemCreated($model));
+                }
+            }
+        });
+
+        // Trigger notification after item is updated
+        static::updated(function (Item $model) {
+            if (auth()->check()) {
+                // Notify all users (or specific users based on your business logic)
+                $users = User::all();
+                foreach ($users as $user) {
+                    $user->notify(new ItemUpdated($model));
+                }
             }
         });
     }
