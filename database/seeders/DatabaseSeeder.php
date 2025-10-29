@@ -32,5 +32,10 @@ class DatabaseSeeder extends Seeder
             ItemSeeder::class,
             SubItemSeeder::class,
         ]);
+
+        // Seed Notification Preferences
+        $this->call([
+            NotificationPreferenceSeeder::class,
+        ]);
     }
 }
