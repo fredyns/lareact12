@@ -103,7 +103,10 @@ export function useNotifications() {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
         },
+        credentials: 'same-origin',
       });
 
       if (!response.ok) throw new Error('Failed to mark as read');
@@ -129,7 +132,11 @@ export function useNotifications() {
         method: 'PATCH',
         headers: {
           'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
         },
+        credentials: 'same-origin',
       });
 
       if (!response.ok) throw new Error('Failed to mark all as read');
@@ -152,19 +159,28 @@ export function useNotifications() {
       const response = await fetch(`/api/notifications/${notificationId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
           'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
         },
+        credentials: 'same-origin',
       });
 
       if (!response.ok) throw new Error('Failed to delete notification');
 
       // Update local state
       setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
+      
+      // Update unread count if deleted notification was unread
+      const deletedNotification = notifications.find(n => n.id === notificationId);
+      if (deletedNotification && !deletedNotification.read_at) {
+        setUnreadCount((prev) => Math.max(0, prev - 1));
+      }
     } catch (error) {
       console.error('Error deleting notification:', error);
     }
-  }, []);
+  }, [notifications]);
 
   // Subscribe to real-time notifications
   useEffect(() => {
