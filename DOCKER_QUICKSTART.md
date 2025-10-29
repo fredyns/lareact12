@@ -2,12 +2,13 @@
 
 ## Services Overview
 
-Your Docker setup now includes **8 services**:
+Your Docker setup now includes **9 services**:
 
 | Service | Container | Port | Purpose |
 |---------|-----------|------|---------|
 | **app** | lareact12_app | - | PHP Laravel application |
 | **queue** | lareact12_queue | - | Queue worker (notifications) |
+| **scheduler** | lareact12_scheduler | - | Task scheduler (cron jobs) |
 | **web** | lareact12_web | 80 | Nginx web server |
 | **postgres** | lareact12_postgres | 5432 | PostgreSQL database |
 | **redis** | lareact12_redis | 6379 | Redis cache/queue |
@@ -133,6 +134,22 @@ docker-compose exec app php artisan queue:failed
 
 # Retry failed jobs
 docker-compose exec app php artisan queue:retry all
+```
+
+### Scheduler Management
+
+```bash
+# View scheduler logs
+docker-compose logs -f scheduler
+
+# List scheduled tasks
+docker-compose exec scheduler php artisan schedule:list
+
+# Test run scheduler
+docker-compose exec scheduler php artisan schedule:run
+
+# Restart scheduler (after code changes)
+docker-compose restart scheduler
 ```
 
 ### Database Management
@@ -345,6 +362,8 @@ docker-compose exec app php artisan optimize:clear
 For more details, see:
 
 - **[DOCKER_QUEUE_SETUP.md](documentation/DOCKER_QUEUE_SETUP.md)** - Queue worker configuration
+- **[DOCKER_SCHEDULER_SETUP.md](documentation/DOCKER_SCHEDULER_SETUP.md)** - Task scheduler configuration
+- **[DOCKER_APP_VS_WEB.md](documentation/DOCKER_APP_VS_WEB.md)** - Architecture explanation
 - **[QUEUE_WORKER_SETUP.md](documentation/QUEUE_WORKER_SETUP.md)** - General queue worker guide
 - **[README_DOCKER.md](documentation/README_DOCKER.md)** - Complete Docker documentation
 - **[DOCKER_CHECKLIST.md](documentation/DOCKER_CHECKLIST.md)** - Deployment checklist
@@ -353,8 +372,9 @@ For more details, see:
 
 Your Docker setup is now **production-ready** with:
 
-✅ **8 services** running automatically
+✅ **9 services** running automatically
 ✅ **Queue worker** processing notifications
+✅ **Task scheduler** running cron jobs
 ✅ **Health checks** monitoring all services
 ✅ **Auto-restart** on failures
 ✅ **Persistent data** in volumes

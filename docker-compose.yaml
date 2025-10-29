@@ -54,6 +54,37 @@ services:
             timeout: 5s
             interval: 30s
     
+    scheduler:
+        build:
+            context: ./docker/php
+            dockerfile: Dockerfile
+        container_name: lareact12_scheduler
+        working_dir: /var/www/html
+        volumes:
+            - '.:/var/www/html'
+        environment:
+            - DB_HOST=postgres
+            - DB_PORT=5432
+            - DB_DATABASE=${DB_DATABASE}
+            - DB_USERNAME=${DB_USERNAME}
+            - DB_PASSWORD=${DB_PASSWORD}
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
+        networks:
+            - sail
+        depends_on:
+            postgres:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+        command: sh -c "while true; do php artisan schedule:run --verbose --no-interaction & sleep 60; done"
+        restart: unless-stopped
+        healthcheck:
+            test: ["CMD-SHELL", "ps aux | grep -q '[p]hp' || exit 1"]
+            retries: 3
+            timeout: 5s
+            interval: 60s
+    
     web:
         image: 'nginx:alpine'
         container_name: lareact12_web
