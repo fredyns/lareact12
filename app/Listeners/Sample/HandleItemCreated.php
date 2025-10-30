@@ -66,11 +66,11 @@ class HandleItemCreated implements ShouldQueue
                 'type' => \App\Notifications\Sample\ItemCreated::class,
                 'data' => json_encode([
                     'title' => 'New Item Created',
-                    'body' => "Item '{$item->name}' was created",
+                    'body' => "Item '{$item->string}' was created",
                     'action_url' => "/sample/items/{$item->id}",
                     'icon' => 'plus-circle',
                     'item_id' => $item->id,
-                    'item_name' => $item->name,
+                    'item_name' => $item->string,
                 ]),
                 'created_at' => $now,
                 'updated_at' => $now,

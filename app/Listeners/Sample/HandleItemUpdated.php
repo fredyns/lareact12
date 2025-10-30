@@ -66,11 +66,11 @@ class HandleItemUpdated implements ShouldQueue
                 'type' => \App\Notifications\Sample\ItemUpdated::class,
                 'data' => json_encode([
                     'title' => 'Item Updated',
-                    'body' => "Item '{$item->name}' was updated",
+                    'body' => "Item '{$item->string}' was updated",
                     'action_url' => "/sample/items/{$item->id}",
                     'icon' => 'edit',
                     'item_id' => $item->id,
-                    'item_name' => $item->name,
+                    'item_name' => $item->string,
                 ]),
                 'created_at' => $now,
                 'updated_at' => $now,
