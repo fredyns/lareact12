@@ -10,17 +10,11 @@ const WebSocketContext = createContext<WebSocketContextType | undefined>(undefin
 export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
   const [pusher, setPusher] = useState<Pusher | null>(null);
 
-  console.log('🎯 WebSocketProvider RENDERED');
-
   useEffect(() => {
-    console.log('🚀 WebSocketProvider useEffect RUNNING');
-    alert('WebSocket initializing - check console!');
-    
     // Initialize Pusher with error handling
     try {
-      // Enable Pusher logging for debugging
-      Pusher.logToConsole = true; // Force enable
-      console.log('📡 Pusher.logToConsole:', Pusher.logToConsole);
+      // Enable Pusher logging for debugging in development
+      Pusher.logToConsole = import.meta.env.DEV;
 
       const pusherInstance = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY || '', {
         wsHost: import.meta.env.VITE_PUSHER_HOST || 'localhost',

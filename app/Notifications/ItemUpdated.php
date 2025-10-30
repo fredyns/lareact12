@@ -41,7 +41,7 @@ class ItemUpdated extends Notification implements ShouldQueue
      */
     public function via($notifiable): array
     {
-        $channels = ['database', 'broadcast'];
+        $channels = ['database'];
 
         // Check email preference
         $emailPref = $notifiable->notificationPreferences()
@@ -53,6 +53,7 @@ class ItemUpdated extends Notification implements ShouldQueue
             $channels[] = 'mail';
         }
 
+        // Note: Broadcasting is handled by NotificationCreated event
         return $channels;
     }
 

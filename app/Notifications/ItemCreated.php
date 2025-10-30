@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\BroadcastMessage;
@@ -41,7 +42,7 @@ class ItemCreated extends Notification implements ShouldQueue
      */
     public function via($notifiable): array
     {
-        $channels = ['database', 'broadcast'];
+        $channels = ['database'];
 
         // Check email preference
         $emailPref = $notifiable->notificationPreferences()
@@ -53,6 +54,7 @@ class ItemCreated extends Notification implements ShouldQueue
             $channels[] = 'mail';
         }
 
+        // Note: Broadcasting is handled by NotificationCreated event
         return $channels;
     }
 

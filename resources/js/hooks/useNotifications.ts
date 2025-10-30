@@ -184,10 +184,6 @@ export function useNotifications() {
 
   // Subscribe to real-time notifications
   useEffect(() => {
-    console.log('📢 useNotifications useEffect triggered');
-    console.log('📢 auth.user:', auth.user);
-    console.log('📢 pusher:', pusher);
-    
     // Fetch initial notifications
     fetchNotifications();
     fetchUnreadCount();
@@ -195,8 +191,7 @@ export function useNotifications() {
     // Subscribe to private notifications channel
     if (auth.user && pusher) {
       const channel = `private-App.Models.User.${auth.user.id}`;
-      console.log('🔔 Subscribing to channel:', channel);
-      alert('Subscribing to: ' + channel);
+      console.log('🔔 Subscribing to notification channel:', channel);
       
       const channelInstance = pusher.subscribe(channel);
 
