@@ -90,17 +90,6 @@ class ItemCreated extends Notification implements ShouldQueue
         return new BroadcastMessage($this->toDatabase($notifiable));
     }
 
-    /**
-     * Get the channels the event should broadcast on
-     *
-     * Uses private channel to ensure only the recipient receives the notification.
-     *
-     * @return array List of broadcast channels
-     */
-    public function broadcastOn(): array
-    {
-        return ["private-user.{$this->notifiable->id}"];
-    }
 
     /**
      * Get the mail representation of the notification

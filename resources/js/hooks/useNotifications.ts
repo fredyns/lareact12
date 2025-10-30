@@ -184,6 +184,10 @@ export function useNotifications() {
 
   // Subscribe to real-time notifications
   useEffect(() => {
+    console.log('📢 useNotifications useEffect triggered');
+    console.log('📢 auth.user:', auth.user);
+    console.log('📢 pusher:', pusher);
+    
     // Fetch initial notifications
     fetchNotifications();
     fetchUnreadCount();
@@ -191,16 +195,30 @@ export function useNotifications() {
     // Subscribe to private notifications channel
     if (auth.user && pusher) {
       const channel = `private-App.Models.User.${auth.user.id}`;
+      console.log('🔔 Subscribing to channel:', channel);
+      alert('Subscribing to: ' + channel);
+      
       const channelInstance = pusher.subscribe(channel);
+
+      // Log subscription state
+      channelInstance.bind('pusher:subscription_succeeded', () => {
+        console.log('✅ Successfully subscribed to:', channel);
+      });
+
+      channelInstance.bind('pusher:subscription_error', (error: any) => {
+        console.error('❌ Subscription error:', error);
+      });
 
       // Listen for new notifications
       channelInstance.bind('notification.created', (notification: Notification) => {
+        console.log('🔔 New notification received:', notification);
         setNotifications((prev) => [notification, ...prev]);
         setUnreadCount((prev) => prev + 1);
       });
 
       // Listen for read notifications
       channelInstance.bind('notification.read', (notification: Notification) => {
+        console.log('✅ Notification marked as read:', notification);
         setNotifications((prev) =>
           prev.map((n) =>
             n.id === notification.id ? { ...n, read_at: notification.read_at } : n
@@ -211,8 +229,11 @@ export function useNotifications() {
 
       // Cleanup on unmount
       return () => {
+        console.log('🔌 Unsubscribing from:', channel);
         channelInstance.unbind('notification.created');
         channelInstance.unbind('notification.read');
+        channelInstance.unbind('pusher:subscription_succeeded');
+        channelInstance.unbind('pusher:subscription_error');
         pusher.unsubscribe(channel);
       };
     }

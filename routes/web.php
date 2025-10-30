@@ -47,6 +47,11 @@ Route::get('downloading/{path}', [DownloadController::class, 'download'])
     ->where('path', '.*')
     ->name('downloads.force');
 
+// Broadcasting Auth Route (for private channels)
+Route::post('broadcasting/auth', function (Illuminate\Http\Request $request) {
+    return Illuminate\Support\Facades\Broadcast::auth($request);
+})->middleware(['auth']);
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
@@ -56,6 +61,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('notifications', function () {
         return Inertia::render('notifications');
     })->name('notifications');
+
 
     // Enum API Routes
     Route::get('enums/{enumClass}', [EnumController::class, 'show'])
