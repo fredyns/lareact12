@@ -97,7 +97,20 @@ export function useNotifications() {
 
   // Mark notification as read
   const markAsRead = useCallback(async (notificationId: string) => {
+    // Store previous state for rollback
+    const previousNotifications = notifications;
+    const previousUnreadCount = unreadCount;
+
     try {
+      // Optimistic update - update UI immediately
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n.id === notificationId ? { ...n, read_at: new Date().toISOString() } : n
+        )
+      );
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+
+      // Make API request in background
       const response = await fetch(`/api/notifications/${notificationId}/read`, {
         method: 'PATCH',
         headers: {
@@ -110,24 +123,28 @@ export function useNotifications() {
       });
 
       if (!response.ok) throw new Error('Failed to mark as read');
-
-      // Update local state
-      setNotifications((prev) =>
-        prev.map((n) =>
-          n.id === notificationId ? { ...n, read_at: new Date().toISOString() } : n
-        )
-      );
-
-      // Decrement unread count
-      setUnreadCount((prev) => Math.max(0, prev - 1));
     } catch (error) {
       console.error('Error marking notification as read:', error);
+      // Rollback on error
+      setNotifications(previousNotifications);
+      setUnreadCount(previousUnreadCount);
     }
-  }, []);
+  }, [notifications, unreadCount]);
 
   // Mark all notifications as read
   const markAllAsRead = useCallback(async () => {
+    // Store previous state for rollback
+    const previousNotifications = notifications;
+    const previousUnreadCount = unreadCount;
+
     try {
+      // Optimistic update - update UI immediately
+      setNotifications((prev) =>
+        prev.map((n) => ({ ...n, read_at: new Date().toISOString() }))
+      );
+      setUnreadCount(0);
+
+      // Make API request in background
       const response = await fetch('/api/notifications/read-all', {
         method: 'PATCH',
         headers: {
@@ -140,18 +157,13 @@ export function useNotifications() {
       });
 
       if (!response.ok) throw new Error('Failed to mark all as read');
-
-      // Update local state
-      setNotifications((prev) =>
-        prev.map((n) => ({ ...n, read_at: new Date().toISOString() }))
-      );
-
-      // Reset unread count
-      setUnreadCount(0);
     } catch (error) {
       console.error('Error marking all as read:', error);
+      // Rollback on error
+      setNotifications(previousNotifications);
+      setUnreadCount(previousUnreadCount);
     }
-  }, []);
+  }, [notifications, unreadCount]);
 
   // Delete notification
   const deleteNotification = useCallback(async (notificationId: string) => {

@@ -4,7 +4,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useNotifications } from '@/hooks/useNotifications';
 import { cn } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
-import { Bell, Loader2 } from 'lucide-react';
+import { Bell, CheckCheck, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
 /**
@@ -19,7 +19,7 @@ import { useState } from 'react';
  * ```
  */
 export function NotificationBell() {
-  const { notifications, unreadCount, isLoading, markAsRead } = useNotifications();
+  const { notifications, unreadCount, isLoading, markAsRead, markAllAsRead } = useNotifications();
   const [isOpen, setIsOpen] = useState(false);
 
   // Auto-close dropdown after marking as read
@@ -97,7 +97,7 @@ export function NotificationBell() {
                         onClick={() => handleMarkAsRead(notification.id)}
                         className="mt-1 flex-shrink-0 rounded bg-blue-500 px-2 py-1 text-xs font-medium text-white hover:bg-blue-600"
                       >
-                        Mark
+                        <CheckCheck className="h-4 w-4" />
                       </button>
                     )}
                   </div>
@@ -115,12 +115,22 @@ export function NotificationBell() {
         {/* Footer */}
         {notifications.length > 0 && (
           <div className="border-t border-neutral-200 px-4 py-3 dark:border-neutral-800">
-            <Link
-              href="/notifications"
-              className="block text-center text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-            >
-              View all notifications
-            </Link>
+            <div className="flex items-center justify-between gap-4">
+              <Link
+                href="/notifications"
+                className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+              >
+                View all notifications
+              </Link>
+              {unreadCount > 0 && (
+                <button
+                  onClick={() => markAllAsRead()}
+                  className="text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
+                >
+                  Mark all as read
+                </button>
+              )}
+            </div>
           </div>
         )}
       </DropdownMenuContent>
