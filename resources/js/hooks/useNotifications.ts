@@ -268,12 +268,33 @@ export function useNotifications() {
         setUnreadCount(0);
       });
 
+      // Listen for notification deletion
+      channelInstance.bind('notification.deleted', (data: { id: string }) => {
+        console.log('🗑️ Notification deleted:', data);
+        const deletedNotification = notifications.find(n => n.id === data.id);
+        setNotifications((prev) => prev.filter((n) => n.id !== data.id));
+        
+        // Update unread count if deleted notification was unread
+        if (deletedNotification && !deletedNotification.read_at) {
+          setUnreadCount((prev) => Math.max(0, prev - 1));
+        }
+      });
+
+      // Listen for all notifications deletion
+      channelInstance.bind('notifications.all-deleted', (data: { user_id: string }) => {
+        console.log('🗑️ All notifications deleted:', data);
+        setNotifications([]);
+        setUnreadCount(0);
+      });
+
       // Cleanup on unmount
       return () => {
         console.log('🔌 Unsubscribing from:', channel);
         channelInstance.unbind('notification.created');
         channelInstance.unbind('notification.read');
         channelInstance.unbind('notifications.all-read');
+        channelInstance.unbind('notification.deleted');
+        channelInstance.unbind('notifications.all-deleted');
         channelInstance.unbind('pusher:subscription_succeeded');
         channelInstance.unbind('pusher:subscription_error');
         pusher.unsubscribe(channel);

@@ -169,7 +169,13 @@ class NotificationController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
+        $notificationId = $notification->id;
+        $userId = $notification->notifiable_id;
+
         $notification->delete();
+
+        // Broadcast the deletion event to all user's tabs
+        broadcast(new \App\Events\NotificationDeleted($notificationId, $userId))->toOthers();
 
         return response()->json(['success' => true]);
     }
@@ -192,6 +198,9 @@ class NotificationController extends Controller
         $user = $request->user();
 
         $count = Notification::forUser($user->id)->delete();
+
+        // Broadcast the "all deleted" event to all user's tabs
+        broadcast(new \App\Events\NotificationsAllDeleted($user))->toOthers();
 
         return response()->json([
             'success' => true,
