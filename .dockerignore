@@ -5,7 +5,6 @@
 .prettierignore
 .prettierrc
 docker-compose.yml
-docker-compose.soketi.yml
 Dockerfile
 documentation/DOCKER_SETUP.md
 README.md

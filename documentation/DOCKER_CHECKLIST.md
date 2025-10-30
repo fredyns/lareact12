@@ -81,10 +81,11 @@
 - [ ] Upload test file
 - [ ] Verify file appears in bucket
 
-### Soketi
+### Reverb
 
-- [ ] Check health: `curl http://localhost:9601/health`
-- [ ] Should return: `{"ok":true}`
+- [ ] Check running: `docker-compose ps reverb`
+- [ ] Check logs: `docker-compose logs -f reverb`
+- [ ] Should see: "Reverb server started"
 - [ ] Check metrics: `curl http://localhost:9601/metrics`
 
 ## Development Workflow
@@ -228,10 +229,10 @@
 
 ### WebSocket Connection Error
 
-- [ ] Check Soketi running: `docker-compose ps soketi`
-- [ ] Test health: `curl http://localhost:9601/health`
-- [ ] Check logs: `docker-compose logs soketi`
-- [ ] Restart Soketi: `docker-compose restart soketi`
+- [ ] Check Reverb running: `docker-compose ps reverb`
+- [ ] Check logs: `docker-compose logs -f reverb`
+- [ ] Restart Reverb: `docker-compose restart reverb`
+- [ ] Verify REVERB_* env variables are set
 
 ### Out of Memory
 

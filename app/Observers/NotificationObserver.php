@@ -19,12 +19,7 @@ class NotificationObserver
     public function created(Notification $notification): void
     {
         // Broadcast the notification to the user in real-time
-        // Use dispatchSync to ensure it runs immediately even from queue context
-        try {
-            broadcast(new NotificationCreated($notification, $notification->notifiable_id));
-        } catch (\Exception $e) {
-            // If broadcast fails from queue context, dispatch it to run in web context
-            \Illuminate\Support\Facades\Log::error('Broadcast failed: ' . $e->getMessage());
-        }
+        // The event implements ShouldBroadcastNow so it broadcasts immediately
+        event(new NotificationCreated($notification, $notification->notifiable_id));
     }
 }

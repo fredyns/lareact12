@@ -14,7 +14,7 @@ Your Laravel application now runs with **9 Docker services** working together:
 │  web (Nginx) - Port 80                                          │
 │  • Serves static files (CSS, JS, images)                        │
 │  • Routes PHP requests to app:9000                              │
-│  • Proxies WebSocket to soketi:6001                             │
+│  • Proxies WebSocket to reverb:8080                             │
 └─────────────┬───────────────────────────────────────────────────┘
               │ FastCGI
               ↓
@@ -44,10 +44,10 @@ Your Laravel application now runs with **9 Docker services** working together:
 └─────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────┐
-│  soketi (WebSocket Server) - Port 6001                          │
+│  reverb (WebSocket Server) - Port 8080                          │
 │  • Real-time notifications                                      │
 │  • Broadcasting events                                          │
-│  • Laravel Echo integration                                     │
+│  • Laravel's official WebSocket server                          │
 └─────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────┐
@@ -69,7 +69,7 @@ Your Laravel application now runs with **9 Docker services** working together:
 - Serve static files (CSS, JS, images, fonts)
 - Route HTTP requests
 - Forward PHP requests to `app` service
-- Proxy WebSocket connections to `soketi`
+- Proxy WebSocket connections to `reverb`
 - SSL termination (in production)
 
 **Technology:** Nginx Alpine
@@ -181,25 +181,24 @@ Your Laravel application now runs with **9 Docker services** working together:
 **Storage:** `./storage/docker/minio`
 
 **Access:**
-- API: http://localhost:9000
 - Console: http://localhost:8900
 - Credentials: minioadmin / minioadmin123
 
 ---
 
-### 8. 📡 **soketi** (WebSocket Server)
-**Container:** `lareact12_soketi`
-**Ports:** 6001 (WebSocket), 9601 (Metrics)
+### 8. 📡 **reverb** (WebSocket Server)
+**Container:** `lareact12_reverb`
+**Ports:** 8080 (WebSocket)
 **Purpose:** Real-time notifications
 
 **Responsibilities:**
-- Broadcast events to clients
+- WebSocket connections
+- Broadcasting events
 - Real-time notifications
-- Live updates
-- Laravel Echo integration
-- Private channels
+- Private channel authorization
+- Pusher protocol compatible
 
-**Technology:** Soketi (Pusher-compatible)
+**Technology:** Laravel Reverb
 
 ---
 
@@ -251,7 +250,7 @@ web
 | **postgres** | Medium | ~50MB | Persistent |
 | **redis** | Low | ~20MB | Persistent |
 | **minio** | Low | ~30MB | Persistent |
-| **soketi** | Low | ~30MB | - |
+| **reverb** | Low | ~30MB | - |
 | **mailpit** | Low | ~20MB | - |
 | **TOTAL** | - | ~360MB | ~1GB+ |
 
@@ -265,8 +264,7 @@ web
 | redis | 6379 | 6379 | Redis |
 | minio | 9000 | 9000 | MinIO API |
 | minio | 8900 | 8900 | MinIO Console |
-| soketi | 6001 | 6001 | WebSocket |
-| soketi | 9601 | 9601 | Metrics |
+| reverb | 8080 | 8080 | WebSocket |
 | mailpit | 1025 | 1025 | SMTP |
 | mailpit | 8025 | 8025 | Web UI |
 

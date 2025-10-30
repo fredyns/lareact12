@@ -45,9 +45,10 @@ class TestNotification extends Command
         $this->info("Broadcasting notification...");
         $this->info("Broadcast Config:");
         $this->info("  Driver: " . config('broadcasting.default'));
-        $this->info("  Host: " . config('broadcasting.connections.pusher.options.host'));
-        $this->info("  Port: " . config('broadcasting.connections.pusher.options.port'));
-        $this->info("  Key: " . config('broadcasting.connections.pusher.key'));
+        $this->info("  Connection: " . config('broadcasting.connections.reverb.driver'));
+        $this->info("  Host: " . config('broadcasting.connections.reverb.options.host'));
+        $this->info("  Port: " . config('broadcasting.connections.reverb.options.port'));
+        $this->info("  Key: " . config('broadcasting.connections.reverb.key'));
         
         try {
             broadcast(new NotificationCreated($notification, $user->id));

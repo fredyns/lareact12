@@ -33,10 +33,10 @@ The `docker-compose.yml` includes the following services:
    - Access Key: `minioadmin`
    - Secret Key: `minioadmin123`
 
-5. **Soketi** (ports 6001, 9601)
-   - WebSocket server for real-time features
-   - WebSocket: `ws://localhost:6001`
-   - Metrics: `http://localhost:9601/health`
+5. **Reverb** (port 8080)
+   - Laravel's official WebSocket server for real-time features
+   - WebSocket: `ws://localhost:8080`
+   - Debug mode enabled for development
 
 ## Quick Start
 
@@ -68,7 +68,7 @@ docker-compose exec app php artisan db:seed
 
 - **Application**: http://localhost:8000
 - **MinIO Console**: http://localhost:9001 (minioadmin/minioadmin123)
-- **Soketi Metrics**: http://localhost:9601/health
+- **Reverb WebSocket**: ws://localhost:8080
 
 ## Common Commands
 
@@ -83,7 +83,7 @@ docker-compose logs -f app
 docker-compose logs -f postgres
 docker-compose logs -f redis
 docker-compose logs -f minio
-docker-compose logs -f soketi
+docker-compose logs -f reverb
 ```
 
 ### Execute Commands in Container
@@ -140,9 +140,9 @@ REDIS_HOST=redis          # Docker service name
 REDIS_PORT=6379
 
 MINIO_ENDPOINT=http://minio:9000
-BROADCAST_DRIVER=pusher
-PUSHER_HOST=soketi        # Docker service name
-PUSHER_PORT=6001
+BROADCAST_DRIVER=reverb
+REVERB_HOST=localhost
+REVERB_PORT=8080
 ```
 
 ## Database Management
@@ -206,9 +206,9 @@ docker-compose exec redis redis-cli MONITOR
 docker-compose exec redis redis-cli FLUSHALL
 ```
 
-## Soketi WebSocket Server
+## Reverb WebSocket Server
 
-### Check Health
+### Check Status
 
 ```bash
 curl http://localhost:9601/health
@@ -264,14 +264,17 @@ docker-compose ps minio
 docker-compose logs minio
 ```
 
-### Soketi Connection Error
+### Reverb Connection Error
 
 ```bash
-# Check Soketi is running
-docker-compose ps soketi
+# Check Reverb is running
+docker-compose ps reverb
 
-# Check Soketi health
-curl http://localhost:9601/health
+# Check Reverb logs
+docker-compose logs -f reverb
+
+# Restart Reverb
+docker-compose restart reverb
 ```
 
 ## Performance Optimization
@@ -331,4 +334,4 @@ For production deployment:
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
 - [Redis Documentation](https://redis.io/documentation)
 - [MinIO Documentation](https://docs.min.io/)
-- [Soketi Documentation](https://docs.soketi.app/)
+- [Laravel Reverb Documentation](https://laravel.com/docs/reverb)

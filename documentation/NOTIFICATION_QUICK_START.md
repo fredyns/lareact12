@@ -523,10 +523,10 @@ networks:
 
 **Start:**
 ```bash
-docker-compose up -d soketi
+docker-compose up -d reverb
 ```
 
-### Option 2: Standalone Docker
+### Option 2: Artisan Command
 
 ```bash
 docker run -d \

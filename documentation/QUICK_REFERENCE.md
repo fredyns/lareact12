@@ -481,8 +481,8 @@ php artisan serve
 # Start queue worker
 php artisan queue:work
 
-# Start Soketi
-docker-compose -f docker-compose.soketi.yml up -d
+# Start Reverb
+docker-compose up -d reverb
 ```
 
 ---

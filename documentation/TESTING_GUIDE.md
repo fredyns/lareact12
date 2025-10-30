@@ -6,7 +6,7 @@
 
 ```bash
 # Terminal 1: Start Docker services
-docker-compose -f docker-compose.soketi.yml up -d
+docker-compose up -d
 
 # Terminal 2: Start Laravel development server
 php artisan serve

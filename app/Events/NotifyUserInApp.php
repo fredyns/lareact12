@@ -11,34 +11,24 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
 /**
- * NotificationCreated Event
+ * NotifyUserInApp Event
  *
- * Broadcast event fired when a notification is created.
- * Sends real-time updates to connected users via Laravel Reverb (WebSocket).
- *
- * Broadcasting:
- * - Uses Laravel Reverb for real-time WebSocket broadcasting
- * - Implements ShouldBroadcastNow for immediate broadcasting
- * - Broadcasts to private user channels for security
+ * Broadcasts notification to user via Laravel Reverb (WebSocket).
+ * Implements ShouldBroadcastNow for immediate real-time delivery.
  *
  * @see \App\Models\Notification
- * @see \App\Listeners\SendItemCreatedNotification
- * @see \App\Observers\NotificationObserver
  */
-class NotificationCreated implements ShouldBroadcastNow
+class NotifyUserInApp implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
      * Constructor
      *
-     * @param \App\Models\Notification $notification The notification that was created
-     * @param string $userId The user ID receiving the notification
+     * @param Notification $notification The notification to broadcast
      */
-    public function __construct(
-        public Notification $notification,
-        public string $userId
-    ) {
+    public function __construct(public Notification $notification)
+    {
     }
 
     /**
@@ -55,7 +45,7 @@ class NotificationCreated implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel("App.Models.User.{$this->userId}"),
+            new PrivateChannel("App.Models.User.{$this->notification->notifiable_id}"),
         ];
     }
 
@@ -73,6 +63,7 @@ class NotificationCreated implements ShouldBroadcastNow
             'type' => $this->notification->type,
             'data' => $this->notification->data,
             'created_at' => $this->notification->created_at,
+            'read_at' => $this->notification->read_at,
         ];
     }
 

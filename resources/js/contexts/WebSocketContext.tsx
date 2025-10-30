@@ -11,18 +11,18 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
   const [pusher, setPusher] = useState<Pusher | null>(null);
 
   useEffect(() => {
-    // Initialize Pusher with error handling
+    // Initialize Pusher (for Reverb) with error handling
     try {
       // Enable Pusher logging for debugging in development
       Pusher.logToConsole = import.meta.env.DEV;
 
-      const pusherInstance = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY || '', {
-        wsHost: import.meta.env.VITE_PUSHER_HOST || 'localhost',
-        wsPort: parseInt(import.meta.env.VITE_PUSHER_PORT || '6001', 10),
-        forceTLS: import.meta.env.VITE_PUSHER_SCHEME === 'https',
+      const pusherInstance = new Pusher(import.meta.env.VITE_REVERB_APP_KEY || '', {
+        wsHost: import.meta.env.VITE_REVERB_HOST || 'localhost',
+        wsPort: parseInt(import.meta.env.VITE_REVERB_PORT || '8080', 10),
+        forceTLS: import.meta.env.VITE_REVERB_SCHEME === 'https',
         disableStats: true,
         enabledTransports: ['ws', 'wss'],
-        cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER || 'mt1',
+        cluster: 'mt1', // Required by Pusher types but not used for self-hosted Reverb
         // Add authorization endpoint for private channels
         authEndpoint: '/broadcasting/auth',
         auth: {
@@ -34,25 +34,26 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
         },
       });
 
-      console.log('🔧 Pusher Config:', {
-        key: import.meta.env.VITE_PUSHER_APP_KEY,
-        host: import.meta.env.VITE_PUSHER_HOST,
-        port: import.meta.env.VITE_PUSHER_PORT,
+      console.log('🔧 Reverb Config:', {
+        key: import.meta.env.VITE_REVERB_APP_KEY,
+        host: import.meta.env.VITE_REVERB_HOST,
+        port: import.meta.env.VITE_REVERB_PORT,
+        scheme: import.meta.env.VITE_REVERB_SCHEME,
         authEndpoint: '/broadcasting/auth',
         csrfToken: document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')?.substring(0, 10) + '...',
       });
 
       // Connection state logging
       pusherInstance.connection.bind('connected', () => {
-        console.log('✅ Pusher connected');
+        console.log('✅ Reverb connected');
       });
 
       pusherInstance.connection.bind('disconnected', () => {
-        console.log('❌ Pusher disconnected');
+        console.log('❌ Reverb disconnected');
       });
 
       pusherInstance.connection.bind('error', (err: any) => {
-        console.error('❌ Pusher connection error:', err);
+        console.error('❌ Reverb connection error:', err);
       });
 
       setPusher(pusherInstance);
@@ -62,7 +63,7 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
         pusherInstance.disconnect();
       };
     } catch (error) {
-      console.error('Failed to initialize Pusher:', error);
+      console.error('Failed to initialize Reverb:', error);
       return undefined;
     }
   }, []);

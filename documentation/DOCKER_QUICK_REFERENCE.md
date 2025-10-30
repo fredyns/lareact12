@@ -41,7 +41,7 @@ docker-compose logs -f app
 docker-compose logs -f postgres
 docker-compose logs -f redis
 docker-compose logs -f minio
-docker-compose logs -f soketi
+docker-compose logs -f reverb
 
 # View last 100 lines
 docker-compose logs --tail=100 app
@@ -155,10 +155,11 @@ docker-compose exec minio mc stat minio/localhost/filename
 curl http://localhost:9601/health
 
 # View metrics
-curl http://localhost:9601/metrics
-
 # View logs
-docker-compose logs -f soketi
+docker-compose logs -f reverb
+
+# Test WebSocket connection
+wscat -c ws://localhost:8080
 ```
 
 ## Development Workflow
@@ -315,17 +316,17 @@ docker-compose restart minio
 ### Soketi Connection Error
 
 ```bash
-# Check Soketi is running
-docker-compose ps soketi
-
-# Check health
-curl http://localhost:9601/health
+# Check Reverb is running
+docker-compose ps reverb
 
 # Check logs
-docker-compose logs soketi
+docker-compose logs -f reverb
 
-# Restart Soketi
-docker-compose restart soketi
+# Restart Reverb
+docker-compose restart reverb
+
+# Test notification
+docker-compose exec app php artisan test:notification
 ```
 
 ### Clear Everything and Start Fresh

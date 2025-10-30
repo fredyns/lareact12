@@ -40,14 +40,14 @@ DB_USERNAME=prod_user
 DB_PASSWORD=secure-password
 
 # Broadcasting
-BROADCAST_DRIVER=soketi
-BROADCAST_CONNECTION=soketi
-SOKETI_HOST=soketi.example.com
-SOKETI_PORT=6001
-SOKETI_SCHEME=https
-SOKETI_APP_ID=1
-SOKETI_APP_KEY=prod-app-key
-SOKETI_APP_SECRET=prod-app-secret
+BROADCAST_DRIVER=reverb
+BROADCAST_CONNECTION=reverb
+REVERB_APP_ID=lareact12
+REVERB_APP_KEY=prod-app-key
+REVERB_APP_SECRET=prod-app-secret
+REVERB_HOST=reverb.example.com
+REVERB_PORT=8080
+REVERB_SCHEME=https
 
 # Queue
 QUEUE_CONNECTION=redis
@@ -123,7 +123,7 @@ services:
     depends_on:
       - db
       - redis
-      - soketi
+      - reverb
     networks:
       - notification-network
     restart: unless-stopped
@@ -153,18 +153,23 @@ services:
       - notification-network
     restart: unless-stopped
 
-  soketi:
-    image: quay.io/soketi/soketi:latest
-    container_name: notification-soketi
+  reverb:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: notification-reverb
     environment:
-      SOKETI_DEBUG: '0'
-      SOKETI_DEFAULT_APP_ID: '1'
-      SOKETI_DEFAULT_APP_KEY: 'prod-app-key'
-      SOKETI_DEFAULT_APP_SECRET: 'prod-app-secret'
+      REVERB_APP_ID: 'lareact12'
+      REVERB_APP_KEY: 'prod-app-key'
+      REVERB_APP_SECRET: 'prod-app-secret'
+      REVERB_HOST: 'reverb.example.com'
+      REVERB_PORT: '8080'
+      REVERB_SCHEME: 'https'
     ports:
-      - "6001:6001"
+      - "8080:8080"
     networks:
       - notification-network
+    command: php artisan reverb:start --host=0.0.0.0 --port=8080
     restart: unless-stopped
 
   nginx:
@@ -224,8 +229,8 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    location /socket.io {
-        proxy_pass http://soketi:6001;
+    location /reverb {
+        proxy_pass http://reverb:8080;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "Upgrade";
@@ -269,14 +274,14 @@ supervisorctl start notification-queue:*
 
 ## Broadcasting Setup
 
-### 1. Soketi Configuration
+### 1. Reverb Configuration
 
 ```bash
-# Start Soketi container
-docker-compose up -d soketi
+# Start Reverb container
+docker-compose up -d reverb
 
 # Verify connection
-curl http://localhost:6001/health
+docker-compose logs -f reverb
 ```
 
 ### 2. Test Broadcasting
@@ -530,14 +535,14 @@ tail -f /var/log/notification-queue.log
 ### Broadcasting Not Working
 
 ```bash
-# Verify Soketi is running
-docker ps | grep soketi
+# Verify Reverb is running
+docker ps | grep reverb
 
-# Check Soketi logs
-docker logs notification-soketi
+# Check Reverb logs
+docker logs notification-reverb
 
-# Test connection
-curl http://soketi:6001/health
+# Test notification
+docker-compose exec app php artisan test:notification
 ```
 
 ### Database Connection Issues

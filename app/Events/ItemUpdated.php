@@ -7,23 +7,23 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
 /**
- * ItemCreated Event
+ * ItemUpdated Event
  *
- * Fired when a new item is created. Triggers the notification system
+ * Fired when an item is updated. Triggers the notification system
  * to send notifications to relevant users.
  *
- * @see \App\Listeners\SendItemCreatedNotification
+ * @see \App\Listeners\HandleItemUpdated
  */
-class ItemCreated
+class ItemUpdated
 {
     use Dispatchable, SerializesModels;
 
     /**
      * Constructor
      *
-     * @param mixed $model The item model that was created
+     * @param Item $item The item that was updated
      */
-    public function __construct(public Item $model)
+    public function __construct(public Item $item)
     {
     }
 }

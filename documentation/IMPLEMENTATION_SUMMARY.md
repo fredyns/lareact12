@@ -63,7 +63,7 @@ Complete real-time notification system for Laravel + React application with in-a
 - `resources/js/components/NotificationBell.tsx`
 - `resources/js/components/NotificationToast.tsx`
 - `resources/js/hooks/useNotifications.ts`
-- `docker-compose.soketi.yml`
+- `config/reverb.php`
 
 **Features:**
 - Real-time notifications via WebSocket
@@ -352,7 +352,7 @@ php artisan key:generate
 php artisan migrate
 
 # 4. Start services
-docker-compose -f docker-compose.soketi.yml up -d
+docker-compose up -d reverb
 php artisan queue:work --queue=notifications
 
 # 5. Build frontend

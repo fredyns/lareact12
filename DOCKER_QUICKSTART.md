@@ -68,14 +68,19 @@ docker-compose logs -f queue
 docker-compose ps queue
 ```
 
-### Test Notifications
+### Test Real-time Notifications
 
-1. Create a new item in the application
-2. Check queue worker logs:
-   ```bash
-   docker-compose logs -f queue
-   ```
-3. You should see notifications being processed!
+1. Open browser console (F12)
+2. Login to the application
+3. Run test command:
+```bash
+docker-compose exec app php artisan test:notification
+```
+4. Check browser console for notification event
+5. Check Reverb logs:
+```bash
+docker-compose logs -f reverb
+```
 
 ## Common Commands
 

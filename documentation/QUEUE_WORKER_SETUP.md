@@ -252,13 +252,13 @@ php artisan queue:work redis --queue=notifications
 npm run dev
 ```
 
-**Terminal 4: Soketi WebSocket Server** (if using real-time notifications)
+**Terminal 4: Reverb WebSocket Server** (if using real-time notifications)
 ```bash
 # If using Docker
-docker-compose up soketi
+docker-compose up reverb
 
 # Or standalone
-soketi start
+php artisan reverb:start
 ```
 
 ## Monitoring

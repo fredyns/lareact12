@@ -65,17 +65,16 @@ return [
             'driver' => 'null',
         ],
 
-        'soketi' => [
-            'driver' => 'pusher',
-            'key' => env('SOKETI_APP_KEY', 'app-key'),
-            'secret' => env('SOKETI_APP_SECRET', 'app-secret'),
-            'app_id' => env('SOKETI_APP_ID', '1'),
+        'reverb' => [
+            'driver' => 'reverb',
+            'key' => env('REVERB_APP_KEY'),
+            'secret' => env('REVERB_APP_SECRET'),
+            'app_id' => env('REVERB_APP_ID'),
             'options' => [
-                'host' => env('SOKETI_HOST', 'localhost'),
-                'port' => env('SOKETI_PORT', 6001),
-                'scheme' => env('SOKETI_SCHEME', 'http'),
-                'encrypted' => env('SOKETI_SCHEME', 'http') === 'https',
-                'useTLS' => env('SOKETI_SCHEME', 'http') === 'https',
+                'host' => env('REVERB_HOST', 'localhost'),
+                'port' => env('REVERB_PORT', 8080),
+                'scheme' => env('REVERB_SCHEME', 'http'),
+                'useTLS' => env('REVERB_SCHEME', 'http') === 'https',
             ],
         ],
 

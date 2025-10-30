@@ -10,7 +10,8 @@ RUN apk add --no-cache \
     oniguruma-dev \
     libxml2-dev \
     libzip-dev \
-    sqlite-dev
+    sqlite-dev \
+    linux-headers
 
 # Install PHP extensions
 RUN docker-php-ext-install \
@@ -21,7 +22,9 @@ RUN docker-php-ext-install \
     xml \
     zip \
     bcmath \
-    opcache
+    opcache \
+    pcntl \
+    sockets
 
 # Install Redis extension via PECL
 RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS && \
@@ -37,6 +40,7 @@ WORKDIR /var/www/html
 
 # Copy PHP configuration
 COPY local.ini /usr/local/etc/php/conf.d/local.ini
+COPY www.conf /usr/local/etc/php-fpm.d/www.conf
 
 # Create app user
 RUN addgroup -g 1000 app && \

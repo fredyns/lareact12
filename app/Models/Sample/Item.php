@@ -176,58 +176,20 @@ class Item extends Model
 
         // Trigger notification after item is created
         static::created(function (Item $model) {
-            if (auth()->check()) {
-                // Only notify the authenticated user
-                $user = auth()->user();
-                
-                // Create notification in database
-                $notification = $user->notifications()->create([
-                    'id' => \Illuminate\Support\Str::uuid(),
-                    'type' => ItemCreated::class,
-                    'data' => [
-                        'title' => 'New Item Created',
-                        'body' => "Item '{$model->name}' was created",
-                        'action_url' => "/sample/items/{$model->id}",
-                        'icon' => 'plus-circle',
-                    ],
-                ]);
-                
-                // Broadcast immediately (synchronously)
-                broadcast(new \App\Events\NotificationCreated($notification, $user->id));
-                
-                // Queue email notification asynchronously
-                dispatch(function () use ($user, $model) {
-                    $user->notify(new ItemCreated($model));
-                })->onQueue('notifications');
-            }
+            // Load relationships needed for notifications
+            $model->load(['user', 'creator']);
+            
+            // Dispatch ItemCreated event (queued listener will handle FOW)
+            event(new \App\Events\ItemCreated($model));
         });
 
         // Trigger notification after item is updated
         static::updated(function (Item $model) {
-            if (auth()->check()) {
-                // Only notify the authenticated user
-                $user = auth()->user();
-                
-                // Create notification in database
-                $notification = $user->notifications()->create([
-                    'id' => \Illuminate\Support\Str::uuid(),
-                    'type' => ItemUpdated::class,
-                    'data' => [
-                        'title' => 'Item Updated',
-                        'body' => "Item '{$model->name}' was updated",
-                        'action_url' => "/sample/items/{$model->id}",
-                        'icon' => 'edit',
-                    ],
-                ]);
-                
-                // Broadcast immediately (synchronously)
-                broadcast(new \App\Events\NotificationCreated($notification, $user->id));
-                
-                // Queue email notification asynchronously
-                dispatch(function () use ($user, $model) {
-                    $user->notify(new ItemUpdated($model));
-                })->onQueue('notifications');
-            }
+            // Load relationships needed for notifications
+            $model->load(['user', 'updater']);
+            
+            // Dispatch ItemUpdated event (queued listener will handle FOW)
+            event(new \App\Events\ItemUpdated($model));
         });
     }
 
