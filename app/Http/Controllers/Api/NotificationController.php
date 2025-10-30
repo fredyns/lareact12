@@ -114,6 +114,9 @@ class NotificationController extends Controller
 
         $notification->markAsRead();
 
+        // Broadcast the read event to all user's tabs
+        broadcast(new \App\Events\NotificationRead($notification))->toOthers();
+
         return response()->json(['success' => true]);
     }
 
@@ -136,6 +139,9 @@ class NotificationController extends Controller
         Notification::forUser($user->id)
             ->unread()
             ->update(['read_at' => now()]);
+
+        // Broadcast the "all read" event to all user's tabs
+        broadcast(new \App\Events\NotificationsAllRead($user))->toOthers();
 
         return response()->json(['success' => true]);
     }

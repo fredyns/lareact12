@@ -234,11 +234,21 @@ export function useNotifications() {
         setUnreadCount((prev) => Math.max(0, prev - 1));
       });
 
+      // Listen for all notifications marked as read
+      channelInstance.bind('notifications.all-read', (data: { user_id: string; marked_at: string }) => {
+        console.log('✅ All notifications marked as read:', data);
+        setNotifications((prev) =>
+          prev.map((n) => ({ ...n, read_at: data.marked_at }))
+        );
+        setUnreadCount(0);
+      });
+
       // Cleanup on unmount
       return () => {
         console.log('🔌 Unsubscribing from:', channel);
         channelInstance.unbind('notification.created');
         channelInstance.unbind('notification.read');
+        channelInstance.unbind('notifications.all-read');
         channelInstance.unbind('pusher:subscription_succeeded');
         channelInstance.unbind('pusher:subscription_error');
         pusher.unsubscribe(channel);
