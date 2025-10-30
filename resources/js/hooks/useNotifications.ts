@@ -169,7 +169,21 @@ export function useNotifications() {
 
   // Delete notification
   const deleteNotification = useCallback(async (notificationId: string) => {
+    // Store previous state for rollback
+    const previousNotifications = notifications;
+    const previousUnreadCount = unreadCount;
+    const deletedNotification = notifications.find(n => n.id === notificationId);
+
     try {
+      // Optimistic update - remove notification immediately
+      setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
+      
+      // Update unread count if deleted notification was unread
+      if (deletedNotification && !deletedNotification.read_at) {
+        setUnreadCount((prev) => Math.max(0, prev - 1));
+      }
+
+      // Make API request in background
       const response = await fetch(`/api/notifications/${notificationId}`, {
         method: 'DELETE',
         headers: {
@@ -182,23 +196,26 @@ export function useNotifications() {
       });
 
       if (!response.ok) throw new Error('Failed to delete notification');
-
-      // Update local state
-      setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
-      
-      // Update unread count if deleted notification was unread
-      const deletedNotification = notifications.find(n => n.id === notificationId);
-      if (deletedNotification && !deletedNotification.read_at) {
-        setUnreadCount((prev) => Math.max(0, prev - 1));
-      }
     } catch (error) {
       console.error('Error deleting notification:', error);
+      // Rollback on error
+      setNotifications(previousNotifications);
+      setUnreadCount(previousUnreadCount);
     }
-  }, [notifications]);
+  }, [notifications, unreadCount]);
 
   // Delete all notifications
   const deleteAllNotifications = useCallback(async () => {
+    // Store previous state for rollback
+    const previousNotifications = notifications;
+    const previousUnreadCount = unreadCount;
+
     try {
+      // Optimistic update - clear all notifications immediately
+      setNotifications([]);
+      setUnreadCount(0);
+
+      // Make API request in background
       const response = await fetch('/api/notifications', {
         method: 'DELETE',
         headers: {
@@ -211,15 +228,14 @@ export function useNotifications() {
       });
 
       if (!response.ok) throw new Error('Failed to delete all notifications');
-
-      // Clear all notifications
-      setNotifications([]);
-      setUnreadCount(0);
     } catch (error) {
       console.error('Error deleting all notifications:', error);
+      // Rollback on error
+      setNotifications(previousNotifications);
+      setUnreadCount(previousUnreadCount);
       throw error;
     }
-  }, []);
+  }, [notifications, unreadCount]);
 
   // Subscribe to real-time notifications
   useEffect(() => {
