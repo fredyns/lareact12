@@ -2,14 +2,14 @@
 
 namespace App\Providers;
 
-use App\Events\ItemCreated;
-use App\Events\ItemUpdated;
 use App\Events\NotifyUser;
 use App\Events\NotifyUserByEmail;
-use App\Listeners\HandleItemCreated;
-use App\Listeners\HandleItemUpdated;
+use App\Events\Sample\ItemCreated;
+use App\Events\Sample\ItemUpdated;
 use App\Listeners\HandleNotifyUser;
 use App\Listeners\HandleNotifyUserByEmail;
+use App\Listeners\Sample\HandleItemCreated;
+use App\Listeners\Sample\HandleItemUpdated;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 /**

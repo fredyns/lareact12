@@ -6,6 +6,7 @@ use App\Events\NotifyUser;
 use App\Events\NotifyUserByEmail;
 use App\Events\NotifyUserInApp;
 use App\Models\NotificationPreference;
+use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
@@ -69,7 +70,7 @@ class HandleNotifyUser implements ShouldQueue
         }
 
         if ($preferences['email']) {
-            event(new NotifyUserByEmail($notification));
+            // event(new NotifyUserByEmail($notification));
             \Log::info("Dispatched NotifyUserByEmail", ['notification_id' => $notification->id]);
         }
     }
@@ -77,11 +78,11 @@ class HandleNotifyUser implements ShouldQueue
     /**
      * Get user's notification preferences for the given notification type
      *
-     * @param \App\Models\User $user
+     * @param User $user
      * @param string $notificationType
      * @return array{in_app: bool, email: bool}
      */
-    protected function getUserPreferences($user, string $notificationType): array
+    protected function getUserPreferences(User $user, string $notificationType): array
     {
         // Get preferences for this notification type
         $preferences = NotificationPreference::where('user_id', $user->id)

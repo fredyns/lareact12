@@ -3,8 +3,8 @@
 namespace App\Listeners;
 
 use App\Events\NotifyUserByEmail;
-use App\Notifications\ItemCreated;
-use App\Notifications\ItemUpdated;
+use App\Notifications\Sample\ItemCreated;
+use App\Notifications\Sample\ItemUpdated;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
@@ -93,8 +93,8 @@ class HandleNotifyUserByEmail implements ShouldQueue
         ];
 
         return match ($notification->type) {
-            \App\Notifications\ItemCreated::class => new ItemCreated($item),
-            \App\Notifications\ItemUpdated::class => new ItemUpdated($item),
+            ItemCreated::class => new ItemCreated($item),
+            ItemUpdated::class => new ItemUpdated($item),
             default => null,
         };
     }

@@ -118,8 +118,9 @@ class ItemCreated extends Notification implements ShouldQueue
 ### Step 1.4: Dispatch Notifications
 
 **In Model (app/Models/Sample/Item.php):**
+
 ```php
-use App\Notifications\ItemCreated;
+use App\Notifications\Sample\ItemCreated;
 
 class Item extends Model
 {
@@ -130,8 +131,9 @@ class Item extends Model
 ```
 
 **Or in Controller:**
+
 ```php
-use App\Notifications\ItemCreated;
+use App\Notifications\Sample\ItemCreated;
 
 // After creating item
 $admins = User::role('admin')->get();
@@ -409,16 +411,13 @@ export function NotificationPreferences() {
 ### Step 4.1: Unit Tests
 
 **File:** `tests/Unit/Notifications/ItemCreatedTest.php`
+
 ```php
 <?php
 
 namespace Tests\Unit\Notifications;
 
-use App\Models\User;
-use App\Models\Sample\Item;
-use App\Notifications\ItemCreated;
-use Illuminate\Support\Facades\Notification;
-use Tests\TestCase;
+use App\Models\Sample\Item;use App\Models\User;use Illuminate\Support\Facades\Notification;use Tests\TestCase;
 
 class ItemCreatedTest extends TestCase
 {
@@ -427,7 +426,7 @@ class ItemCreatedTest extends TestCase
         $item = Item::factory()->create();
         $user = User::factory()->create();
 
-        $notification = new ItemCreated($item);
+        $notification = new \App\Notifications\Sample\ItemCreated($item);
         $data = $notification->toDatabase($user);
 
         $this->assertEquals('Item Baru Dibuat', $data['title']);
@@ -441,9 +440,9 @@ class ItemCreatedTest extends TestCase
         $user = User::factory()->create();
         $item = Item::factory()->create();
 
-        $user->notify(new ItemCreated($item));
+        $user->notify(new \App\Notifications\Sample\ItemCreated($item));
 
-        Notification::assertSentTo($user, ItemCreated::class);
+        Notification::assertSentTo($user, \App\Notifications\Sample\ItemCreated::class);
     }
 }
 ```
@@ -598,7 +597,7 @@ Broadcast::channel('user.1', fn($user, $id) => (int)$user->id === (int)$id);
 
 // Test event
 event(new \Illuminate\Notifications\Events\BroadcastNotificationCreated(
-    new \App\Notifications\ItemCreated($item)
+    new \App\Notifications\Sample\ItemCreated($item)
 ));
 ```
 

@@ -79,11 +79,7 @@ Event → Fan out to all users → Store in DB → User gets instantly
 
 namespace App\Listeners;
 
-use App\Models\Notification;
-use App\Models\User;
-use App\Events\ItemCreated;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Log;
+use App\Events\Sample\ItemCreated;use App\Models\Notification;use App\Models\User;use Illuminate\Support\Facades\Log;use Illuminate\Support\Str;
 
 class SendNotificationListener
 {
@@ -176,9 +172,7 @@ class SendNotificationListener
 
 namespace App\Providers;
 
-use App\Events\ItemCreated;
-use App\Listeners\SendNotificationListener;
-use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use App\Events\Sample\ItemCreated;use App\Listeners\SendNotificationListener;use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -249,8 +243,7 @@ class NotificationCreated implements ShouldBroadcast
 
 namespace App\Models\Sample;
 
-use App\Events\ItemCreated;
-use Illuminate\Database\Eloquent\Model;
+use App\Events\Sample\ItemCreated;use Illuminate\Database\Eloquent\Model;
 
 class Item extends Model
 {
@@ -520,12 +513,7 @@ if ($item->is_urgent) {
 
 namespace App\Listeners;
 
-use App\Events\ItemCreated;
-use App\Models\Notification;
-use App\Models\User;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
+use App\Events\Sample\ItemCreated;use App\Models\Notification;use App\Models\User;use Illuminate\Support\Facades\Cache;use Illuminate\Support\Facades\Log;use Illuminate\Support\Str;
 
 class SendNotificationListener
 {

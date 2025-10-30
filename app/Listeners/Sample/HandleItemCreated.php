@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Listeners;
+namespace App\Listeners\Sample;
 
-use App\Events\ItemCreated;
 use App\Events\NotifyUser;
+use App\Events\Sample\ItemCreated;
 use App\Models\Notification;
 use App\Models\Sample\Item;
 use App\Models\User;
@@ -39,7 +39,7 @@ class HandleItemCreated implements ShouldQueue
     /**
      * Handle the event
      *
-     * @param ItemCreated $event
+     * @param \App\Events\Sample\ItemCreated $event
      * @return void
      */
     public function handle(ItemCreated $event): void
@@ -63,7 +63,7 @@ class HandleItemCreated implements ShouldQueue
                 'id' => (string) Str::uuid(),
                 'notifiable_type' => get_class($user),
                 'notifiable_id' => $user->id,
-                'type' => \App\Notifications\ItemCreated::class,
+                'type' => \App\Notifications\Sample\ItemCreated::class,
                 'data' => json_encode([
                     'title' => 'New Item Created',
                     'body' => "Item '{$item->name}' was created",
@@ -108,7 +108,7 @@ class HandleItemCreated implements ShouldQueue
      * @param mixed $item
      * @return \Illuminate\Support\Collection<User>
      */
-    protected function getAffectedUsers($item): \Illuminate\Support\Collection
+    protected function getAffectedUsers(Item $item): \Illuminate\Support\Collection
     {
         // Get users to notify based on item relationships
         // In production, this could be:

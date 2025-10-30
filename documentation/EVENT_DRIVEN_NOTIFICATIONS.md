@@ -87,11 +87,11 @@ This system implements a **multi-step, event-driven architecture** with **Fanout
 ```php
 static::created(function (Item $model) {
     // Simple event dispatch - no business logic here
-    event(new \App\Events\ItemCreated($model));
+    event(new \App\Events\Sample\ItemCreated($model));
 });
 
 static::updated(function (Item $model) {
-    event(new \App\Events\ItemUpdated($model));
+    event(new \App\Events\Sample\ItemUpdated($model));
 });
 ```
 
@@ -123,7 +123,7 @@ class HandleItemCreated implements ShouldQueue
                 'id' => (string) Str::uuid(),
                 'notifiable_type' => get_class($user),
                 'notifiable_id' => $user->id,
-                'type' => \App\Notifications\ItemCreated::class,
+                'type' => \App\Notifications\Sample\ItemCreated::class,
                 'data' => json_encode([...]),
                 'created_at' => now(),
                 'updated_at' => now(),

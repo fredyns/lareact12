@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Events;
+namespace App\Events\Sample;
 
 use App\Models\Sample\Item;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -12,7 +12,6 @@ use Illuminate\Queue\SerializesModels;
  * Fired when a new item is created. Triggers the notification system
  * to send notifications to relevant users.
  *
- * @see \App\Listeners\SendItemCreatedNotification
  */
 class ItemCreated
 {

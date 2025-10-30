@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Listeners;
+namespace App\Listeners\Sample;
 
-use App\Events\ItemUpdated;
 use App\Events\NotifyUser;
+use App\Events\Sample\ItemUpdated;
 use App\Models\Notification;
 use App\Models\Sample\Item;
 use App\Models\User;
@@ -39,7 +39,7 @@ class HandleItemUpdated implements ShouldQueue
     /**
      * Handle the event
      *
-     * @param ItemUpdated $event
+     * @param \App\Events\Sample\ItemUpdated $event
      * @return void
      */
     public function handle(ItemUpdated $event): void
@@ -63,7 +63,7 @@ class HandleItemUpdated implements ShouldQueue
                 'id' => (string) Str::uuid(),
                 'notifiable_type' => get_class($user),
                 'notifiable_id' => $user->id,
-                'type' => \App\Notifications\ItemUpdated::class,
+                'type' => \App\Notifications\Sample\ItemUpdated::class,
                 'data' => json_encode([
                     'title' => 'Item Updated',
                     'body' => "Item '{$item->name}' was updated",
@@ -108,7 +108,7 @@ class HandleItemUpdated implements ShouldQueue
      * @param mixed $item
      * @return \Illuminate\Support\Collection<User>
      */
-    protected function getAffectedUsers($item): \Illuminate\Support\Collection
+    protected function getAffectedUsers(Item$item): \Illuminate\Support\Collection
     {
         // Get users to notify based on item relationships
         // In production, this could be:

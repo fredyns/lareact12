@@ -6,8 +6,6 @@ use App\Enums\Sample\ItemEnumerate;
 use App\Models\Traits\CaseInsensitiveSorting;
 use App\Models\Traits\Searchable;
 use App\Models\User;
-use App\Notifications\ItemCreated;
-use App\Notifications\ItemUpdated;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -180,7 +178,7 @@ class Item extends Model
             $model->load(['user', 'creator']);
             
             // Dispatch ItemCreated event (queued listener will handle FOW)
-            event(new \App\Events\ItemCreated($model));
+            event(new \App\Events\Sample\ItemCreated($model));
         });
 
         // Trigger notification after item is updated
@@ -189,7 +187,7 @@ class Item extends Model
             $model->load(['user', 'updater']);
             
             // Dispatch ItemUpdated event (queued listener will handle FOW)
-            event(new \App\Events\ItemUpdated($model));
+            event(new \App\Events\Sample\ItemUpdated($model));
         });
     }
 

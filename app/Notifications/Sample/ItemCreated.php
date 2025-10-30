@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Notifications;
+namespace App\Notifications\Sample;
 
+use App\Models\Sample\Item;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\BroadcastMessage;
+use Illuminate\Notifications\Notification;
 
 /**
  * ItemCreated Notification
@@ -26,7 +26,7 @@ class ItemCreated extends Notification implements ShouldQueue
      *
      * @param mixed $item The item that was created
      */
-    public function __construct(private $item)
+    public function __construct(private Item $item)
     {
         $this->onQueue('notifications');
     }

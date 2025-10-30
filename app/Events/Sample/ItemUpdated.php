@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Events;
+namespace App\Events\Sample;
 
 use App\Models\Sample\Item;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -12,7 +12,7 @@ use Illuminate\Queue\SerializesModels;
  * Fired when an item is updated. Triggers the notification system
  * to send notifications to relevant users.
  *
- * @see \App\Listeners\HandleItemUpdated
+ * @see \App\Listeners\Sample\HandleItemUpdated
  */
 class ItemUpdated
 {
