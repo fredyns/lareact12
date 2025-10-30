@@ -24,6 +24,8 @@ interface Auth {
 interface NotificationData {
   title: string;
   body: string;
+  action_url?: string;
+  icon?: string;
   [key: string]: unknown;
 }
 

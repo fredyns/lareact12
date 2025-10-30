@@ -65,44 +65,63 @@ export function NotificationBell() {
             </div>
           ) : recentNotifications.length > 0 ? (
             <div className="divide-y divide-neutral-200 dark:divide-neutral-800">
-              {recentNotifications.map((notification) => (
-                <div
-                  key={notification.id}
-                  className={cn(
-                    'border-l-4 px-4 py-3 transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900',
-                    notification.read_at
-                      ? 'border-l-transparent bg-white dark:bg-neutral-950'
-                      : 'border-l-blue-500 bg-blue-50 dark:bg-blue-950/20',
-                  )}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-                        {notification.data.title}
-                      </p>
-                      <p className="mt-1 line-clamp-2 text-xs text-neutral-600 dark:text-neutral-400">
-                        {notification.data.body}
-                      </p>
-                      <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-500">
-                        {new Date(notification.created_at).toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </p>
-                    </div>
-                    {!notification.read_at && (
-                      <button
-                        onClick={() => handleMarkAsRead(notification.id)}
-                        className="mt-1 flex-shrink-0 rounded bg-blue-500 px-2 py-1 text-xs font-medium text-white hover:bg-blue-600"
-                      >
-                        <CheckCheck className="h-4 w-4" />
-                      </button>
+              {recentNotifications.map((notification) => {
+                const NotificationWrapper = notification.data.action_url ? Link : 'div';
+                const wrapperProps = notification.data.action_url
+                  ? {
+                      href: notification.data.action_url,
+                      onClick: () => {
+                        if (!notification.read_at) handleMarkAsRead(notification.id);
+                        setIsOpen(false);
+                      },
+                    }
+                  : {};
+
+                return (
+                  <NotificationWrapper
+                    key={notification.id}
+                    {...wrapperProps}
+                    className={cn(
+                      'block border-l-4 px-4 py-3 transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900',
+                      notification.read_at
+                        ? 'border-l-transparent bg-white dark:bg-neutral-950'
+                        : 'border-l-blue-500 bg-blue-50 dark:bg-blue-950/20',
+                      notification.data.action_url && 'cursor-pointer',
                     )}
-                  </div>
-                </div>
-              ))}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                          {notification.data.title}
+                        </p>
+                        <p className="mt-1 line-clamp-2 text-xs text-neutral-600 dark:text-neutral-400">
+                          {notification.data.body}
+                        </p>
+                        <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-500">
+                          {new Date(notification.created_at).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </p>
+                      </div>
+                      {!notification.read_at && (
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleMarkAsRead(notification.id);
+                          }}
+                          className="mt-1 flex-shrink-0 rounded bg-blue-500 px-2 py-1 text-xs font-medium text-white hover:bg-blue-600"
+                        >
+                          <CheckCheck className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
+                  </NotificationWrapper>
+                );
+              })}
             </div>
           ) : (
             <div className="flex h-32 flex-col items-center justify-center text-neutral-500">

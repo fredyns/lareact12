@@ -1,18 +1,19 @@
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 import { useNotifications } from '@/hooks/useNotifications';
 import { cn } from '@/lib/utils';
+import { Link } from '@inertiajs/react';
 import { CheckCheck, Loader2, RefreshCw, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -28,8 +29,16 @@ import { useState } from 'react';
  * ```
  */
 export function NotificationCenter() {
-  const { notifications, unreadCount, isLoading, markAsRead, markAllAsRead, deleteNotification, deleteAllNotifications, fetchNotifications } =
-    useNotifications();
+  const {
+    notifications,
+    unreadCount,
+    isLoading,
+    markAsRead,
+    markAllAsRead,
+    deleteNotification,
+    deleteAllNotifications,
+    fetchNotifications,
+  } = useNotifications();
 
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
   const [page, setPage] = useState(1);
@@ -140,19 +149,27 @@ export function NotificationCenter() {
               </div>
 
               {/* Content */}
-              <div className="min-w-0 flex-1">
-                <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">{notification.data.title}</h3>
-                <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">{notification.data.body}</p>
-                <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-500">
-                  {new Date(notification.created_at).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </p>
-              </div>
+              <Link
+                href={notification.data.action_url ?? '#'}
+                // className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
+                onClick={() => !notification.read_at && handleMarkAsRead(notification.id)}
+              >
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">{notification.data.title}</h3>
+                  <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">{notification.data.body}</p>
+                  <div className="mt-2 flex items-center gap-2">
+                    <p className="text-xs text-neutral-500 dark:text-neutral-500">
+                      {new Date(notification.created_at).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </p>
+                  </div>
+                </div>
+              </Link>
 
               {/* Actions */}
               <div className="flex flex-shrink-0 gap-2">
@@ -233,17 +250,8 @@ export function NotificationCenter() {
         <div className="flex justify-center">
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button
-                variant="destructive"
-                size="sm"
-                disabled={isDeleting}
-                className="gap-2"
-              >
-                {isDeleting ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Trash2 className="h-4 w-4" />
-                )}
+              <Button variant="destructive" size="sm" disabled={isDeleting} className="gap-2">
+                {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
                 Delete all notifications
               </Button>
             </AlertDialogTrigger>
