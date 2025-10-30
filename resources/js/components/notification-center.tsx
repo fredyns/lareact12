@@ -172,7 +172,7 @@ export function NotificationCenter() {
               </Link>
 
               {/* Actions */}
-              <div className="flex flex-shrink-0 gap-2">
+              <div className="ml-auto flex flex-shrink-0 items-start gap-2">
                 {!notification.read_at && (
                   <Button
                     title={'Mark as read'}
