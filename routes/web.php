@@ -81,6 +81,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::patch('/{id}/read', [NotificationController::class, 'markAsRead'])->name('mark-as-read');
         Route::patch('/read-all', [NotificationController::class, 'markAllAsRead'])->name('mark-all-as-read');
         Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
+        Route::delete('/', [NotificationController::class, 'destroyAll'])->name('destroy-all');
     });
 
     // Notification Preferences API Routes (session-based auth)

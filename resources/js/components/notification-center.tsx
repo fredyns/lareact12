@@ -1,5 +1,16 @@
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { useNotifications } from '@/hooks/useNotifications';
 import { cn } from '@/lib/utils';
 import { CheckCheck, Loader2, RefreshCw, Trash2 } from 'lucide-react';
@@ -17,11 +28,12 @@ import { useState } from 'react';
  * ```
  */
 export function NotificationCenter() {
-  const { notifications, unreadCount, isLoading, markAsRead, markAllAsRead, deleteNotification, fetchNotifications } =
+  const { notifications, unreadCount, isLoading, markAsRead, markAllAsRead, deleteNotification, deleteAllNotifications, fetchNotifications } =
     useNotifications();
 
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
   const [page, setPage] = useState(1);
+  const [isDeleting, setIsDeleting] = useState(false);
   const itemsPerPage = 10;
 
   const filteredNotifications = filter === 'unread' ? notifications.filter((n) => !n.read_at) : notifications;
@@ -45,6 +57,18 @@ export function NotificationCenter() {
 
   const handleRefresh = async () => {
     await fetchNotifications();
+  };
+
+  const handleDeleteAll = async () => {
+    try {
+      setIsDeleting(true);
+      await deleteAllNotifications();
+      setPage(1);
+    } catch (error) {
+      console.error('Failed to delete all notifications:', error);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -203,6 +227,44 @@ export function NotificationCenter() {
           </p>
         </div>
       </div>
+
+      {/* Delete All */}
+      {notifications.length > 0 && (
+        <div className="flex justify-center">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="destructive"
+                size="sm"
+                disabled={isDeleting}
+                className="gap-2"
+              >
+                {isDeleting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Trash2 className="h-4 w-4" />
+                )}
+                Delete all notifications
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete all {notifications.length} notification
+                  {notifications.length !== 1 ? 's' : ''} from your account.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDeleteAll} className="bg-red-600 hover:bg-red-700">
+                  Delete all
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      )}
     </div>
   );
 }

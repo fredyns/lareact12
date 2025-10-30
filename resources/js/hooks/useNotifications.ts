@@ -194,6 +194,31 @@ export function useNotifications() {
     }
   }, [notifications]);
 
+  // Delete all notifications
+  const deleteAllNotifications = useCallback(async () => {
+    try {
+      const response = await fetch('/api/notifications', {
+        method: 'DELETE',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+        },
+        credentials: 'same-origin',
+      });
+
+      if (!response.ok) throw new Error('Failed to delete all notifications');
+
+      // Clear all notifications
+      setNotifications([]);
+      setUnreadCount(0);
+    } catch (error) {
+      console.error('Error deleting all notifications:', error);
+      throw error;
+    }
+  }, []);
+
   // Subscribe to real-time notifications
   useEffect(() => {
     // Fetch initial notifications
@@ -265,5 +290,6 @@ export function useNotifications() {
     markAsRead,
     markAllAsRead,
     deleteNotification,
+    deleteAllNotifications,
   };
 }

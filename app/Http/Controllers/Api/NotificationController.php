@@ -175,6 +175,31 @@ class NotificationController extends Controller
     }
 
     /**
+     * Delete all notifications for the user
+     *
+     * Permanently removes all notifications belonging to the authenticated user.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     *
+     * @response {
+     *   "success": true,
+     *   "deleted": 42
+     * }
+     */
+    public function destroyAll(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        $count = Notification::forUser($user->id)->delete();
+
+        return response()->json([
+            'success' => true,
+            'deleted' => $count,
+        ]);
+    }
+
+    /**
      * Get all notification preferences for the user
      *
      * Returns preferences grouped by notification type.
