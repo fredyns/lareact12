@@ -1,16 +1,40 @@
-# Test Execution Guide - Sample Items & Sub-Items CRUD
+# Test Execution Guide - LaReact12 Sample Items Module
 
 ## Quick Start
 
-The browser preview is now open at: **http://localhost**
+**Application URL:** http://localhost:8000  
+**Test Credentials:** admin@admin.com / admin
+
+## Pre-Execution Checklist
+
+### Environment Verification
+```bash
+# Check Docker containers
+docker-compose ps
+
+# Verify database
+php artisan migrate:status
+
+# Test MinIO connection
+curl http://localhost:9000/minio/health/live
+
+# Check application
+curl http://localhost:8000
+```
+
+### Browser Setup
+1. Open Chrome DevTools (F12)
+2. Navigate to Network tab
+3. Enable "Preserve log"
+4. Set screen size to 1920x1080
 
 ## Application Routes
 
 ### Sample Items Routes
-- **List:** http://localhost/sample/items
-- **Create:** http://localhost/sample/items/create
-- **Show:** http://localhost/sample/items/{id}
-- **Edit:** http://localhost/sample/items/{id}/edit
+- **List:** http://localhost:8000/sample/items
+- **Create:** http://localhost:8000/sample/items/create
+- **Show:** http://localhost:8000/sample/items/{id}
+- **Edit:** http://localhost:8000/sample/items/{id}/edit
 
 ### Sub-Items Routes (Standalone)
 - **List:** http://localhost/sample/sub-items
@@ -33,18 +57,53 @@ The browser preview is now open at: **http://localhost**
 3. Verify successful authentication
 
 #### 1.2 Test CREATE - Sample Items
-1. Navigate to http://localhost/sample/items
-2. Click "Create" or "Add New Item" button
-3. Fill in the form with test data:
-   - **Test Case 1:** Complete all fields
-   - **Test Case 2:** Only required fields
-   - **Test Case 3:** Invalid data (test validation)
-4. Submit the form
-5. **Verify:**
-   - Success message appears
-   - Redirected to appropriate page
-   - Item appears in the list
-6. **Record:** Response time and any issues
+
+**High Priority Tests:**
+
+1. **Complete Form Test (SI-C-01)**
+   - Navigate to http://localhost:8000/sample/items/create
+   - Fill ALL fields:
+     - string*: "Test Item Alpha"
+     - email: "test@example.com"
+     - color: Select blue (#0000FF)
+     - integer: Use slider to set 75
+     - decimal: Enter 99.99
+     - date: Select today's date
+     - time: Set 14:30
+     - datetime: Set current datetime
+     - file: Upload test-document.pdf (< 10MB)
+     - image: Upload test-image.jpg (< 5MB)
+     - enumerate: Select from dropdown
+     - user: Search and select user
+     - boolean: Check the checkbox
+     - ip_address: Enter 192.168.1.100
+     - latitude: 40.7128
+     - longitude: -74.0060
+     - text: "Multi-line description text"
+     - markdown: "# Header\n**Bold text** and *italic*"
+     - wysiwyg: Use TinyMCE editor
+   - **Verify**: Upload progress indicators
+   - Submit form
+   - **Record**: Total time, file upload times
+   - **Verify**: Item created, files in MinIO
+
+2. **File Upload Integration (SI-C-05)**
+   - Test PDF upload with progress
+   - Test image upload with preview
+   - Verify MinIO folder: `sample_items/2025/10/31/`
+   - Check file organization
+
+3. **Markdown Editor (SI-C-06)**
+   - Test live preview functionality
+   - Add mermaid diagram:
+     ```
+     ```mermaid
+     graph TD
+         A[Start] --> B[Process]
+         B --> C[End]
+     ```
+     ```
+   - **Verify**: Diagram renders in preview
 
 #### 1.3 Test READ - Sample Items
 1. Navigate to http://localhost/sample/items
