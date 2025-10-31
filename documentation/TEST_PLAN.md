@@ -10,22 +10,61 @@
 2. Verify all CRUD operations for Sub-Items (both embedded and standalone)
 3. Measure performance and response times
 4. Identify any bugs or issues
+5. Validate integration with MinIO file storage
+6. Verify real-time notification functionality
+7. Test RBAC permissions for different user roles
+8. Validate form validation and error handling
+9. Test responsive design and mobile compatibility
+10. Verify accessibility compliance
 
 ---
 
 ## Test Scope
 
 ### Sample Items CRUD
-- **Create:** Add new sample items with various data
-- **Read:** View item list and individual item details
-- **Update:** Edit existing items
-- **Delete:** Remove items from the system
+- **Create:** Add new sample items with various data types (text, numbers, dates, files, etc.)
+- **Read:** View item list and individual item details with proper pagination
+- **Update:** Edit existing items with validation
+- **Delete:** Remove items from the system with confirmation
 
 ### Sub-Items CRUD
-- **Create:** Add sub-items to parent items
+- **Create:** Add sub-items to parent items (embedded interface)
 - **Read:** View sub-items list (embedded and standalone)
 - **Update:** Edit existing sub-items
-- **Delete:** Remove sub-items
+- **Delete:** Remove sub-items with proper cascading
+
+### Integration Testing
+- File uploads to MinIO storage
+- Real-time notifications via WebSocket
+- RBAC permissions enforcement
+- API endpoint validation
+
+---
+
+## Test Prerequisites
+
+### Test Data Requirements
+- Test user as Sys-Admin:
+  - email: admin@admin.com
+  - password: admin
+- Sample data for all field types:
+    - Text fields (short, long, markdown)
+    - Numeric fields (integer, decimal)
+    - Date/time fields
+    - File upload fields (PDF, DOCX, images)
+    - Select fields with options
+    - Boolean fields
+
+### Environment Setup
+1. Docker containers must be running:
+    - PHP Application (port 8000)
+    - PostgreSQL database
+    - Redis cache/queue
+    - MinIO object storage
+    - Reverb WebSocket server
+2. Database must be migrated and seeded
+3. Test user accounts must be created
+4. MinIO buckets must be configured
 
 ---
 
@@ -121,6 +160,7 @@
 - **Cache:** Redis (Docker container)
 - **Storage:** MinIO (Docker container)
 - **Queue:** Redis (Docker container)
+- **WebSocket:** Reverb (Docker container)
 
 ---
 
@@ -143,6 +183,16 @@ _Any bugs or issues will be documented here_
 
 ## Recommendations
 _Recommendations for improvements will be listed here_
+
+---
+
+## Automated Testing Integration
+
+This test plan aligns with the project's automated testing framework:
+- Unit tests located in `tests/Unit/`
+- Feature tests located in `tests/Feature/`
+- Run all tests with: `php artisan test`
+- Run specific test suite: `php artisan test --testsuite=Feature`
 
 ---
 
