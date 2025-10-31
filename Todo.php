@@ -11,7 +11,6 @@
  *  40. logs for `login`
  *  41. create image thumbnail with `intervention/image`
  *  42. implement next performance optimization @ `documentation/PERFORMANCE_RECOMMENDATIONS_NEXT.md`
- *  44. move notif bell to right
  *  45. search menus
  *  46.
  * 

@@ -1,7 +1,6 @@
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
-import { NotificationBell } from '@/components/notification-bell';
 import {
     Sidebar,
     SidebarContent,
@@ -118,9 +117,6 @@ export function AppSidebar() {
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     </SidebarMenu>
-                    <div className="pr-2">
-                        <NotificationBell />
-                    </div>
                 </div>
             </SidebarHeader>
 
