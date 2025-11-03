@@ -77,10 +77,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Notification Web Routes (session-based auth for web pages)
     Route::prefix('notifications')->name('notifications.')->group(function () {
         Route::get('/', [NotificationController::class, 'index'])
-            ->middleware('cache.api:2')
             ->name('index');
         Route::get('/count', [NotificationController::class, 'count'])
-            ->middleware('cache.api:1')
             ->name('count');
         Route::patch('/{id}/read', [NotificationController::class, 'markAsRead'])->name('mark-as-read');
         Route::patch('/read-all', [NotificationController::class, 'markAllAsRead'])->name('mark-all-as-read');
