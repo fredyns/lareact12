@@ -19,6 +19,36 @@ declare global {
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
+// Setup preconnect and font optimization
+function setupPerformanceOptimizations() {
+    const preconnectDomains = [
+        'https://fonts.bunny.net',
+    ];
+
+    preconnectDomains.forEach((domain) => {
+        const link = document.createElement('link');
+        link.rel = 'preconnect';
+        link.href = domain;
+        link.crossOrigin = 'anonymous';
+        document.head.appendChild(link);
+    });
+
+    // DNS prefetch for analytics and other services
+    const dnsPrefetchDomains = [
+        'https://cdn.jsdelivr.net',
+    ];
+
+    dnsPrefetchDomains.forEach((domain) => {
+        const link = document.createElement('link');
+        link.rel = 'dns-prefetch';
+        link.href = domain;
+        document.head.appendChild(link);
+    });
+}
+
+// Call on app initialization
+setupPerformanceOptimizations();
+
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     resolve: (name) =>

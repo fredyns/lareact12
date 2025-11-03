@@ -3,6 +3,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import LandingLayout from '@/layouts/landing-layout';
 import { Link } from '@inertiajs/react';
 import { Anchor, ArrowRight, Award, CheckCircle, Mail, MapPin, Phone, Shield, Ship } from 'lucide-react';
+import { Suspense, lazy } from 'react';
+
+// Lazy load non-critical sections
+const ServicesSection = lazy(() => import('./sections/services-section'));
+const WhyChooseUsSection = lazy(() => import('./sections/why-choose-us-section'));
+const CtaSection = lazy(() => import('./sections/cta-section'));
+
+// Loading skeleton for sections
+function SectionSkeleton() {
+  return (
+    <div className="animate-pulse bg-gray-200 h-64 rounded-lg" />
+  );
+}
 
 export default function LandingHome() {
   return (
@@ -73,198 +86,20 @@ export default function LandingHome() {
         </div>
       </div>
 
-      {/* Services Overview */}
-      <div className="bg-gray-50 py-20">
-        <div className="container mx-auto px-4">
-          <div className="mb-16 text-center">
-            <h2 className="mb-4 text-4xl font-bold text-gray-900">Our Core Services</h2>
-            <p className="mx-auto max-w-3xl text-xl text-gray-600">
-              Comprehensive maritime solutions tailored to meet international standards and regulations
-            </p>
-          </div>
+      {/* Services Overview - Lazy Loaded */}
+      <Suspense fallback={<SectionSkeleton />}>
+        <ServicesSection />
+      </Suspense>
 
-          <div className="grid gap-8 md:grid-cols-3">
-            <Card className="border-t-4 border-t-blue-600 transition-shadow duration-300 hover:shadow-xl">
-              <CardHeader>
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100">
-                  <Ship className="h-6 w-6 text-blue-600" />
-                </div>
-                <CardTitle>Ship Classification</CardTitle>
-                <CardDescription>Complete classification services for new builds and existing vessels</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600" />
-                    <span className="text-sm text-gray-600">Hull & Machinery Classification</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600" />
-                    <span className="text-sm text-gray-600">Plan Approval & Review</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600" />
-                    <span className="text-sm text-gray-600">Construction Supervision</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
+      {/* Why Choose Us - Lazy Loaded */}
+      <Suspense fallback={<SectionSkeleton />}>
+        <WhyChooseUsSection />
+      </Suspense>
 
-            <Card className="border-t-4 border-t-green-600 transition-shadow duration-300 hover:shadow-xl">
-              <CardHeader>
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-green-100">
-                  <Shield className="h-6 w-6 text-green-600" />
-                </div>
-                <CardTitle>Statutory Surveys</CardTitle>
-                <CardDescription>Mandatory surveys on behalf of flag state administrations</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600" />
-                    <span className="text-sm text-gray-600">SOLAS Compliance</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600" />
-                    <span className="text-sm text-gray-600">Load Line Surveys</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600" />
-                    <span className="text-sm text-gray-600">ISM/ISPS Certification</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="border-t-4 border-t-purple-600 transition-shadow duration-300 hover:shadow-xl">
-              <CardHeader>
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-purple-100">
-                  <Award className="h-6 w-6 text-purple-600" />
-                </div>
-                <CardTitle>Technical Consultancy</CardTitle>
-                <CardDescription>Expert advice and technical support for maritime operations</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600" />
-                    <span className="text-sm text-gray-600">Risk Assessment</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600" />
-                    <span className="text-sm text-gray-600">Damage Surveys</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600" />
-                    <span className="text-sm text-gray-600">Retrofit & Conversion</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="mt-12 text-center">
-            <Link href="/landing/services">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
-                View All Services
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* Why Choose Us */}
-      <div className="bg-white py-20">
-        <div className="container mx-auto px-4">
-          <div className="grid items-center gap-12 md:grid-cols-2">
-            <div>
-              <h2 className="mb-6 text-4xl font-bold text-gray-900">Why Choose Us</h2>
-              <p className="mb-8 text-lg text-gray-600">
-                As a leading classification society, we provide unparalleled expertise and commitment to maritime safety
-                and excellence.
-              </p>
-
-              <div className="space-y-6">
-                <div className="flex gap-4">
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-blue-100">
-                    <Award className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <h3 className="mb-2 font-semibold text-gray-900">IACS Member</h3>
-                    <p className="text-gray-600">
-                      Full member of International Association of Classification Societies
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-green-100">
-                    <Shield className="h-6 w-6 text-green-600" />
-                  </div>
-                  <div>
-                    <h3 className="mb-2 font-semibold text-gray-900">Global Recognition</h3>
-                    <p className="text-gray-600">Recognized by major flag states and port authorities worldwide</p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-purple-100">
-                    <Anchor className="h-6 w-6 text-purple-600" />
-                  </div>
-                  <div>
-                    <h3 className="mb-2 font-semibold text-gray-900">Expert Surveyors</h3>
-                    <p className="text-gray-600">Highly qualified and experienced maritime surveyors and engineers</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="relative">
-              <div className="absolute inset-0 rotate-3 transform rounded-3xl bg-blue-200"></div>
-              <div className="relative rounded-3xl bg-gradient-to-br from-blue-600 to-blue-800 p-8 text-white">
-                <h3 className="mb-6 text-2xl font-bold">Get Started Today</h3>
-                <p className="mb-6">
-                  Contact us for a consultation and discover how we can support your maritime operations.
-                </p>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <Phone className="h-5 w-5" />
-                    <span>+62 21 4200 5000</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Mail className="h-5 w-5" />
-                    <span>info@maritimesurvey.co.id</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <MapPin className="h-5 w-5" />
-                    <span>Jakarta, Indonesia</span>
-                  </div>
-                </div>
-                <Button className="mt-6 w-full bg-white text-blue-600 hover:bg-blue-50">Contact Us Now</Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* CTA Section */}
-      <div className="bg-gradient-to-r from-blue-900 to-blue-700 py-16 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="mb-4 text-3xl font-bold md:text-4xl">Ready to Ensure Your Vessel's Compliance?</h2>
-          <p className="mx-auto mb-8 max-w-2xl text-xl text-blue-100">
-            Let our expert team guide you through classification and certification processes
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Button size="lg" className="bg-white text-blue-900 hover:bg-blue-50">
-              Request a Quote
-            </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
-              Download Brochure
-            </Button>
-          </div>
-        </div>
-      </div>
+      {/* CTA Section - Lazy Loaded */}
+      <Suspense fallback={<SectionSkeleton />}>
+        <CtaSection />
+      </Suspense>
     </LandingLayout>
   );
 }
