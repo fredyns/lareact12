@@ -76,6 +76,7 @@
         "laravel-vite-plugin": "^2.0",
         "leaflet": "^1.9.4",
         "lucide-react": "^0.475.0",
+        "mermaid": "^11.12.1",
         "pusher-js": "^8.4.0",
         "react": "^19.2.0",
         "react-color": "^2.19.3",

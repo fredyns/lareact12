@@ -1,3 +1,4 @@
+import { MermaidChart } from '@/components/markdown/MermaidChart';
 import { Skeleton } from '@/components/ui/skeleton';
 import { normalizeMarkdown } from '@/utils/markdown';
 import ReactMarkdown from 'react-markdown';
@@ -29,12 +30,22 @@ export function ShowMarkdown({ label, value, loading = false }: ShowMarkdownProp
               h6: (props) => <h6 className="mt-3 mb-1 text-xs font-bold" {...props} />,
               code({
                 inline,
+                className,
                 children,
                 ...props
               }: {
                 inline?: boolean;
+                className?: string;
                 children?: React.ReactNode;
               } & React.HTMLAttributes<HTMLElement>) {
+                // Check if this is a mermaid code block
+                const isMermaid = className?.includes('language-mermaid');
+                const codeString = String(children).replace(/\n$/, '');
+
+                if (isMermaid) {
+                  return <MermaidChart code={codeString} />;
+                }
+
                 if (inline) {
                   return (
                     <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm" {...props}>

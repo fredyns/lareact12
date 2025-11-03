@@ -3,6 +3,13 @@
  * Track and log performance metrics for optimization
  */
 
+// Extend Window interface to include gtag
+declare global {
+  interface Window {
+    gtag?: (command: string, eventName: string, eventParams?: Record<string, string | number | boolean>) => void;
+  }
+}
+
 export interface PerformanceMetrics {
   name: string;
   duration: number;
@@ -133,7 +140,14 @@ export const performanceMonitor = new PerformanceMonitor();
 /**
  * Report Core Web Vitals to analytics
  */
-export const reportWebVitals = (metric: any): void => {
+export interface WebVitalMetric {
+  name: string;
+  value: number;
+  rating?: string;
+  id: string;
+}
+
+export const reportWebVitals = (metric: WebVitalMetric): void => {
   if (import.meta.env.DEV) {
     console.log('Web Vitals:', {
       name: metric.name,
@@ -161,9 +175,10 @@ export const logResourceTiming = (): void => {
     const resources = performance.getEntriesByType('resource');
     console.group('Resource Timing');
     resources.forEach(resource => {
+      const resourceTiming = resource as PerformanceResourceTiming;
       console.log(`${resource.name}:`, {
         duration: `${(resource.duration as number).toFixed(2)}ms`,
-        size: `${((resource as any).transferSize || 0) / 1024}KB`,
+        size: `${(resourceTiming.transferSize || 0) / 1024}KB`,
       });
     });
     console.groupEnd();
@@ -182,7 +197,7 @@ export const logNavigationTiming = (): void => {
       console.log('TCP Connection:', `${(navigation.connectEnd - navigation.connectStart).toFixed(2)}ms`);
       console.log('Request Time:', `${(navigation.responseStart - navigation.requestStart).toFixed(2)}ms`);
       console.log('Response Time:', `${(navigation.responseEnd - navigation.responseStart).toFixed(2)}ms`);
-      console.log('DOM Processing:', `${(navigation.domComplete - navigation.domLoading).toFixed(2)}ms`);
+      console.log('DOM Processing:', `${(navigation.domComplete - navigation.domContentLoadedEventStart).toFixed(2)}ms`);
       console.log('Total Load Time:', `${(navigation.loadEventEnd - navigation.fetchStart).toFixed(2)}ms`);
       console.groupEnd();
     }

@@ -98,7 +98,7 @@ export const loadCSSOnInteraction = (href: string, events: string[] = ['click', 
  */
 export const optimizeCSSDelivery = async (): Promise<void> => {
   // Defer non-critical CSS files
-  const nonCriticalCSS = [
+  const nonCriticalCSS: string[] = [
     // Add non-critical CSS files here
     // Example: '/css/animations.css'
     // Example: '/css/print.css'
