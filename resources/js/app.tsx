@@ -7,6 +7,16 @@ import { createRoot } from 'react-dom/client';
 import { initializeTheme } from './hooks/use-appearance';
 import { WebSocketProvider } from './contexts/WebSocketContext';
 
+// Extend Window interface to include custom properties
+declare global {
+    interface Window {
+        __performanceMonitor?: {
+            start: (label: string) => void;
+            end: (label: string) => void;
+        };
+    }
+}
+
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
@@ -33,19 +43,27 @@ createInertiaApp({
 // This will set light / dark mode on load...
 initializeTheme();
 
-// Optimize CSS delivery (deferred to avoid initialization issues)
-if (typeof window !== 'undefined') {
-    window.addEventListener('load', () => {
-        import('./utils/cssLoader').then(({ optimizeCSSDelivery }) => {
-            optimizeCSSDelivery();
-        }).catch(err => console.error('CSS optimization failed:', err));
-    });
+// Load performance monitor only in development
+if (import.meta.env.DEV) {
+    import('./utils/performanceMonitor').then(({ performanceMonitor }) => {
+        // Performance monitor is now available for development use
+        window.__performanceMonitor = performanceMonitor;
+    }).catch(err => console.error('Performance monitor failed to load:', err));
 }
 
-// Web Vitals tracking for performance monitoring
+// Web Vitals tracking for performance monitoring (always active)
 import { onCLS, onINP, onFCP, onLCP, onTTFB } from 'web-vitals';
 
-function sendToAnalytics(metric: any) {
+interface WebVitalsMetric {
+    name: string;
+    value: number;
+    rating?: string;
+    delta: number;
+    navigationType: string;
+    id: string;
+}
+
+function sendToAnalytics(metric: WebVitalsMetric) {
     // Send metrics to console in development
     if (import.meta.env.DEV) {
         console.log('Web Vitals:', {

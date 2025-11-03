@@ -1,28 +1,70 @@
 const CACHE_NAME = 'lareact12-v1';
-const urlsToCache = [
-  '/',
-  '/build/assets/vendor.js',
-  '/build/assets/app.js',
-  '/build/assets/app.css',
-  '/build/assets/ui.js',
-  // Add other critical assets
-  '/favicon.ico',
-  '/favicon.svg',
-  '/apple-touch-icon.png',
-];
+
+// Dynamically discover assets from Vite manifest
+async function getAssetsToCache() {
+  try {
+    const response = await fetch('/build/manifest.json');
+    if (!response.ok) {
+      console.warn('Service Worker: Manifest not found, using fallback assets');
+      return getDefaultAssets();
+    }
+    
+    const manifest = await response.json();
+    const assets = ['/'];
+    
+    // Extract all asset paths from manifest
+    Object.values(manifest).forEach(entry => {
+      if (entry.file) {
+        assets.push(`/build/${entry.file}`);
+      }
+      if (entry.css) {
+        entry.css.forEach(css => {
+          assets.push(`/build/${css}`);
+        });
+      }
+    });
+    
+    // Add static assets
+    assets.push('/favicon.ico', '/favicon.svg', '/apple-touch-icon.png');
+    
+    return assets;
+  } catch (error) {
+    console.error('Service Worker: Error loading manifest:', error);
+    return getDefaultAssets();
+  }
+}
+
+// Fallback assets if manifest is not available
+function getDefaultAssets() {
+  return [
+    '/',
+    '/favicon.ico',
+    '/favicon.svg',
+    '/apple-touch-icon.png',
+  ];
+}
 
 // Install event - cache critical resources
 self.addEventListener('install', event => {
   console.log('Service Worker: Installing...');
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Service Worker: Caching critical resources');
-        return cache.addAll(urlsToCache);
+    getAssetsToCache()
+      .then(urlsToCache => {
+        return caches.open(CACHE_NAME)
+          .then(cache => {
+            console.log('Service Worker: Caching critical resources', urlsToCache.length);
+            // Use addAll with error handling to skip missing assets
+            return Promise.all(
+              urlsToCache.map(url => {
+                return cache.add(url).catch(err => {
+                  console.warn(`Service Worker: Failed to cache ${url}:`, err);
+                });
+              })
+            );
+          });
       })
       .then(() => {
         console.log('Service Worker: All critical resources cached');
-        // Force the waiting service worker to become the active service worker
         return self.skipWaiting();
       })
   );
