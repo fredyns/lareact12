@@ -19,7 +19,7 @@ import { type NavItem, type NavGroup } from '@/types';
 import { Link } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, Users, Shield, Key, Package, Ship, Anchor, Building2, Layers, Search, X } from 'lucide-react';
 import AppLogo from './app-logo';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, memo } from 'react';
 
 const mainNavItems: NavItem[] = [
     {
@@ -105,7 +105,8 @@ const footerNavItems: NavItem[] = [
     },
 ];
 
-export function AppSidebar() {
+// Memoized AppSidebar to prevent unnecessary re-renders
+export const AppSidebar = memo(function AppSidebar() {
     const [searchQuery, setSearchQuery] = useState('');
 
     // Filter menu items based on search query
@@ -188,4 +189,4 @@ export function AppSidebar() {
             </SidebarFooter>
         </Sidebar>
     );
-}
+});

