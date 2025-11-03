@@ -13,7 +13,6 @@ use App\Http\Controllers\EnumController;
 use App\Http\Controllers\RBAC\PermissionController;
 use App\Http\Controllers\RBAC\RoleController;
 use App\Http\Controllers\Sample\Item\SubItemController as ItemSubItemController;
-use App\Http\Controllers\Sample\SubItemController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -126,9 +125,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::put('/{subItem}', [ItemSubItemController::class, 'update'])->name('update');
             Route::delete('/{subItem}', [ItemSubItemController::class, 'destroy'])->name('destroy');
         });
-        
-        // Standalone sub-items resource (for dedicated pages)
-        Route::resource('sub-items', SubItemController::class);
     });
 });
 

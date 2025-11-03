@@ -68,11 +68,6 @@ const navGroups: NavGroup[] = [
                 href: sample.items.index.url(),
                 icon: Package,
             },
-            {
-                title: 'Sub Items',
-                href: '/sample/sub-items',
-                icon: Layers,
-            },
         ],
     },
     {
