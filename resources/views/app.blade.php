@@ -37,9 +37,16 @@
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
+        {{-- DNS prefetch for external resources --}}
+        <link rel="dns-prefetch" href="https://fonts.bunny.net">
+        
+        {{-- Preload critical font --}}
+        <link rel="preload" href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600"></noscript>
+        
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 
+        @routes
         @viteReactRefresh
         @vite(['resources/js/app.tsx'])
         @inertiaHead

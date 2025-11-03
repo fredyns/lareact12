@@ -183,10 +183,8 @@ class Item extends Model
 
         // Trigger notification after item is updated
         static::updated(function (Item $model) {
-            // Load relationships needed for notifications
-            $model->load(['user', 'updater']);
-            
             // Dispatch ItemUpdated event (queued listener will handle FOW)
+            // Note: Event listener will load relationships if needed for notifications
             event(new \App\Events\Sample\ItemUpdated($model));
         });
     }

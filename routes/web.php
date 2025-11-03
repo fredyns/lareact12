@@ -52,6 +52,7 @@ Route::post('broadcasting/auth', function (Illuminate\Http\Request $request) {
 })->middleware(['auth']);
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    // Dashboard route - cached for 5 minutes for authenticated users
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
@@ -62,9 +63,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('notifications');
 
 
-    // Enum API Routes
+    // Enum API Routes - Cache for 60 minutes since enums rarely change
     Route::get('enums/{enumClass}', [EnumController::class, 'show'])
         ->where('enumClass', '.*')
+        ->middleware('cache.api:60')
         ->name('enums.show');
 
     // Generic Upload Routes for MinIO
@@ -76,8 +78,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Notification Web Routes (session-based auth for web pages)
     Route::prefix('notifications')->name('notifications.')->group(function () {
         Route::get('/', [NotificationController::class, 'index'])
+            ->middleware('cache.api:2')
             ->name('index');
         Route::get('/count', [NotificationController::class, 'count'])
+            ->middleware('cache.api:1')
             ->name('count');
         Route::patch('/{id}/read', [NotificationController::class, 'markAsRead'])->name('mark-as-read');
         Route::patch('/read-all', [NotificationController::class, 'markAllAsRead'])->name('mark-all-as-read');
@@ -116,7 +120,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('items/{item}', UpdateItem::class)->name('items.update');
         Route::patch('items/{item}', UpdateItem::class);
         Route::delete('items/{item}', DeleteItem::class)->name('items.destroy');
-        
+
         // Embedded sub-items routes (for item show page)
         Route::prefix('items/{item}/sub-items')->name('items.sub-items.')->group(function () {
             Route::get('/', [ItemSubItemController::class, 'index'])->name('index');

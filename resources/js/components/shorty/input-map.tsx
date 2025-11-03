@@ -6,8 +6,21 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MapPin, X } from 'lucide-react';
-import { useEffect, useEffectEvent, useRef, useState } from 'react';
-import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet';
+import { lazy, Suspense, useEffect, useEffectEvent, useRef, useState } from 'react';
+
+// Lazy load Leaflet components to reduce initial bundle size
+const MapContainer = lazy(() => 
+  import('react-leaflet').then(m => ({ default: m.MapContainer }))
+);
+const TileLayer = lazy(() => 
+  import('react-leaflet').then(m => ({ default: m.TileLayer }))
+);
+const Marker = lazy(() => 
+  import('react-leaflet').then(m => ({ default: m.Marker }))
+);
+
+// Import hooks normally (cannot be lazy loaded)
+import { useMap, useMapEvents } from 'react-leaflet';
 
 // Fix for Leaflet marker icons
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
@@ -393,23 +406,35 @@ export function InputMap({
                 </div>
               </div>
               <div className="h-[calc(90vh-16rem)]">
-                <MapContainer
-                  center={[tempLat || DEFAULT_CENTER[0], tempLng || DEFAULT_CENTER[1]]}
-                  zoom={zoom}
-                  style={{
-                    height: '100%',
-                    width: '100%',
-                  }}
-                  scrollWheelZoom={true}
-                  zoomControl={true}
-                >
-                  <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  />
-                  <ClickableMarker position={[tempLat || DEFAULT_CENTER[0], tempLng || DEFAULT_CENTER[1]]} onPositionChange={handleTempPositionChange} disabled={disabled} loading={loading} />
-                  <ScaleControl />
-                </MapContainer>
+                <Suspense fallback={
+                  <div className="h-full w-full animate-pulse bg-muted rounded border flex items-center justify-center">
+                    <div className="text-center space-y-3">
+                      <MapPin className="mx-auto h-8 w-8 text-muted-foreground" />
+                      <div className="space-y-2">
+                        <div className="h-4 bg-muted-foreground/20 rounded w-32 mx-auto"></div>
+                        <div className="h-4 bg-muted-foreground/20 rounded w-24 mx-auto"></div>
+                      </div>
+                    </div>
+                  </div>
+                }>
+                  <MapContainer
+                    center={[tempLat || DEFAULT_CENTER[0], tempLng || DEFAULT_CENTER[1]]}
+                    zoom={zoom}
+                    style={{
+                      height: '100%',
+                      width: '100%',
+                    }}
+                    scrollWheelZoom={true}
+                    zoomControl={true}
+                  >
+                    <TileLayer
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    <ClickableMarker position={[tempLat || DEFAULT_CENTER[0], tempLng || DEFAULT_CENTER[1]]} onPositionChange={handleTempPositionChange} disabled={disabled} loading={loading} />
+                    <ScaleControl />
+                  </MapContainer>
+                </Suspense>
               </div>
               <div className="flex justify-between gap-2">
                 {!required && (

@@ -52,18 +52,22 @@ export default defineConfig({
                         '@radix-ui/react-select',
                         '@radix-ui/react-checkbox',
                     ],
-                    // Heavy libraries chunk (only include if used)
+                    // Heavy libraries chunk (lazy loaded)
                     'heavy': [
                         '@tinymce/tinymce-react',
                         'leaflet',
                         'react-leaflet',
                     ],
                 },
+                // Optimize chunk naming
+                chunkFileNames: 'assets/chunks/[name]-[hash].js',
+                entryFileNames: 'assets/[name]-[hash].js',
+                assetFileNames: 'assets/[name]-[hash][extname]',
             },
         },
         
         // Chunk size warnings
-        chunkSizeWarningLimit: 1000,
+        chunkSizeWarningLimit: 500,
         
         // Source maps for production debugging (optional)
         sourcemap: false,
