@@ -74,18 +74,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('image', [UploadController::class, 'uploadImage'])->name('image');
     });
 
-    // Notification API Routes (session-based auth for web pages)
-    Route::prefix('api/notifications')->name('api.notifications.')->group(function () {
-        Route::get('/', [NotificationController::class, 'index'])->name('index');
-        Route::get('/count', [NotificationController::class, 'count'])->name('count');
+    // Notification Web Routes (session-based auth for web pages)
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/', [NotificationController::class, 'index'])
+            ->middleware('cache.api:2')
+            ->name('index');
+        Route::get('/count', [NotificationController::class, 'count'])
+            ->middleware('cache.api:1')
+            ->name('count');
         Route::patch('/{id}/read', [NotificationController::class, 'markAsRead'])->name('mark-as-read');
         Route::patch('/read-all', [NotificationController::class, 'markAllAsRead'])->name('mark-all-as-read');
         Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
         Route::delete('/', [NotificationController::class, 'destroyAll'])->name('destroy-all');
     });
 
-    // Notification Preferences API Routes (session-based auth)
-    Route::prefix('api/notification-preferences')->name('api.notification-preferences.')->group(function () {
+    // Notification Preferences Web Routes (session-based auth)
+    Route::prefix('notification-preferences')->name('notification-preferences.')->group(function () {
         Route::get('/', [NotificationController::class, 'getPreferences'])->name('index');
         Route::put('/', [NotificationController::class, 'updatePreference'])->name('update');
         Route::post('/reset', [NotificationController::class, 'resetPreferences'])->name('reset');

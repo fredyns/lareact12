@@ -48,11 +48,12 @@ export function useNotificationPreferences() {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch('/api/notification-preferences', {
+      const response = await fetch('/notification-preferences', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
           'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
         },
+        credentials: 'same-origin',
       });
 
       if (!response.ok) throw new Error('Failed to fetch preferences');
@@ -80,13 +81,15 @@ export function useNotificationPreferences() {
       try {
         setError(null);
 
-        const response = await fetch('/api/notification-preferences', {
+        const response = await fetch('/notification-preferences', {
           method: 'PUT',
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
             'Accept': 'application/json',
             'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
           },
+          credentials: 'same-origin',
           body: JSON.stringify({
             type,
             channel,
@@ -131,12 +134,14 @@ export function useNotificationPreferences() {
     try {
       setError(null);
 
-      const response = await fetch('/api/notification-preferences/reset', {
+      const response = await fetch('/notification-preferences/reset', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
           'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
         },
+        credentials: 'same-origin',
       });
 
       if (!response.ok) throw new Error('Failed to reset preferences');

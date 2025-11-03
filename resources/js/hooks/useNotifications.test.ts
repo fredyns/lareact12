@@ -220,7 +220,7 @@ describe('useNotifications', () => {
 
       await waitFor(() => {
         expect(global.fetch).toHaveBeenCalledWith(
-          '/api/notifications',
+          '/notifications',
           expect.any(Object)
         );
       });

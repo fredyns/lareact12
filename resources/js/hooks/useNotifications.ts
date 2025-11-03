@@ -62,9 +62,10 @@ export function useNotifications() {
   const fetchNotifications = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/notifications', {
+      const response = await fetch('/notifications', {
         headers: {
           'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
         },
       });
 
@@ -82,9 +83,10 @@ export function useNotifications() {
   // Fetch unread count
   const fetchUnreadCount = useCallback(async () => {
     try {
-      const response = await fetch('/api/notifications/count', {
+      const response = await fetch('/notifications/count', {
         headers: {
           'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
         },
       });
 
@@ -113,7 +115,7 @@ export function useNotifications() {
       setUnreadCount((prev) => Math.max(0, prev - 1));
 
       // Make API request in background
-      const response = await fetch(`/api/notifications/${notificationId}/read`, {
+      const response = await fetch(`/notifications/${notificationId}/read`, {
         method: 'PATCH',
         headers: {
           'Accept': 'application/json',
@@ -147,7 +149,7 @@ export function useNotifications() {
       setUnreadCount(0);
 
       // Make API request in background
-      const response = await fetch('/api/notifications/read-all', {
+      const response = await fetch('/notifications/read-all', {
         method: 'PATCH',
         headers: {
           'Accept': 'application/json',
@@ -184,7 +186,7 @@ export function useNotifications() {
       }
 
       // Make API request in background
-      const response = await fetch(`/api/notifications/${notificationId}`, {
+      const response = await fetch(`/notifications/${notificationId}`, {
         method: 'DELETE',
         headers: {
           'Accept': 'application/json',
@@ -216,7 +218,7 @@ export function useNotifications() {
       setUnreadCount(0);
 
       // Make API request in background
-      const response = await fetch('/api/notifications', {
+      const response = await fetch('/notifications', {
         method: 'DELETE',
         headers: {
           'Accept': 'application/json',
