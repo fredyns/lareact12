@@ -38,16 +38,20 @@ class UpdateItem extends Controller
         // Fill the model with validated data
         $item->fill($data);
 
-        // Move uploaded files to the final location
+        // Move uploaded files to the final location (handles its own save if needed)
         $this->moveFilesToUploadPath->handle($item, ['file', 'image']);
 
-        // Save everything in a single operation
-        $item->save();
+        // Save everything in a single operation only if there are changes
+        if ($item->isDirty()) {
+            $item->save();
+        }
 
-        // Refresh relationships
-        $item->load(['user', 'creator', 'updater']);
-
+        // Only load relationships if returning JSON (for API responses)
+        // For redirects, the relationships will be loaded on the show page
         if ($request->wantsJson()) {
+            // Load relationships with eager loading to avoid N+1 queries
+            $item->load(['user', 'creator', 'updater']);
+            
             return (new ItemResource($item))
                 ->response()
                 ->setStatusCode(200);
