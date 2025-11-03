@@ -241,7 +241,7 @@ describe('useNotificationPreferences', () => {
 
       await waitFor(() => {
         expect(global.fetch).toHaveBeenCalledWith(
-          '/api/notification-preferences',
+          '/notification-preferences',
           expect.any(Object)
         );
       });
