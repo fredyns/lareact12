@@ -33,6 +33,15 @@ createInertiaApp({
 // This will set light / dark mode on load...
 initializeTheme();
 
+// Optimize CSS delivery (deferred to avoid initialization issues)
+if (typeof window !== 'undefined') {
+    window.addEventListener('load', () => {
+        import('./utils/cssLoader').then(({ optimizeCSSDelivery }) => {
+            optimizeCSSDelivery();
+        }).catch(err => console.error('CSS optimization failed:', err));
+    });
+}
+
 // Web Vitals tracking for performance monitoring
 import { onCLS, onINP, onFCP, onLCP, onTTFB } from 'web-vitals';
 
