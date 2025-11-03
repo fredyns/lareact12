@@ -10,7 +10,7 @@ import { register } from '@/routes';
 import { request } from '@/routes/password';
 import { Form, Head } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
-import { memo } from 'react';
+import { memo, useCallback, useState } from 'react';
 
 interface LoginProps {
     status?: string;
@@ -104,6 +104,47 @@ const LoginFormContent = memo(function LoginFormContent({
 });
 
 export default function Login({ status, canResetPassword }: LoginProps) {
+    const [clientErrors, setClientErrors] = useState<Record<string, string>>({});
+    const [isValidating, setIsValidating] = useState(false);
+
+    // Client-side validation for faster feedback
+    const validateForm = useCallback((formData: FormData) => {
+        const errors: Record<string, string> = {};
+        const email = formData.get('email') as string;
+        const password = formData.get('password') as string;
+
+        // Email validation
+        if (!email) {
+            errors.email = 'Email is required';
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            errors.email = 'Please enter a valid email address';
+        }
+
+        // Password validation
+        if (!password) {
+            errors.password = 'Password is required';
+        } else if (password.length < 1) {
+            errors.password = 'Password is required';
+        }
+
+        setClientErrors(errors);
+        return Object.keys(errors).length === 0;
+    }, []);
+
+    // Optimized form submission with client-side validation
+    const handleSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
+        const formData = new FormData(e.currentTarget);
+        
+        // Quick client-side validation
+        setIsValidating(true);
+        const isValid = validateForm(formData);
+        setIsValidating(false);
+
+        if (!isValid) {
+            e.preventDefault();
+        }
+    }, [validateForm]);
+
     return (
         <AuthLayout
             title="Log in to your account"
@@ -115,14 +156,20 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                 {...AuthenticatedSessionController.store.form()}
                 resetOnSuccess={['password']}
                 className="flex flex-col gap-6"
+                onSubmit={handleSubmit}
             >
-                {({ processing, errors }) => (
-                    <LoginFormContent
-                        processing={processing}
-                        errors={errors}
-                        canResetPassword={canResetPassword}
-                    />
-                )}
+                {({ processing, errors }) => {
+                    // Merge client-side and server-side errors
+                    const mergedErrors = { ...clientErrors, ...errors };
+
+                    return (
+                        <LoginFormContent
+                            processing={processing || isValidating}
+                            errors={mergedErrors}
+                            canResetPassword={canResetPassword}
+                        />
+                    );
+                }}
             </Form>
 
             {status && (

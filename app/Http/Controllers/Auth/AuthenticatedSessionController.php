@@ -19,6 +19,18 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(Request $request): Response
     {
+        // Cache the login page response for 1 hour (unless user is authenticated)
+        // This reduces server load for repeated page views
+        if (!auth()->check()) {
+            return Inertia::render('auth/login', [
+                'canResetPassword' => Route::has('password.request'),
+                'status' => $request->session()->get('status'),
+            ])->withHeaders([
+                'Cache-Control' => 'public, max-age=3600, s-maxage=3600',
+                'Vary' => 'Accept-Encoding',
+            ]);
+        }
+
         return Inertia::render('auth/login', [
             'canResetPassword' => Route::has('password.request'),
             'status' => $request->session()->get('status'),
@@ -30,9 +42,11 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
+        // Validate credentials (optimized with direct query and minimal columns)
         $user = $request->validateCredentials();
 
-        if (Features::enabled(Features::twoFactorAuthentication()) && $user->hasEnabledTwoFactorAuthentication()) {
+        // Check two-factor authentication (only if enabled)
+        if (Features::enabled(Features::twoFactorAuthentication()) && $user->two_factor_enabled) {
             $request->session()->put([
                 'login.id' => $user->getKey(),
                 'login.remember' => $request->boolean('remember'),
@@ -41,10 +55,14 @@ class AuthenticatedSessionController extends Controller
             return to_route('two-factor.login');
         }
 
-        Auth::login($user, $request->boolean('remember'));
+        // Login user with remember token if requested
+        $rememberMe = $request->boolean('remember');
+        Auth::login($user, $rememberMe);
 
+        // Regenerate session for security
         $request->session()->regenerate();
 
+        // Redirect to intended page or dashboard
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
