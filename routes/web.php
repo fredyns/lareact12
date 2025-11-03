@@ -63,9 +63,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('notifications');
 
 
-    // Enum API Routes
+    // Enum API Routes - Cache for 60 minutes since enums rarely change
     Route::get('enums/{enumClass}', [EnumController::class, 'show'])
         ->where('enumClass', '.*')
+        ->middleware('cache.api:60')
         ->name('enums.show');
 
     // Generic Upload Routes for MinIO
@@ -119,7 +120,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('items/{item}', UpdateItem::class)->name('items.update');
         Route::patch('items/{item}', UpdateItem::class);
         Route::delete('items/{item}', DeleteItem::class)->name('items.destroy');
-        
+
         // Embedded sub-items routes (for item show page)
         Route::prefix('items/{item}/sub-items')->name('items.sub-items.')->group(function () {
             Route::get('/', [ItemSubItemController::class, 'index'])->name('index');
@@ -128,7 +129,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::put('/{subItem}', [ItemSubItemController::class, 'update'])->name('update');
             Route::delete('/{subItem}', [ItemSubItemController::class, 'destroy'])->name('destroy');
         });
-        
+
         // Standalone sub-items resource (for dedicated pages)
         Route::resource('sub-items', SubItemController::class);
     });

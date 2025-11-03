@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CacheApiResponses;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Console\Scheduling\Schedule;
@@ -17,6 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
+
+        $middleware->alias([
+            'cache.api' => CacheApiResponses::class,
+        ]);
 
         $middleware->web(append: [
             HandleAppearance::class,

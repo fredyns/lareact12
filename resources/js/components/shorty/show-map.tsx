@@ -4,8 +4,24 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { X } from 'lucide-react';
-import { useEffect, useEffectEvent, useRef, useState } from 'react';
-import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
+import { lazy, Suspense, useEffect, useEffectEvent, useRef, useState } from 'react';
+
+// Lazy load Leaflet components to reduce initial bundle size
+const MapContainer = lazy(() => 
+  import('react-leaflet').then(m => ({ default: m.MapContainer }))
+);
+const TileLayer = lazy(() => 
+  import('react-leaflet').then(m => ({ default: m.TileLayer }))
+);
+const Marker = lazy(() => 
+  import('react-leaflet').then(m => ({ default: m.Marker }))
+);
+const Popup = lazy(() => 
+  import('react-leaflet').then(m => ({ default: m.Popup }))
+);
+
+// Import hooks normally (cannot be lazy loaded)
+import { useMap } from 'react-leaflet';
 
 // Fix for Leaflet marker icons
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
@@ -220,25 +236,37 @@ export function ShowMap({ latitude, longitude, popupText = 'Location', zoom = DE
             </DialogHeader>
             <div className="mt-4 h-[calc(90vh-8rem)]">
               {isValidLocation && (
-                <MapContainer
-                  center={[latitude, longitude]}
-                  zoom={zoom}
-                  style={{
-                    height: '100%',
-                    width: '100%',
-                  }}
-                  scrollWheelZoom={true}
-                  zoomControl={true}
-                >
-                  <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  />
-                  <Marker position={[latitude, longitude]}>
-                    <Popup>{popupText}</Popup>
-                  </Marker>
-                  <ScaleControl />
-                </MapContainer>
+                <Suspense fallback={
+                  <div className="h-full w-full animate-pulse bg-muted rounded border flex items-center justify-center">
+                    <div className="text-center space-y-3">
+                      <div className="mx-auto h-8 w-8 bg-muted-foreground/20 rounded"></div>
+                      <div className="space-y-2">
+                        <div className="h-4 bg-muted-foreground/20 rounded w-32 mx-auto"></div>
+                        <div className="h-4 bg-muted-foreground/20 rounded w-24 mx-auto"></div>
+                      </div>
+                    </div>
+                  </div>
+                }>
+                  <MapContainer
+                    center={[latitude, longitude]}
+                    zoom={zoom}
+                    style={{
+                      height: '100%',
+                      width: '100%',
+                    }}
+                    scrollWheelZoom={true}
+                    zoomControl={true}
+                  >
+                    <TileLayer
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    <Marker position={[latitude, longitude]}>
+                      <Popup>{popupText}</Popup>
+                    </Marker>
+                    <ScaleControl />
+                  </MapContainer>
+                </Suspense>
               )}
             </div>
           </DialogPrimitive.Content>
