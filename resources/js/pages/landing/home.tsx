@@ -1,8 +1,7 @@
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import LandingLayout from '@/layouts/landing-layout';
 import { Link } from '@inertiajs/react';
-import { Anchor, ArrowRight, Award, CheckCircle, Mail, MapPin, Phone, Shield, Ship } from 'lucide-react';
+import { ArrowRight, Shield, Ship } from 'lucide-react';
 import { Suspense, lazy } from 'react';
 
 // Lazy load non-critical sections
