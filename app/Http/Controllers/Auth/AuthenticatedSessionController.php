@@ -19,18 +19,6 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(Request $request): Response
     {
-        // Cache the login page response for 1 hour (unless user is authenticated)
-        // This reduces server load for repeated page views
-        if (!auth()->check()) {
-            return Inertia::render('auth/login', [
-                'canResetPassword' => Route::has('password.request'),
-                'status' => $request->session()->get('status'),
-            ])->withHeaders([
-                'Cache-Control' => 'public, max-age=3600, s-maxage=3600',
-                'Vary' => 'Accept-Encoding',
-            ]);
-        }
-
         return Inertia::render('auth/login', [
             'canResetPassword' => Route::has('password.request'),
             'status' => $request->session()->get('status'),
