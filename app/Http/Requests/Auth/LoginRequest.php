@@ -43,7 +43,7 @@ class LoginRequest extends FormRequest
 
         // Optimize: Use direct query with only needed columns for faster lookup
         /** @var User|null $user */
-        $user = User::select(['id', 'email', 'password', 'email_verified_at', 'two_factor_enabled'])
+        $user = User::select(['id', 'email', 'password', 'email_verified_at'])
             ->where('email', $this->string('email')->lower()->value())
             ->first();
 
