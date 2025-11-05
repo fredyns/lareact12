@@ -1,4 +1,6 @@
-import { Label } from '@/components/ui/label';
+import { InputEmail } from '@/components/shorty/input-email';
+import { InputEnum } from '@/components/shorty/input-enum';
+import { InputString } from '@/components/shorty/input-string';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -8,15 +10,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import React, { useState } from 'react';
-import AsyncSelect from 'react-select/async';
-import { Item, SelectOption } from '@/types';
-import { Plus } from 'lucide-react';
-import { InputString } from '@/components/shorty/input-string';
-import { InputEmail } from '@/components/shorty/input-email';
-import { InputEnum } from '@/components/shorty/input-enum';
-import enums from '@/types/enums.generated';
+import { Label } from '@/components/ui/label';
 import sample from '@/routes/sample';
+import select from '@/routes/select';
+import { SelectOption } from '@/types';
+import enums from '@/types/enums.generated';
+import { Plus } from 'lucide-react';
+import { useState } from 'react';
+import AsyncSelect from 'react-select/async';
 
 interface InputSelectSampleItemProps {
   id: string;
@@ -56,9 +57,9 @@ export function InputSelectSampleItem({
 
   const loadOptions = async (inputValue: string): Promise<SelectOption[]> => {
     setSearchInput(inputValue);
-    
+
     try {
-      const response = await fetch(sample.items.index.url({ query: { search: inputValue } }), {
+      const response = await fetch(select.userOptions.url({ query: { search: inputValue } }), {
         method: 'GET',
         headers: {
           Accept: 'application/json',
@@ -73,12 +74,7 @@ export function InputSelectSampleItem({
       }
 
       const result = await response.json();
-      const items = result.data?.data || result.data || result;
-
-      const options = items.map((item: Item) => ({
-        value: item.id,
-        label: item.string,
-      }));
+      const options = result.data || result;
 
       // Add "Create new" option if search has value and no results (only if allowCreate is true)
       if (allowCreate && inputValue && options.length === 0) {
@@ -165,7 +161,7 @@ export function InputSelectSampleItem({
       // Success - extract item from Laravel JsonResource response
       // Laravel JsonResource wraps data in a 'data' property
       const item = result.data || result;
-      
+
       const newOption: SelectOption = {
         value: item.id,
         label: item.string,
@@ -174,7 +170,7 @@ export function InputSelectSampleItem({
       setSelectedValue(newOption);
       onChange(item.id);
       setIsDialogOpen(false);
-      
+
       // Reset form
       setNewItemData({
         string: '',
@@ -195,7 +191,7 @@ export function InputSelectSampleItem({
         <Label htmlFor={id}>
           {label} {required && <span className="text-destructive">*</span>}
         </Label>
-        
+
         <div className="flex gap-2">
           <div className="flex-1">
             <AsyncSelect
@@ -266,7 +262,7 @@ export function InputSelectSampleItem({
               }}
             />
           </div>
-          
+
           {allowCreate && (
             <Button
               type="button"
@@ -283,7 +279,7 @@ export function InputSelectSampleItem({
             </Button>
           )}
         </div>
-        
+
         {error && <p className="text-sm text-destructive">{error}</p>}
       </div>
 
@@ -291,16 +287,12 @@ export function InputSelectSampleItem({
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Create New Item</DialogTitle>
-            <DialogDescription>
-              Add a new sample item. Only basic information is required.
-            </DialogDescription>
+            <DialogDescription>Add a new sample item. Only basic information is required.</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             {formErrors.general && (
-              <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-                {formErrors.general}
-              </div>
+              <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{formErrors.general}</div>
             )}
 
             <InputString
@@ -333,18 +325,10 @@ export function InputSelectSampleItem({
           </div>
 
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsDialogOpen(false)}
-            >
+            <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
               Cancel
             </Button>
-            <Button
-              type="button"
-              onClick={handleCreateItem}
-              disabled={isCreating}
-            >
+            <Button type="button" onClick={handleCreateItem} disabled={isCreating}>
               {isCreating ? 'Creating...' : 'Create Item'}
             </Button>
           </DialogFooter>

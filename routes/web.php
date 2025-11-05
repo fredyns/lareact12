@@ -7,6 +7,7 @@ use App\Actions\Sample\Items\Edit\EditItem;
 use App\Actions\Sample\Items\Edit\UpdateItem;
 use App\Actions\Sample\Items\Index\IndexItems;
 use App\Actions\Sample\Items\Show\ShowItem;
+use App\Actions\Select\UserOptions;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\EnumController;
@@ -73,6 +74,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('upload')->name('upload.')->group(function () {
         Route::post('file', [UploadController::class, 'uploadFile'])->name('file');
         Route::post('image', [UploadController::class, 'uploadImage'])->name('image');
+    });
+
+    // Select Options Routes
+    Route::prefix('select')->name('select.')->group(function () {
+        Route::get('user-options', UserOptions::class)->name('user-options');
     });
 
     // Notification Web Routes (session-based auth for web pages)
