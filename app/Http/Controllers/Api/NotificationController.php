@@ -8,6 +8,8 @@ use App\Models\NotificationPreference;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Inertia\Inertia;
+use Inertia\Response;
 
 /**
  * NotificationController
@@ -28,13 +30,13 @@ class NotificationController extends Controller
      * Results are ordered by creation date (newest first).
      *
      * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Inertia\Response
      *
      * @queryParam filter string Filter by status: 'unread' or 'read'. Optional.
      * @queryParam type string Filter by notification type. Optional.
      * @queryParam per_page int Number of results per page. Default: 20.
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): Response
     {
         $user = $request->user();
 
@@ -57,7 +59,9 @@ class NotificationController extends Controller
         $notifications = $query->latest()
             ->paginate($request->get('per_page', 20));
 
-        return response()->json($notifications);
+        return Inertia::render('notifications', [
+            'notifications' => $notifications,
+        ]);
     }
 
     /**
