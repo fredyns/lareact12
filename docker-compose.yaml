@@ -8,20 +8,15 @@ services:
         volumes:
             - '.:/var/www/html'
         environment:
-            - DB_HOST=postgres
-            - DB_PORT=5432
+            - DB_HOST=${DB_HOST}
+            - DB_PORT=${DB_PORT}
             - DB_DATABASE=${DB_DATABASE}
             - DB_USERNAME=${DB_USERNAME}
             - DB_PASSWORD=${DB_PASSWORD}
-            - REDIS_HOST=redis
-            - REDIS_PORT=6379
+            - REDIS_HOST=${REDIS_HOST}
+            - REDIS_PORT=${REDIS_PORT}
         networks:
-            - sail
-        depends_on:
-            postgres:
-                condition: service_healthy
-            redis:
-                condition: service_healthy
+            - lareact
     
     queue:
         build:
@@ -32,20 +27,15 @@ services:
         volumes:
             - '.:/var/www/html'
         environment:
-            - DB_HOST=postgres
-            - DB_PORT=5432
+            - DB_HOST=${DB_HOST}
+            - DB_PORT=${DB_PORT}
             - DB_DATABASE=${DB_DATABASE}
             - DB_USERNAME=${DB_USERNAME}
             - DB_PASSWORD=${DB_PASSWORD}
-            - REDIS_HOST=redis
-            - REDIS_PORT=6379
+            - REDIS_HOST=${REDIS_HOST}
+            - REDIS_PORT=${REDIS_PORT}
         networks:
-            - sail
-        depends_on:
-            postgres:
-                condition: service_healthy
-            redis:
-                condition: service_healthy
+            - lareact
         command: php artisan queue:work redis --queue=notifications,default --sleep=3 --tries=3 --max-time=3600
         restart: unless-stopped
         healthcheck:
@@ -63,20 +53,15 @@ services:
         volumes:
             - '.:/var/www/html'
         environment:
-            - DB_HOST=postgres
-            - DB_PORT=5432
+            - DB_HOST=${DB_HOST}
+            - DB_PORT=${DB_PORT}
             - DB_DATABASE=${DB_DATABASE}
             - DB_USERNAME=${DB_USERNAME}
             - DB_PASSWORD=${DB_PASSWORD}
-            - REDIS_HOST=redis
-            - REDIS_PORT=6379
+            - REDIS_HOST=${REDIS_HOST}
+            - REDIS_PORT=${REDIS_PORT}
         networks:
-            - sail
-        depends_on:
-            postgres:
-                condition: service_healthy
-            redis:
-                condition: service_healthy
+            - lareact
         command: sh -c "while true; do php artisan schedule:run --verbose --no-interaction & sleep 60; done"
         restart: unless-stopped
         healthcheck:
@@ -95,70 +80,9 @@ services:
             - './docker/nginx/conf.d:/etc/nginx/conf.d'
             - './docker/nginx/nginx.conf:/etc/nginx/nginx.conf'
         networks:
-            - sail
+            - lareact
         depends_on:
             - app
-
-    postgres:
-        image: 'postgres:17-alpine'
-        container_name: lareact12_postgres
-        ports:
-            - '${FORWARD_DB_PORT:-5432}:5432'
-        environment:
-            PGPASSWORD: '${DB_PASSWORD:-secret}'
-            POSTGRES_DB: '${DB_DATABASE}'
-            POSTGRES_USER: '${DB_USERNAME}'
-            POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
-        volumes:
-            - './storage/docker/pgsql:/var/lib/postgresql/data'
-        networks:
-            - sail
-        healthcheck:
-            test: [CMD, pg_isready, '-q', '-d', '${DB_DATABASE}', '-U', '${DB_USERNAME}']
-            retries: 3
-            timeout: 5s
-
-    redis:
-        image: 'redis:alpine'
-        container_name: lareact12_redis
-        ports:
-            - '${FORWARD_REDIS_PORT:-6379}:6379'
-        volumes:
-            - './storage/docker/redis:/data'
-        networks:
-            - sail
-        healthcheck:
-            test: [CMD, redis-cli, ping]
-            retries: 3
-            timeout: 5s
-
-    minio:
-        image: 'minio/minio:latest'
-        container_name: lareact12_minio
-        ports:
-            - '${FORWARD_MINIO_PORT:-9000}:9000'
-            - '${FORWARD_MINIO_CONSOLE_PORT:-8900}:8900'
-        environment:
-            MINIO_ROOT_USER: minioadmin
-            MINIO_ROOT_PASSWORD: minioadmin123
-        volumes:
-            - './storage/docker/minio:/data'
-        networks:
-            - sail
-        command: 'minio server /data --console-address ":8900"'
-        healthcheck:
-            test: [CMD, mc, ready, local]
-            retries: 3
-            timeout: 5s
-
-    mailpit:
-        image: 'axllent/mailpit:latest'
-        container_name: lareact12_mailpit
-        ports:
-            - '${FORWARD_MAILPIT_PORT:-1025}:1025'
-            - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
-        networks:
-            - sail
 
     reverb:
         build:
@@ -169,13 +93,13 @@ services:
         volumes:
             - '.:/var/www/html'
         environment:
-            - DB_HOST=postgres
-            - DB_PORT=5432
+            - DB_HOST=${DB_HOST}
+            - DB_PORT=${DB_PORT}
             - DB_DATABASE=${DB_DATABASE}
             - DB_USERNAME=${DB_USERNAME}
             - DB_PASSWORD=${DB_PASSWORD}
-            - REDIS_HOST=redis
-            - REDIS_PORT=6379
+            - REDIS_HOST=${REDIS_HOST}
+            - REDIS_PORT=${REDIS_PORT}
             - REVERB_APP_ID=${REVERB_APP_ID}
             - REVERB_APP_KEY=${REVERB_APP_KEY}
             - REVERB_APP_SECRET=${REVERB_APP_SECRET}
@@ -185,12 +109,7 @@ services:
         ports:
             - '${REVERB_PORT:-8080}:8080'
         networks:
-            - sail
-        depends_on:
-            postgres:
-                condition: service_healthy
-            redis:
-                condition: service_healthy
+            - lareact
         command: php artisan reverb:start --host=0.0.0.0 --port=8080 --debug
         restart: unless-stopped
         healthcheck:
@@ -200,5 +119,5 @@ services:
             interval: 30s
 
 networks:
-    sail:
-        driver: bridge
+    lareact:
+      driver: bridge
