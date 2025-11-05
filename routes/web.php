@@ -7,6 +7,7 @@ use App\Actions\Sample\Items\Edit\EditItem;
 use App\Actions\Sample\Items\Edit\UpdateItem;
 use App\Actions\Sample\Items\Index\IndexItems;
 use App\Actions\Sample\Items\Show\ShowItem;
+use App\Actions\Select\Sample\ItemOptions;
 use App\Actions\Select\UserOptions;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\DownloadController;
@@ -79,6 +80,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Select Options Routes
     Route::prefix('select')->name('select.')->group(function () {
         Route::get('user-options', UserOptions::class)->name('user-options');
+
+        Route::get('sample/item-options', ItemOptions::class)->name('sample.item-options');
     });
 
     // Notification Web Routes (session-based auth for web pages)

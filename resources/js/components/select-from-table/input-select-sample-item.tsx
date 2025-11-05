@@ -12,7 +12,6 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import sample from '@/routes/sample';
-import select from '@/routes/select';
 import { SelectOption } from '@/types';
 import enums from '@/types/enums.generated';
 import { Plus } from 'lucide-react';
@@ -59,7 +58,7 @@ export function InputSelectSampleItem({
     setSearchInput(inputValue);
 
     try {
-      const response = await fetch(select.userOptions.url({ query: { search: inputValue } }), {
+      const response = await fetch(`/select/sample/item-options?search=${encodeURIComponent(inputValue)}`, {
         method: 'GET',
         headers: {
           Accept: 'application/json',
