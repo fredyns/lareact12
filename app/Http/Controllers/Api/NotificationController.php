@@ -28,15 +28,16 @@ class NotificationController extends Controller
      *
      * Supports filtering by read status and notification type.
      * Results are ordered by creation date (newest first).
+     * Returns JSON if expectJson middleware is applied, otherwise returns Inertia response.
      *
      * @param \Illuminate\Http\Request $request
-     * @return \Inertia\Response
+     * @return \Inertia\Response|\Illuminate\Http\JsonResponse
      *
      * @queryParam filter string Filter by status: 'unread' or 'read'. Optional.
      * @queryParam type string Filter by notification type. Optional.
      * @queryParam per_page int Number of results per page. Default: 20.
      */
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
         $user = $request->user();
 
@@ -58,6 +59,11 @@ class NotificationController extends Controller
 
         $notifications = $query->latest()
             ->paginate($request->get('per_page', 20));
+
+        // Return JSON if expectJson middleware is applied, otherwise return Inertia
+        if ($request->expectsJson()) {
+            return response()->json($notifications);
+        }
 
         return Inertia::render('notifications', [
             'notifications' => $notifications,
@@ -118,8 +124,12 @@ class NotificationController extends Controller
 
         $notification->markAsRead();
 
-        // Broadcast the read event to all user's tabs
-        broadcast(new \App\Events\NotificationRead($notification))->toOthers();
+        // Broadcast the read event to all user's tabs (fail gracefully if broadcast unavailable)
+        try {
+            broadcast(new \App\Events\NotificationRead($notification))->toOthers();
+        } catch (\Exception $e) {
+            \Log::warning('Failed to broadcast notification read event', ['error' => $e->getMessage()]);
+        }
 
         return response()->json(['success' => true]);
     }
@@ -144,8 +154,12 @@ class NotificationController extends Controller
             ->unread()
             ->update(['read_at' => now()]);
 
-        // Broadcast the "all read" event to all user's tabs
-        broadcast(new \App\Events\NotificationsAllRead($user))->toOthers();
+        // Broadcast the "all read" event to all user's tabs (fail gracefully if broadcast unavailable)
+        try {
+            broadcast(new \App\Events\NotificationsAllRead($user))->toOthers();
+        } catch (\Exception $e) {
+            \Log::warning('Failed to broadcast notifications all read event', ['error' => $e->getMessage()]);
+        }
 
         return response()->json(['success' => true]);
     }
@@ -178,8 +192,12 @@ class NotificationController extends Controller
 
         $notification->delete();
 
-        // Broadcast the deletion event to all user's tabs
-        broadcast(new \App\Events\NotificationDeleted($notificationId, $userId))->toOthers();
+        // Broadcast the deletion event to all user's tabs (fail gracefully if broadcast unavailable)
+        try {
+            broadcast(new \App\Events\NotificationDeleted($notificationId, $userId))->toOthers();
+        } catch (\Exception $e) {
+            \Log::warning('Failed to broadcast notification deleted event', ['error' => $e->getMessage()]);
+        }
 
         return response()->json(['success' => true]);
     }
@@ -203,8 +221,12 @@ class NotificationController extends Controller
 
         $count = Notification::forUser($user->id)->delete();
 
-        // Broadcast the "all deleted" event to all user's tabs
-        broadcast(new \App\Events\NotificationsAllDeleted($user))->toOthers();
+        // Broadcast the "all deleted" event to all user's tabs (fail gracefully if broadcast unavailable)
+        try {
+            broadcast(new \App\Events\NotificationsAllDeleted($user))->toOthers();
+        } catch (\Exception $e) {
+            \Log::warning('Failed to broadcast notifications all deleted event', ['error' => $e->getMessage()]);
+        }
 
         return response()->json([
             'success' => true,

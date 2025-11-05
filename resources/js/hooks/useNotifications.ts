@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { usePage } from '@inertiajs/react';
 import { useWebSocket } from '@/contexts/WebSocketContext';
 
@@ -57,12 +57,23 @@ export function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const csrfInitialized = useRef(false);
+
+  // Initialize CSRF cookie on mount
+  useEffect(() => {
+    if (!csrfInitialized.current) {
+      csrfInitialized.current = true;
+      fetch('/sanctum/csrf-cookie', {
+        credentials: 'same-origin',
+      }).catch(error => console.error('Failed to initialize CSRF cookie:', error));
+    }
+  }, []);
 
   // Fetch notifications from API
   const fetchNotifications = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/notifications', {
+      const response = await fetch('/notifications/api/list', {
         headers: {
           'Accept': 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
@@ -99,6 +110,11 @@ export function useNotifications() {
     }
   }, []);
 
+  // Get CSRF token from meta tag (fallback for Sanctum cookie-based auth)
+  const getCsrfToken = useCallback(() => {
+    return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+  }, []);
+
   // Mark notification as read
   const markAsRead = useCallback(async (notificationId: string) => {
     // Store previous state for rollback
@@ -121,19 +137,19 @@ export function useNotifications() {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+          'X-CSRF-TOKEN': getCsrfToken(),
         },
         credentials: 'same-origin',
       });
 
-      if (!response.ok) throw new Error('Failed to mark as read');
+      if (!response.ok) throw new Error(`Failed to mark as read: ${response.status}`);
     } catch (error) {
       console.error('Error marking notification as read:', error);
       // Rollback on error
       setNotifications(previousNotifications);
       setUnreadCount(previousUnreadCount);
     }
-  }, [notifications, unreadCount]);
+  }, [notifications, unreadCount, getCsrfToken]);
 
   // Mark all notifications as read
   const markAllAsRead = useCallback(async () => {
@@ -155,19 +171,19 @@ export function useNotifications() {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+          'X-CSRF-TOKEN': getCsrfToken(),
         },
         credentials: 'same-origin',
       });
 
-      if (!response.ok) throw new Error('Failed to mark all as read');
+      if (!response.ok) throw new Error(`Failed to mark all as read: ${response.status}`);
     } catch (error) {
       console.error('Error marking all as read:', error);
       // Rollback on error
       setNotifications(previousNotifications);
       setUnreadCount(previousUnreadCount);
     }
-  }, [notifications, unreadCount]);
+  }, [notifications, unreadCount, getCsrfToken]);
 
   // Delete notification
   const deleteNotification = useCallback(async (notificationId: string) => {
@@ -192,19 +208,19 @@ export function useNotifications() {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+          'X-CSRF-TOKEN': getCsrfToken(),
         },
         credentials: 'same-origin',
       });
 
-      if (!response.ok) throw new Error('Failed to delete notification');
+      if (!response.ok) throw new Error(`Failed to delete notification: ${response.status}`);
     } catch (error) {
       console.error('Error deleting notification:', error);
       // Rollback on error
       setNotifications(previousNotifications);
       setUnreadCount(previousUnreadCount);
     }
-  }, [notifications, unreadCount]);
+  }, [notifications, unreadCount, getCsrfToken]);
 
   // Delete all notifications
   const deleteAllNotifications = useCallback(async () => {
@@ -224,12 +240,12 @@ export function useNotifications() {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+          'X-CSRF-TOKEN': getCsrfToken(),
         },
         credentials: 'same-origin',
       });
 
-      if (!response.ok) throw new Error('Failed to delete all notifications');
+      if (!response.ok) throw new Error(`Failed to delete all notifications: ${response.status}`);
     } catch (error) {
       console.error('Error deleting all notifications:', error);
       // Rollback on error
@@ -237,7 +253,7 @@ export function useNotifications() {
       setUnreadCount(previousUnreadCount);
       throw error;
     }
-  }, [notifications, unreadCount]);
+  }, [notifications, unreadCount, getCsrfToken]);
 
   // Subscribe to real-time notifications
   useEffect(() => {
